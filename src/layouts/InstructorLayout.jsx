@@ -33,9 +33,19 @@ function InstructorLayout() {
     },
 
     {
+      label: "Notifications",
+      path: "/instructor/notifications"
+    },
+
+    {
       label: "Messages",
       path: "/instructor/messages"
-    }
+    },
+
+    {
+      label: "Grade Submissions",
+      path: "/instructor/grade-submissions"
+    },
 
   ];
 

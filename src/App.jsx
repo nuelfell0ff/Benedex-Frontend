@@ -32,6 +32,20 @@ import Messages from "./pages/student/Messages";
 
 
 import InstructorDashboard from "./pages/instructor/InstructorDashboard";
+import InstructorCourses from "./pages/instructor/InstructorCourses";
+import GradeSubmissions from "./pages/instructor/GradeSubmissions";
+import InstructorLiveClasses from "./pages/instructor/InstructorLiveClasses";
+import InstructorNotifications from "./pages/instructor/InstructorNotifications";
+import InstructorMessages from "./pages/instructor/InstructorMessages";
+import CreateCourse from "./pages/instructor/CreateCourse";
+import CreateModule from "./pages/instructor/CreateModule";
+import CreateAssignment from "./pages/instructor/CreateAssignment";
+import InstructorStudents from "./pages/instructor/InstructorStudents";
+
+
+
+
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
 
@@ -188,6 +202,56 @@ function App() {
           <Route
             index
             element={<InstructorDashboard />}
+          />
+
+          <Route
+            path="courses"
+            element={<InstructorCourses />}
+          />
+
+          <Route
+            path="create-course"
+            element={<CreateCourse />}
+          />
+
+          <Route
+            path="create-module/:courseId"
+            element={<CreateModule />}
+          />
+
+          <Route
+            path="create-assignment/:courseId"
+            element={<CreateAssignment />}
+          />
+
+          <Route
+            path="assignments"
+            element={<CreateAssignment />}
+          />
+
+          <Route
+            path="students"
+            element={<InstructorStudents />}
+          />
+
+          <Route
+            path="grade-submissions"
+            element={<GradeSubmissions />}
+          />
+
+          <Route
+            path="live-classes"
+            element={<InstructorLiveClasses />}
+          />
+
+          <Route
+            path="notifications"
+            element={<InstructorNotifications />}
+          />
+
+          <Route
+            path="messages"
+            element={<InstructorMessages />}
           />
 
         </Route>
