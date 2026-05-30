@@ -66,6 +66,94 @@ const liveSessions = [
   },
 ];
 
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const buildFallbackConsistency = (year = new Date().getUTCFullYear()) =>
+  monthNames.map((name, monthIndex) => {
+    const daysInMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+
+    return {
+      name,
+      monthIndex,
+      daysInMonth,
+      days: Array.from({ length: daysInMonth }, (_, dayIndex) => ({
+        day: dayIndex + 1,
+        count: 0,
+        intensity: 0,
+      })),
+    };
+  });
+
+const buildConsistencyGraph = (learningSummary) => {
+  const summary = learningSummary || {
+    year: new Date().getUTCFullYear(),
+    months: buildFallbackConsistency(),
+  };
+
+  const year = summary.year || new Date().getUTCFullYear();
+  const monthList = summary.months?.length > 0 ? summary.months : buildFallbackConsistency(year);
+  const activityMap = new Map();
+  const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysToRender = isLeapYear ? 366 : 365;
+
+  monthList.forEach((month) => {
+    month.days.forEach((day) => {
+      const key = `${year}-${String((month.monthIndex ?? 0) + 1).padStart(2, "0")}-${String(day.day).padStart(2, "0")}`;
+      activityMap.set(key, day.count || 0);
+    });
+  });
+
+  const startOfYear = new Date(Date.UTC(year, 0, 1));
+
+  const cells = [];
+  const monthMarkers = monthList.map((month) => ({
+    label: month.name.slice(0, 3),
+    monthIndex: month.monthIndex ?? 0,
+  }));
+
+  for (let index = 0; index < daysToRender; index += 1) {
+    const date = new Date(startOfYear);
+    date.setUTCDate(startOfYear.getUTCDate() + index);
+
+    const key = date.toISOString().slice(0, 10);
+    const count = activityMap.get(key) || 0;
+    const weekday = date.getUTCDay();
+
+    cells.push({
+      key,
+      count,
+      intensity: count >= 5 ? 4 : count >= 3 ? 3 : count >= 2 ? 2 : count >= 1 ? 1 : 0,
+      weekday,
+      weekIndex: Math.floor(index / 7),
+      monthIndex: date.getUTCMonth(),
+    });
+  }
+
+  const renderedWeeks = Math.ceil(cells.length / 7);
+
+  return {
+    year,
+    monthMarkers,
+    cells,
+    renderedWeeks,
+    activeDays: cells.filter((cell) => cell.count > 0).length,
+    totalDays: cells.length,
+  };
+};
+
 function StudentDashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -99,21 +187,30 @@ function StudentDashboard() {
   const viewModel = useMemo(() => {
     const studentName = dashboard?.profile?.fullName || "Kwame Mensah";
     const firstName = studentName.split(" ")[0] || "Kwame";
-    const level = dashboard?.profile?.level || 12;
     const xp = dashboard?.xp ?? 1240;
-    const xpGoal = 2000;
-    const xpProgress = Math.min(100, Math.round((xp / xpGoal) * 100));
-    const levelProgress = 62;
+    const level = dashboard?.level ?? Math.max(1, Math.floor(xp / 100));
+    const xpTarget = dashboard?.xpTarget ?? 2000;
+    const xpProgress = dashboard?.xpProgress ?? Math.min(100, Math.round((xp / xpTarget) * 100));
+    const currentStreak = dashboard?.learningSummary?.currentStreak ?? 14;
+    const learningSummary = dashboard?.learningSummary || {
+      activeDays: 0,
+      totalDays: 365,
+      activityCount: 0,
+      months: buildFallbackConsistency(),
+    };
+
     const badgeNames = Array.isArray(dashboard?.badges)
       ? dashboard.badges.map((badge) =>
         typeof badge === "string" ? badge : badge?.name || badge?.title || "Badge"
       )
       : [];
 
-    const learningSquares = Array.from({ length: 36 }, (_, index) => ({
-      level: (index % 6) + 1,
-      active: index < 22,
-    }));
+    const consistencyMonths =
+      learningSummary.months?.length > 0
+        ? learningSummary.months
+        : buildFallbackConsistency(learningSummary.year || new Date().getUTCFullYear());
+
+    const consistencyGraph = buildConsistencyGraph(learningSummary);
 
     const courses =
       dashboard?.enrolledCourses?.length > 0
@@ -145,11 +242,13 @@ function StudentDashboard() {
       firstName,
       level,
       xp,
-      xpGoal,
+      xpTarget,
       xpProgress,
-      levelProgress,
+      currentStreak,
+      learningSummary,
       badgeNames,
-      learningSquares,
+      consistencyMonths,
+      consistencyGraph,
       courses,
     };
   }, [dashboard]);
@@ -176,7 +275,9 @@ function StudentDashboard() {
       <section className="student-hero">
         <div>
           <p className="student-hero-kicker">Good Morning, {viewModel.firstName}</p>
-          <h1>You're on a 14-day learning streak. Keep the momentum going!</h1>
+          <h1>
+            You&apos;re on a {viewModel.currentStreak}-day learning streak. Keep the momentum going!
+          </h1>
         </div>
       </section>
 
@@ -193,14 +294,14 @@ function StudentDashboard() {
                 <span className="student-card-label">Current Level</span>
                 <h2>Level {viewModel.level}</h2>
                 <p>
-                  {viewModel.xp.toLocaleString()} XP / {viewModel.xpGoal.toLocaleString()} XP
+                  {viewModel.xp.toLocaleString()} XP / {viewModel.xpTarget.toLocaleString()} XP
                 </p>
                 <div className="student-level-bar" aria-hidden="true">
                   <span style={{ width: `${viewModel.xpProgress}%` }} />
                 </div>
               </div>
 
-              <div className="student-ring-wrap" aria-label={`${viewModel.levelProgress}% complete`}>
+              <div className="student-ring-wrap" aria-label={`${viewModel.xpProgress}% complete`}>
                 <svg viewBox="0 0 120 120" className="student-ring">
                   <circle className="student-ring-track" cx="60" cy="60" r="48" />
                   <circle
@@ -208,10 +309,10 @@ function StudentDashboard() {
                     cx="60"
                     cy="60"
                     r="48"
-                    style={{ strokeDashoffset: 301 - (301 * viewModel.levelProgress) / 100 }}
+                    style={{ strokeDashoffset: 301 - (301 * viewModel.xpProgress) / 100 }}
                   />
                 </svg>
-                <strong>{viewModel.levelProgress}%</strong>
+                <strong>{viewModel.xpProgress}%</strong>
               </div>
             </motion.article>
 
@@ -225,17 +326,43 @@ function StudentDashboard() {
                 <h3>Learning Consistency</h3>
                 <div className="student-legend">
                   <span>Less</span>
+                  <div className="student-legend-swatch" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                   <span>More</span>
                 </div>
               </div>
 
-              <div className="student-heatmap" aria-hidden="true">
-                {viewModel.learningSquares.map((square, index) => (
-                  <span
-                    key={index}
-                    className={`student-heatmap-square student-heatmap-level-${square.level}${square.active ? " is-active" : ""}`}
-                  />
-                ))}
+              <div className="student-consistency-chart">
+                <div className="student-consistency-months" aria-hidden="true">
+                  {viewModel.consistencyGraph.monthMarkers.map((month) => (
+                    <span key={month.label}>{month.label}</span>
+                  ))}
+                </div>
+
+                <div className="student-consistency-body">
+                  <div className="student-consistency-weekdays" aria-hidden="true">
+                    <span>Mon</span>
+                    <span>Wed</span>
+                    <span>Fri</span>
+                  </div>
+
+                  <div className="student-consistency-grid" aria-label="Yearly learning consistency heatmap">
+                    {viewModel.consistencyGraph.cells.map((cell) => (
+                      <span
+                        key={cell.key}
+                        className={`student-consistency-box is-${cell.intensity}`}
+                        title={`${cell.key}: ${cell.count} activities`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <p className="student-consistency-caption">Learn how we count contributions</p>
               </div>
             </motion.article>
           </div>
