@@ -47,6 +47,11 @@ import InstructorStudents from "./pages/instructor/InstructorStudents";
 
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPayments from "./pages/admin/AdminPayments";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminCourses from "./pages/admin/AdminCourses";
 
 
 
@@ -281,6 +286,31 @@ function App() {
           <Route
             index
             element={<AdminDashboard />}
+          />
+
+          <Route
+            path="analytics"
+            element={<AdminAnalytics />}
+          />
+
+          <Route
+            path="users"
+            element={<AdminUsers />}
+          />
+
+          <Route
+            path="payments"
+            element={<AdminPayments />}
+          />
+
+          <Route
+            path="settings"
+            element={<AdminSettings />}
+          />
+
+          <Route
+            path="courses"
+            element={<AdminCourses />}
           />
 
         </Route>

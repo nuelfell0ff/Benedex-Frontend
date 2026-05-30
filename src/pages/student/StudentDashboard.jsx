@@ -1,263 +1,391 @@
+import { useEffect, useMemo, useState } from "react";
+
+import { motion } from "framer-motion";
+
 import {
-useEffect,
-useState
-}
-from "react";
+  FiArrowRight,
+  FiAward,
+  FiBookOpen,
+  FiBriefcase,
+  FiCalendar,
+  FiCheckCircle,
+  FiLayers,
+  FiLock,
+  FiPlayCircle,
+  FiStar,
+  FiTarget,
+  FiUsers,
+} from "react-icons/fi";
 
 import API from "../../services/api";
 
-function StudentDashboard(){
-
-const [dashboard,setDashboard] =
-useState(null);
-
-const [loading,setLoading] =
-useState(true);
-
-
-
-
-useEffect(()=>{
-
-const fetchDashboard =
-async()=>{
-
-try{
-
-const res =
-await API.get(
-"/dashboard/student"
-);
-
-setDashboard(
-res.data
-);
-
-}
-catch(error){
-
-console.log(error);
-
-}
-finally{
-
-setLoading(false);
-
-}
-
-};
-
-fetchDashboard();
-
-},[]);
-
-
-
-
-if(loading){
-
-return <h1>Loading...</h1>;
-
-}
-
-
-
-return(
-
-<div>
-
-<h1>
-Student Dashboard
-</h1>
-
-
-
-<hr />
-
-
-
-<h2>
-Profile
-</h2>
-
-<p>
-
-Name:
-{dashboard?.profile?.fullName}
-
-</p>
-
-<p>
-
-Email:
-{dashboard?.profile?.email}
-
-</p>
-
-
-
-<hr />
-
-
-
-<h2>
-XP
-</h2>
-
-<p>
-
-{dashboard?.xp}
-
-XP
-
-</p>
-
-
-
-<hr />
-
-
-
-<h2>
-Badges
-</h2>
-
-{
-
-dashboard?.badges?.length > 0
-
-?
-
-dashboard.badges.map((badge,index)=>(
-
-<p key={index}>
-
-{badge}
-
-</p>
-
-))
-
-:
-
-<p>
-No badges yet
-</p>
-
-}
-
-
-
-<hr />
-
-
-
-<h2>
-Enrolled Courses
-</h2>
-
-{
-
-dashboard?.enrolledCourses?.length > 0
-
-?
-
-dashboard.enrolledCourses.map((course)=>(
-
-<div key={course._id}>
-
-<h4>
-{course.title}
-</h4>
-
-<p>
-{course.description}
-</p>
-
-</div>
-
-))
-
-:
-
-<p>
-No enrolled courses
-</p>
-
-}
-
-
-
-<hr />
-
-
-
-<h2>
-Assignment Submissions
-</h2>
-
-{
-
-dashboard?.submissions?.length > 0
-
-?
-
-dashboard.submissions.map((submission)=>(
-
-<div key={submission._id}>
-
-<p>
-
-Assignment:
-
-{submission.assignment?.title}
-
-</p>
-
-<p>
-
-Grade:
-
-{
-
-submission.grade !== null
-
-?
-
-submission.grade
-
-:
-
-"Pending"
-
-}
-
-</p>
-
-<p>
-
-Status:
-
-{submission.status}
-
-</p>
-
-</div>
-
-))
-
-:
-
-<p>
-No submissions
-</p>
-
-}
-
-</div>
-
-);
-
+const badgeCatalog = [
+  { label: "Fast Learner", icon: <FiAward /> },
+  { label: "Code Master", icon: <FiBriefcase /> },
+  { label: "Bug Hunter", icon: <FiTarget /> },
+  { label: "Team Lead", icon: <FiUsers /> },
+  { label: "UI Architect", icon: <FiLayers /> },
+  { label: "Data Wizard", icon: <FiLock /> },
+];
+
+const activitySeed = [
+  {
+    title: "Module Completed",
+    detail: 'You finished "Advanced Hooks" in React Mastery.',
+    time: "2 hours ago",
+    icon: <FiCheckCircle />,
+  },
+  {
+    title: "Assignment Submitted",
+    detail: "E-commerce API Integration project.",
+    time: "5 hours ago",
+    icon: <FiBookOpen />,
+  },
+  {
+    title: "New Badge Earned",
+    detail: 'Unlocked the "Fast Learner" achievement.',
+    time: "Yesterday",
+    icon: <FiStar />,
+  },
+];
+
+const liveSessions = [
+  {
+    date: "Today at 14:00",
+    title: "System Architecture Q&A",
+    mentor: "Sarah Drasner",
+    action: "Join Session",
+    soon: true,
+  },
+  {
+    date: "Tomorrow at 10:00",
+    title: "Career Coaching: Portfolio Review",
+    mentor: "James Clear",
+    action: "Set Reminder",
+    soon: false,
+  },
+];
+
+function StudentDashboard() {
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchDashboard = async () => {
+      try {
+        const res = await API.get("/dashboard/student");
+
+        if (isMounted) {
+          setDashboard(res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchDashboard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const viewModel = useMemo(() => {
+    const studentName = dashboard?.profile?.fullName || "Kwame Mensah";
+    const firstName = studentName.split(" ")[0] || "Kwame";
+    const level = dashboard?.profile?.level || 12;
+    const xp = dashboard?.xp ?? 1240;
+    const xpGoal = 2000;
+    const xpProgress = Math.min(100, Math.round((xp / xpGoal) * 100));
+    const levelProgress = 62;
+    const badgeNames = Array.isArray(dashboard?.badges)
+      ? dashboard.badges.map((badge) =>
+        typeof badge === "string" ? badge : badge?.name || badge?.title || "Badge"
+      )
+      : [];
+
+    const learningSquares = Array.from({ length: 36 }, (_, index) => ({
+      level: (index % 6) + 1,
+      active: index < 22,
+    }));
+
+    const courses =
+      dashboard?.enrolledCourses?.length > 0
+        ? dashboard.enrolledCourses.slice(0, 2).map((course, index) => ({
+          title: course.title,
+          description: course.description,
+          progress: index === 0 ? 45 : 78,
+          lessons: index === 0 ? "12/24 Lessons" : "18/23 Lessons",
+          status: "In Progress",
+        }))
+        : [
+          {
+            title: "Advanced React Patterns",
+            description: "Master design patterns and performance optimization.",
+            progress: 45,
+            lessons: "12/24 Lessons",
+            status: "In Progress",
+          },
+          {
+            title: "Visual Design Systems",
+            description: "Scaling design for enterprise platforms.",
+            progress: 78,
+            lessons: "18/23 Lessons",
+            status: "In Progress",
+          },
+        ];
+
+    return {
+      firstName,
+      level,
+      xp,
+      xpGoal,
+      xpProgress,
+      levelProgress,
+      badgeNames,
+      learningSquares,
+      courses,
+    };
+  }, [dashboard]);
+
+  if (loading) {
+    return (
+      <div className="student-loading-shell">
+        <div className="student-loading-card">
+          <span className="student-spinner" />
+          <strong>Loading dashboard...</strong>
+          <span>Fetching your learning progress.</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      className="student-dashboard"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+    >
+      <section className="student-hero">
+        <div>
+          <p className="student-hero-kicker">Good Morning, {viewModel.firstName}</p>
+          <h1>You're on a 14-day learning streak. Keep the momentum going!</h1>
+        </div>
+      </section>
+
+      <div className="student-dashboard-grid">
+        <div className="student-dashboard-main">
+          <div className="student-summary-row">
+            <motion.article
+              className="student-card student-level-card"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.05 }}
+            >
+              <div>
+                <span className="student-card-label">Current Level</span>
+                <h2>Level {viewModel.level}</h2>
+                <p>
+                  {viewModel.xp.toLocaleString()} XP / {viewModel.xpGoal.toLocaleString()} XP
+                </p>
+                <div className="student-level-bar" aria-hidden="true">
+                  <span style={{ width: `${viewModel.xpProgress}%` }} />
+                </div>
+              </div>
+
+              <div className="student-ring-wrap" aria-label={`${viewModel.levelProgress}% complete`}>
+                <svg viewBox="0 0 120 120" className="student-ring">
+                  <circle className="student-ring-track" cx="60" cy="60" r="48" />
+                  <circle
+                    className="student-ring-progress"
+                    cx="60"
+                    cy="60"
+                    r="48"
+                    style={{ strokeDashoffset: 301 - (301 * viewModel.levelProgress) / 100 }}
+                  />
+                </svg>
+                <strong>{viewModel.levelProgress}%</strong>
+              </div>
+            </motion.article>
+
+            <motion.article
+              className="student-card student-consistency-card"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.12 }}
+            >
+              <div className="student-card-header-row">
+                <h3>Learning Consistency</h3>
+                <div className="student-legend">
+                  <span>Less</span>
+                  <span>More</span>
+                </div>
+              </div>
+
+              <div className="student-heatmap" aria-hidden="true">
+                {viewModel.learningSquares.map((square, index) => (
+                  <span
+                    key={index}
+                    className={`student-heatmap-square student-heatmap-level-${square.level}${square.active ? " is-active" : ""}`}
+                  />
+                ))}
+              </div>
+            </motion.article>
+          </div>
+
+          <section className="student-section">
+            <div className="student-section-head">
+              <h3>Earned Badges</h3>
+              <button type="button">View All</button>
+            </div>
+
+            <div className="student-badge-grid">
+              {badgeCatalog.map((badge) => {
+                const active = viewModel.badgeNames.includes(badge.label);
+
+                return (
+                  <motion.article
+                    key={badge.label}
+                    className={`student-badge-card${active ? " is-earned" : " is-muted"}`}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.32 }}
+                  >
+                    <span className="student-badge-icon" aria-hidden="true">
+                      {badge.icon}
+                    </span>
+                    <strong>{badge.label}</strong>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="student-section">
+            <div className="student-section-head student-section-head-inline">
+              <h3>Continue Learning</h3>
+              <div className="student-carousel-actions" aria-hidden="true">
+                <button type="button">
+                  <FiArrowRight className="student-rotate-left" />
+                </button>
+                <button type="button">
+                  <FiArrowRight />
+                </button>
+              </div>
+            </div>
+
+            <div className="student-course-grid">
+              {viewModel.courses.map((course, index) => (
+                <motion.article
+                  key={course.title}
+                  className="student-course-card"
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                >
+                  <div className="student-course-preview">
+                    <span>{course.status}</span>
+                    <FiPlayCircle />
+                  </div>
+
+                  <div className="student-course-body">
+                    <h4>{course.title}</h4>
+                    <p>{course.description}</p>
+
+                    <div className="student-course-meta">
+                      <span>{course.progress}% Complete</span>
+                      <span>{course.lessons}</span>
+                    </div>
+
+                    <div className="student-course-bar" aria-hidden="true">
+                      <span style={{ width: `${course.progress}%` }} />
+                    </div>
+
+                    <button type="button" className="student-course-button">
+                      Continue Learning <FiArrowRight />
+                    </button>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <aside className="student-dashboard-side">
+          <motion.section
+            className="student-side-card"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08 }}
+          >
+            <div className="student-side-head">
+              <h3>Upcoming Live</h3>
+              <span className="student-live-pill">LIVE SOON</span>
+            </div>
+
+            <div className="student-live-list">
+              {liveSessions.map((session) => (
+                <article key={session.title} className="student-live-card">
+                  <div className="student-live-meta">
+                    <FiCalendar />
+                    <span>{session.date}</span>
+                  </div>
+                  <h4>{session.title}</h4>
+                  <p>Mentor: {session.mentor}</p>
+
+                  <button type="button" className="student-live-button" disabled={!session.soon}>
+                    {session.action}
+                  </button>
+                </article>
+              ))}
+            </div>
+          </motion.section>
+
+          <motion.section
+            className="student-side-card"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.12 }}
+          >
+            <h3>Activity Log</h3>
+
+            <div className="student-activity-list">
+              {activitySeed.map((item) => (
+                <article key={item.title} className="student-activity-item">
+                  <span className="student-activity-icon" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>{item.detail}</p>
+                    <span>{item.time}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </motion.section>
+        </aside>
+      </div>
+
+      <footer className="student-footer">
+        <p>© 2026 Benedex Digital Hub. Built for African Excellence.</p>
+        <p>Empowering the next generation of African digital leaders.</p>
+        <div>
+          <span>Privacy Policy</span>
+          <span>Terms of Service</span>
+          <span>Currency: USD/NGN</span>
+          <span>Contact Support</span>
+        </div>
+      </footer>
+    </motion.div>
+  );
 }
 
 export default StudentDashboard;
