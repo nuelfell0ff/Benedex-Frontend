@@ -16,6 +16,9 @@ function StudentCourses() {
   const [courses, setCourses] =
     useState([]);
 
+  const [enrolledCourseIds, setEnrolledCourseIds] =
+    useState(new Set());
+
   const [loading, setLoading] =
     useState(true);
 
@@ -29,14 +32,22 @@ function StudentCourses() {
 
         try {
 
-          const res =
-            await API.get(
-              "/courses"
-            );
+          const [coursesRes, dashboardRes] = await Promise.all([
+            API.get("/courses"),
+            API.get("/dashboard/student")
+          ]);
 
           setCourses(
-            res.data
+            coursesRes.data
           );
+
+          const enrolledIds = new Set(
+            (dashboardRes.data?.enrolledCourses || []).map(
+              (course) => course._id
+            )
+          );
+
+          setEnrolledCourseIds(enrolledIds);
 
         }
         catch (error) {
@@ -61,6 +72,10 @@ function StudentCourses() {
 
   const handleEnroll =
     async (courseId) => {
+
+      if (enrolledCourseIds.has(courseId)) {
+        return;
+      }
 
       try {
 
@@ -131,6 +146,7 @@ function StudentCourses() {
 
 
             <button
+              disabled={enrolledCourseIds.has(course._id)}
 
               onClick={() => handleEnroll(
                 course._id
@@ -138,7 +154,7 @@ function StudentCourses() {
 
             >
 
-              Enroll
+              {enrolledCourseIds.has(course._id) ? "Paid / Enrolled" : "Enroll"}
 
             </button>
 
