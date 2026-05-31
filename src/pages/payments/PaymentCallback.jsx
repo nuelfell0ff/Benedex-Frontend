@@ -19,14 +19,13 @@ function PaymentCallback() {
 
     const verify = async () => {
       try {
-        const res = await API.get(`/payments/verify?reference=${encodeURIComponent(reference)}`);
+        // backend exposes GET /api/payments/verify/:reference
+        const res = await API.get(`/payments/verify/${encodeURIComponent(reference)}`);
 
-        // backend should return a shape like { success: true, enrolled: true, courseId }
         if (res?.data?.success) {
           setStatus("success");
           setMessage(res.data.message || "Payment verified — enrollment complete.");
 
-          // if backend indicates a course id, redirect to the course or student dashboard
           const courseId = res.data.courseId;
           setTimeout(() => {
             if (courseId) navigate(`/student/courses/${courseId}`);
