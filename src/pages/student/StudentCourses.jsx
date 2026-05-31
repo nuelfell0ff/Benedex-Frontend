@@ -1,179 +1,179 @@
 import {
-useEffect,
-useState
+  useEffect,
+  useState
 }
-from "react";
+  from "react";
 
 import {
-Link
+  Link
 }
-from "react-router-dom";
+  from "react-router-dom";
 
 import API from "../../services/api";
 
-function StudentCourses(){
+function StudentCourses() {
 
-const [courses,setCourses] =
-useState([]);
+  const [courses, setCourses] =
+    useState([]);
 
-const [loading,setLoading] =
-useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
 
 
 
-useEffect(()=>{
+  useEffect(() => {
 
-const fetchCourses =
-async()=>{
+    const fetchCourses =
+      async () => {
 
-try{
+        try {
 
-const res =
-await API.get(
-"/courses"
-);
+          const res =
+            await API.get(
+              "/courses"
+            );
 
-setCourses(
-res.data
-);
+          setCourses(
+            res.data
+          );
 
-}
-catch(error){
+        }
+        catch (error) {
 
-console.log(error);
+          console.log(error);
 
-}
-finally{
+        }
+        finally {
 
-setLoading(false);
+          setLoading(false);
 
-}
+        }
 
-};
+      };
 
-fetchCourses();
+    fetchCourses();
 
-},[]);
+  }, []);
 
 
 
 
-const handleEnroll =
-async(courseId)=>{
+  const handleEnroll =
+    async (courseId) => {
 
-try{
+      try {
 
-		const res = await API.post(
-			"/payments/initialize",
-			{ courseId },
-			{
-				params: {
-					callback: `${window.location.origin}/payments/callback`,
-				},
-			}
-		);
+        const res = await API.post(
+          "/payments/initialize",
+          { courseId },
+          {
+            params: {
+              callback: `${window.location.origin}/payments/callback`,
+            },
+          }
+        );
 
-		// open Paystack authorization in new tab and also navigate current window
-		const url = res.data.authorization_url;
-		if (url) {
-			window.open(url, "_blank");
-			// optional: navigate current window to callback so user sees status after payment
-			window.location.href = `/payments/callback?reference=${res.data.reference || ""}`;
-		}
+        // open Paystack authorization in new tab and also navigate current window
+        const url = res.data.authorization_url;
+        if (url) {
+          window.open(url, "_blank");
+          // optional: navigate current window to callback so user sees status after payment
+          window.location.href = `/payments/callback?reference=${res.data.reference || ""}`;
+        }
 
-}
-catch(error){
+      }
+      catch (error) {
 
-console.log(error);
+        console.log(error);
 
-}
+      }
 
-};
+    };
 
 
 
 
-if(loading){
+  if (loading) {
 
-return <h1>Loading...</h1>;
+    return <h1>Loading...</h1>;
 
-}
+  }
 
 
 
 
-return(
+  return (
 
-<div>
+    <div>
 
-<h1>
-Courses
-</h1>
+      <h1>
+        Courses
+      </h1>
 
 
 
-{
+      {
 
-courses.map((course)=>(
+        courses.map((course) => (
 
-<div key={course._id}>
+          <div key={course._id}>
 
-<h2>
-{course.title}
-</h2>
+            <h2>
+              {course.title}
+            </h2>
 
-<p>
-{course.description}
-</p>
+            <p>
+              {course.description}
+            </p>
 
-<p>
+            <p>
 
-Price:
+              Price:
 
-₦{course.price}
+              ₦{course.price}
 
-</p>
+            </p>
 
 
 
-<button
+            <button
 
-onClick={()=>handleEnroll(
-course._id
-)}
+              onClick={() => handleEnroll(
+                course._id
+              )}
 
->
+            >
 
-Enroll
+              Enroll
 
-</button>
+            </button>
 
 
 
-<Link
-to={`/student/courses/${course._id}`}
->
+            <Link
+              to={`/student/courses/${course._id}`}
+            >
 
-<button>
+              <button>
 
-View Course
+                View Course
 
-</button>
+              </button>
 
-</Link>
+            </Link>
 
-<hr />
+            <hr />
 
-</div>
+          </div>
 
-))
+        ))
 
-}
+      }
 
-</div>
+    </div>
 
-);
+  );
 
 }
 
