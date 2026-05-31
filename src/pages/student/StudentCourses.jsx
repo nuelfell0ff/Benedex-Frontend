@@ -64,7 +64,10 @@ function StudentCourses() {
 
       try {
 
-        const res = await API.post("/payments/initialize", { courseId });
+        const res = await API.post("/payments/initialize", {
+          courseId,
+          callbackUrl: `${window.location.origin}/payments/callback`
+        });
 
         const url = res.data.authorization_url;
         if (url) {
