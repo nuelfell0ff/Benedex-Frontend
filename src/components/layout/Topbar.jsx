@@ -1,4 +1,4 @@
-import { FiBell, FiChevronDown, FiLogOut, FiSearch, FiShoppingCart } from "react-icons/fi";
+import { FiBell, FiChevronDown, FiLogOut, FiSearch } from "react-icons/fi";
 
 import { useAuth } from "../../context/AuthContext";
 
@@ -24,18 +24,9 @@ function Topbar() {
         />
       </label>
 
-      <nav className="student-topnav" aria-label="Student quick links">
-        <span>Courses</span>
-        <span>Instructors</span>
-        <span>Resources</span>
-      </nav>
-
       <div className="student-top-actions">
         <button type="button" className="student-icon-button" aria-label="Notifications">
           <FiBell />
-        </button>
-        <button type="button" className="student-icon-button" aria-label="Cart">
-          <FiShoppingCart />
         </button>
 
         <div className="student-user-chip">

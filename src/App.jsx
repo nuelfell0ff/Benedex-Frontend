@@ -52,6 +52,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminCourses from "./pages/admin/AdminCourses";
+import PaymentCallback from "./pages/payments/PaymentCallback";
 
 
 
@@ -117,6 +118,8 @@ function App() {
           path="/login"
           element={<Login />}
         />
+
+        <Route path="/payments/callback" element={<PaymentCallback />} />
 
         <Route
           path="/register"

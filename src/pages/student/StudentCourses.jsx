@@ -64,19 +64,23 @@ async(courseId)=>{
 
 try{
 
-const res =
-await API.post(
+		const res = await API.post(
+			"/payments/initialize",
+			{ courseId },
+			{
+				params: {
+					callback: `${window.location.origin}/payments/callback`,
+				},
+			}
+		);
 
-"/payments/initialize",
-
-{
-courseId
-}
-
-);
-
-window.location.href =
-res.data.authorization_url;
+		// open Paystack authorization in new tab and also navigate current window
+		const url = res.data.authorization_url;
+		if (url) {
+			window.open(url, "_blank");
+			// optional: navigate current window to callback so user sees status after payment
+			window.location.href = `/payments/callback?reference=${res.data.reference || ""}`;
+		}
 
 }
 catch(error){

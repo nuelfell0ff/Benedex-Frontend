@@ -362,7 +362,6 @@ function StudentDashboard() {
                   </div>
                 </div>
 
-                <p className="student-consistency-caption">Learn how we count contributions</p>
               </div>
             </motion.article>
           </div>
