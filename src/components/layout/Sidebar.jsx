@@ -1,6 +1,10 @@
 import { NavLink } from "react-router-dom";
+import { FiLogOut } from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 
 function Sidebar({ links }) {
+  const { logout } = useAuth();
+
   return (
     <aside className="student-sidebar">
       <div className="student-sidebar-brand">
@@ -30,6 +34,20 @@ function Sidebar({ links }) {
           </NavLink>
         ))}
       </nav>
+
+      <div className="student-sidebar-footer">
+        <button
+          type="button"
+          className="student-sidebar-logout"
+          onClick={logout}
+          aria-label="Sign out"
+        >
+          <span className="student-sidebar-icon" aria-hidden="true">
+            <FiLogOut />
+          </span>
+          <span className="student-sidebar-label">Logout</span>
+        </button>
+      </div>
     </aside>
 
   );

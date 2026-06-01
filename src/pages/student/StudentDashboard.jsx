@@ -9,9 +9,13 @@ import {
   FiBriefcase,
   FiCalendar,
   FiCheckCircle,
+  FiClock,
+  FiLogIn,
+  FiMessageCircle,
   FiLayers,
   FiLock,
   FiPlayCircle,
+  FiRadio,
   FiStar,
   FiTarget,
   FiUsers,
@@ -26,27 +30,6 @@ const badgeCatalog = [
   { label: "Team Lead", icon: <FiUsers /> },
   { label: "UI Architect", icon: <FiLayers /> },
   { label: "Data Wizard", icon: <FiLock /> },
-];
-
-const activitySeed = [
-  {
-    title: "Module Completed",
-    detail: 'You finished "Advanced Hooks" in React Mastery.',
-    time: "2 hours ago",
-    icon: <FiCheckCircle />,
-  },
-  {
-    title: "Assignment Submitted",
-    detail: "E-commerce API Integration project.",
-    time: "5 hours ago",
-    icon: <FiBookOpen />,
-  },
-  {
-    title: "New Badge Earned",
-    detail: 'Unlocked the "Fast Learner" achievement.',
-    time: "Yesterday",
-    icon: <FiStar />,
-  },
 ];
 
 const liveSessions = [
@@ -154,6 +137,37 @@ const buildConsistencyGraph = (learningSummary) => {
   };
 };
 
+const activityIconMap = {
+  account_registered: <FiUsers />,
+  user_logged_in: <FiLogIn />,
+  course_enrolled: <FiBookOpen />,
+  assignment_submitted: <FiCheckCircle />,
+  module_completed: <FiLayers />,
+  lesson_started: <FiPlayCircle />,
+  live_class_joined: <FiRadio />,
+  xp_awarded: <FiStar />,
+};
+
+const formatTimeAgo = (value) => {
+  if (!value) return "Just now";
+
+  const date = new Date(value);
+  const diffSeconds = Math.max(1, Math.floor((Date.now() - date.getTime()) / 1000));
+
+  if (diffSeconds < 60) return `${diffSeconds}s ago`;
+
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString();
+};
+
 function StudentDashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -250,6 +264,7 @@ function StudentDashboard() {
       consistencyMonths,
       consistencyGraph,
       courses,
+      recentActivities: dashboard?.recentActivities || [],
     };
   }, [dashboard]);
 
@@ -483,18 +498,30 @@ function StudentDashboard() {
             <h3>Activity Log</h3>
 
             <div className="student-activity-list">
-              {activitySeed.map((item) => (
-                <article key={item.title} className="student-activity-item">
+              {viewModel.recentActivities.length > 0 ? (
+                viewModel.recentActivities.map((item) => (
+                  <article key={item._id || `${item.type}-${item.createdAt}`} className="student-activity-item">
+                    <span className="student-activity-icon" aria-hidden="true">
+                      {activityIconMap[item.type] || <FiMessageCircle />}
+                    </span>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.type.replaceAll("_", " ")}</p>
+                      <span>{formatTimeAgo(item.createdAt)}</span>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <article className="student-activity-item student-activity-empty">
                   <span className="student-activity-icon" aria-hidden="true">
-                    {item.icon}
+                    <FiClock />
                   </span>
                   <div>
-                    <strong>{item.title}</strong>
-                    <p>{item.detail}</p>
-                    <span>{item.time}</span>
+                    <strong>No recent activity yet</strong>
+                    <p>New actions will show here.</p>
                   </div>
                 </article>
-              ))}
+              )}
             </div>
           </motion.section>
         </aside>

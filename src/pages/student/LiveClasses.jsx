@@ -1,136 +1,161 @@
 import {
-useEffect,
-useState
+  useEffect,
+  useState
 }
-from "react";
+  from "react";
 
 import API from "../../services/api";
 
-function LiveClasses(){
+function LiveClasses() {
 
-const [classes,setClasses] =
-useState([]);
+  const [classes, setClasses] =
+    useState([]);
 
-const [loading,setLoading] =
-useState(true);
-
-
-
-
-useEffect(()=>{
-
-const fetchClasses =
-async()=>{
-
-try{
-
-const res =
-await API.get(
-"/live-classes"
-);
-
-setClasses(
-res.data
-);
-
-}
-catch(error){
-
-console.log(error);
-
-}
-finally{
-
-setLoading(false);
-
-}
-
-};
-
-fetchClasses();
-
-},[]);
+  const [loading, setLoading] =
+    useState(true);
 
 
 
 
-if(loading){
+  useEffect(() => {
 
-return <h1>Loading...</h1>;
+    const fetchClasses =
+      async () => {
 
-}
+        try {
+
+          const res =
+            await API.get(
+              "/live-classes/student"
+            );
+
+          setClasses(
+            res.data
+          );
+
+        }
+        catch (error) {
+
+          console.log(error);
+
+        }
+        finally {
+
+          setLoading(false);
+
+        }
+
+      };
+
+    fetchClasses();
+
+  }, []);
+
+
+
+  const handleJoinClass = async (liveClass) => {
+
+    try {
+
+      const res = await API.post(
+        `/live-classes/join/${liveClass._id}`
+      );
+
+      const meetingLink = res.data?.meetingLink || liveClass.meetingLink;
+
+      if (meetingLink) {
+        window.open(meetingLink, "_blank", "noopener,noreferrer");
+      }
+
+    }
+    catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
 
 
 
 
-return(
+  if (loading) {
 
-<div>
+    return <h1>Loading...</h1>;
 
-<h1>
-Live Classes
-</h1>
+  }
 
-{
 
-classes.length > 0
 
-?
 
-classes.map((liveClass)=>(
+  return (
 
-<div key={liveClass._id}>
+    <div>
 
-<h2>
-{liveClass.title}
-</h2>
+      <h1>
+        Live Classes
+      </h1>
 
-<p>
+      {
 
-Instructor:
+        classes.length > 0
 
-{liveClass.instructor?.fullName}
+          ?
 
-</p>
+          classes.map((liveClass) => (
 
-<p>
+            <div key={liveClass._id}>
 
-Date:
+              <h2>
+                {liveClass.title}
+              </h2>
 
-{
-new Date(
-liveClass.date
-).toLocaleString()
-}
+              <p>
 
-</p>
+                Instructor:
 
-<a
-href={liveClass.meetingLink}
-target="_blank"
->
+                {liveClass.instructor?.fullName}
 
-Join Class
+              </p>
 
-</a>
+              <p>
 
-<hr />
+                Date:
 
-</div>
+                {
+                  new Date(
+                    liveClass.startTime
+                  ).toLocaleString()
+                }
 
-))
+              </p>
 
-:
+              <button
+                type="button"
+                onClick={() => handleJoinClass(liveClass)}
+              >
 
-<p>
-No live classes available
-</p>
+                Join Class
 
-}
+              </button>
 
-</div>
+              <hr />
 
-);
+            </div>
+
+          ))
+
+          :
+
+          <p>
+            No live classes available
+          </p>
+
+      }
+
+    </div>
+
+  );
 
 }
 

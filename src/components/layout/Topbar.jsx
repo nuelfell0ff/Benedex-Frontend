@@ -1,9 +1,9 @@
-import { FiBell, FiChevronDown, FiLogOut, FiSearch } from "react-icons/fi";
+import { FiBell, FiChevronDown, FiSearch } from "react-icons/fi";
 
 import { useAuth } from "../../context/AuthContext";
 
 function Topbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const initials = (user?.fullName || "Student")
     .split(" ")
@@ -39,15 +39,6 @@ function Topbar() {
           </div>
           <FiChevronDown aria-hidden="true" className="student-user-chevron" />
         </div>
-
-        <button
-          type="button"
-          className="student-icon-button student-logout-button"
-          onClick={logout}
-          aria-label="Sign out"
-        >
-          <FiLogOut />
-        </button>
       </div>
     </header>
   );

@@ -594,6 +594,34 @@ input {
 .student-sidebar-nav {
   display: grid;
   gap: 8px;
+  align-content: start;
+}
+
+.student-sidebar-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.student-sidebar-logout {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  color: rgba(15, 23, 42, 0.82);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.student-sidebar-logout:hover {
+  background: rgba(8, 52, 90, 0.07);
+  color: #08345a;
+  transform: translateX(2px);
 }
 
 .student-sidebar-link {
@@ -749,10 +777,6 @@ input {
 .student-user-chevron {
   color: rgba(15, 23, 42, 0.55);
   font-size: 0.9rem;
-}
-
-.student-logout-button {
-  color: rgba(15, 23, 42, 0.78);
 }
 
 .student-content {
@@ -1410,12 +1434,16 @@ input {
   .student-sidebar-brand-copy,
   .student-sidebar-label,
   .student-user-copy,
-  .student-user-chevron,
-  .student-logout-button {
+  .student-user-chevron {
     display: none;
   }
 
   .student-sidebar-link {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .student-sidebar-logout {
     justify-content: center;
     padding-inline: 0;
   }
@@ -1445,7 +1473,31 @@ input {
 @media (max-width: 820px) {
   .student-topbar {
     padding-inline: 14px;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .student-search {
+    min-height: 40px;
+    padding-inline: 12px;
+  }
+
+  .student-top-actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .student-user-chip {
+    width: auto;
+    min-width: 0;
+    padding-right: 10px;
+  }
+
+  .student-user-copy,
+  .student-user-chevron {
+    display: none;
   }
 
   .student-content {
@@ -1481,17 +1533,27 @@ input {
   }
 
   .student-topbar {
-    grid-template-columns: minmax(0, 1fr);
     left: 72px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
   }
 
   .student-top-actions {
-    justify-content: space-between;
-    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 6px;
   }
 
   .student-user-chip {
-    width: 100%;
+    width: auto;
+  }
+
+  .student-search {
+    min-width: 0;
+  }
+
+  .student-search input {
+    min-width: 0;
   }
 
   .student-level-card {
