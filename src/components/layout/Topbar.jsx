@@ -1,4 +1,5 @@
 import { FiBell, FiChevronDown, FiSearch } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 
@@ -25,9 +26,9 @@ function Topbar() {
       </label>
 
       <div className="student-top-actions">
-        <button type="button" className="student-icon-button" aria-label="Notifications">
+        <Link className="student-icon-button" to="/student/notifications" aria-label="Notifications">
           <FiBell />
-        </button>
+        </Link>
 
         <div className="student-user-chip">
           <span className="student-user-avatar" aria-hidden="true">

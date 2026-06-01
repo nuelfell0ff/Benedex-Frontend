@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 import {
   FiArrowRight,
@@ -11,7 +12,6 @@ import {
   FiCheckCircle,
   FiClock,
   FiLogIn,
-  FiMessageCircle,
   FiLayers,
   FiLock,
   FiPlayCircle,
@@ -268,6 +268,8 @@ function StudentDashboard() {
     };
   }, [dashboard]);
 
+  const previewActivities = viewModel.recentActivities.slice(0, 4);
+
   if (loading) {
     return (
       <div className="student-loading-shell">
@@ -495,21 +497,32 @@ function StudentDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.12 }}
           >
-            <h3>Activity Log</h3>
+            <div className="student-section-head">
+              <h3>Activity Log</h3>
+              <Link className="student-see-more-link" to="/student/notifications">
+                See more <FiArrowRight />
+              </Link>
+            </div>
 
             <div className="student-activity-list">
-              {viewModel.recentActivities.length > 0 ? (
-                viewModel.recentActivities.map((item) => (
-                  <article key={item._id || `${item.type}-${item.createdAt}`} className="student-activity-item">
+              {previewActivities.length > 0 ? (
+                previewActivities.map((item, index) => (
+                  <motion.article
+                    key={item._id || `${item.type}-${item.createdAt}`}
+                    className="student-activity-item"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
                     <span className="student-activity-icon" aria-hidden="true">
-                      {activityIconMap[item.type] || <FiMessageCircle />}
+                      {activityIconMap[item.type] || <FiClock />}
                     </span>
                     <div>
                       <strong>{item.title}</strong>
                       <p>{item.type.replaceAll("_", " ")}</p>
                       <span>{formatTimeAgo(item.createdAt)}</span>
                     </div>
-                  </article>
+                  </motion.article>
                 ))
               ) : (
                 <article className="student-activity-item student-activity-empty">

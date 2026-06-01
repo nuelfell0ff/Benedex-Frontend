@@ -624,6 +624,10 @@ input {
   transform: translateX(2px);
 }
 
+.student-sidebar-logout .student-sidebar-icon {
+  font-size: 1rem;
+}
+
 .student-sidebar-link {
   min-height: 44px;
   padding: 0 12px;
@@ -818,6 +822,10 @@ input {
   gap: 16px;
 }
 
+.student-dashboard-main {
+  overflow-x: hidden;
+}
+
 .student-summary-row {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -923,6 +931,8 @@ input {
 .student-consistency-card {
   display: grid;
   gap: 16px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .student-consistency-box {
@@ -984,6 +994,7 @@ input {
   color: rgba(15, 23, 42, 0.62);
   font-size: 0.76rem;
   min-width: max-content;
+  width: fit-content;
 }
 
 .student-consistency-months span {
@@ -997,6 +1008,7 @@ input {
   gap: 10px;
   align-items: start;
   min-width: max-content;
+  width: fit-content;
 }
 
 .student-consistency-weekdays {
@@ -1021,6 +1033,7 @@ input {
   grid-auto-columns: 10px;
   gap: 4px;
   overflow: visible;
+  width: fit-content;
 }
 
 .student-legend-swatch {
@@ -1136,6 +1149,22 @@ input {
   color: #08345a;
   font-weight: 600;
   cursor: pointer;
+}
+
+.student-see-more-link,
+.student-notifications-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #08345a;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.student-see-more-link:hover,
+.student-notifications-back:hover {
+  color: #0d5aa0;
 }
 
 .student-section-head-inline {
@@ -1342,7 +1371,18 @@ input {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
-  align-items: start;
+  align-items: center;
+}
+
+.student-activity-empty {
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(8, 52, 90, 0.04);
+  border: 1px dashed rgba(8, 52, 90, 0.18);
+}
+
+.student-activity-empty p {
+  margin-top: 6px;
 }
 
 .student-activity-icon {
@@ -1351,9 +1391,18 @@ input {
   border-radius: 50%;
   background: rgba(46, 127, 193, 0.12);
   color: #2e7fc1;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
+  line-height: 1;
+  align-self: center;
+  justify-self: center;
+}
+
+.student-activity-icon svg {
+  display: block;
+  font-size: 0.9rem;
 }
 
 .student-activity-item span {
@@ -1361,6 +1410,43 @@ input {
   margin-top: 3px;
   font-size: 0.76rem;
   color: rgba(15, 23, 42, 0.5);
+}
+
+.student-notifications-page {
+  padding-bottom: 18px;
+}
+
+.student-notifications-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.student-notifications-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.student-notification-count {
+  font-size: 0.8rem;
+  color: rgba(15, 23, 42, 0.56);
+}
+
+.student-notifications-list {
+  gap: 14px;
+}
+
+.student-notification-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+.student-notification-empty {
+  margin-top: 6px;
 }
 
 .student-footer {
@@ -1448,6 +1534,10 @@ input {
     padding-inline: 0;
   }
 
+  .student-sidebar-footer {
+    padding-top: 12px;
+  }
+
   .student-sidebar-link:hover {
     transform: none;
   }
@@ -1510,7 +1600,7 @@ input {
   }
 
   .student-badge-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -1530,6 +1620,22 @@ input {
   .student-sidebar-brand {
     justify-content: center;
     padding-inline: 0;
+  }
+
+  .student-sidebar-footer {
+    padding-top: 8px;
+  }
+
+  .student-sidebar-logout {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    padding-inline: 0;
+    border-radius: 12px;
+  }
+
+  .student-sidebar-logout .student-sidebar-label {
+    display: none;
   }
 
   .student-topbar {
@@ -1571,11 +1677,19 @@ input {
   }
 
   .student-consistency-months {
-    padding-left: 30px;
+    padding-left: 24px;
   }
 
   .student-consistency-body {
     grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .student-consistency-card {
+    padding-inline: 14px;
+  }
+
+  .student-badge-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .student-consistency-grid {

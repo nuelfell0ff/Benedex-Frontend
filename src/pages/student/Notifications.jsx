@@ -1,112 +1,158 @@
+import { useEffect, useMemo, useState } from "react";
+
+import { Link } from "react-router-dom";
+
+import { motion } from "framer-motion";
+
 import {
-useEffect,
-useState
-}
-from "react";
+  FiArrowLeft,
+  FiBookOpen,
+  FiCheckCircle,
+  FiClock,
+  FiLayers,
+  FiLogIn,
+  FiPlayCircle,
+  FiRadio,
+  FiStar,
+  FiUsers,
+} from "react-icons/fi";
 
 import API from "../../services/api";
 
-function Notifications(){
-
-const [notifications,setNotifications] =
-useState([]);
-
-const [loading,setLoading] =
-useState(true);
-
-
-
-
-useEffect(()=>{
-
-const fetchNotifications =
-async()=>{
-
-try{
-
-const res =
-await API.get(
-"/notifications"
-);
-
-setNotifications(
-res.data
-);
-
-}
-catch(error){
-
-console.log(error);
-
-}
-finally{
-
-setLoading(false);
-
-}
-
+const activityIconMap = {
+  account_registered: <FiUsers />,
+  user_logged_in: <FiLogIn />,
+  course_enrolled: <FiBookOpen />,
+  assignment_submitted: <FiCheckCircle />,
+  module_completed: <FiLayers />,
+  lesson_started: <FiPlayCircle />,
+  live_class_joined: <FiRadio />,
+  xp_awarded: <FiStar />,
 };
 
-fetchNotifications();
+const formatTimeAgo = (value) => {
+  if (!value) return "Just now";
 
-},[]);
+  const date = new Date(value);
+  const diffSeconds = Math.max(1, Math.floor((Date.now() - date.getTime()) / 1000));
 
+  if (diffSeconds < 60) return `${diffSeconds}s ago`;
 
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
 
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
 
-if(loading){
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
 
-return <h1>Loading...</h1>;
+  return date.toLocaleDateString();
+};
 
-}
+function Notifications() {
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    let isMounted = true;
 
+    const fetchDashboard = async () => {
+      try {
+        const res = await API.get("/dashboard/student");
 
+        if (isMounted) {
+          setDashboard(res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-return(
+    fetchDashboard();
 
-<div>
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-<h1>
-Notifications
-</h1>
+  const recentActivities = useMemo(
+    () => dashboard?.recentActivities || [],
+    [dashboard]
+  );
 
-{
+  if (loading) {
+    return (
+      <div className="student-loading-shell">
+        <div className="student-loading-card">
+          <span className="student-spinner" />
+          <strong>Loading activity log...</strong>
+          <span>Fetching your latest actions.</span>
+        </div>
+      </div>
+    );
+  }
 
-notifications.length > 0
+  return (
+    <motion.main
+      className="student-dashboard student-notifications-page"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+    >
+      <section className="student-hero student-notifications-hero">
+        <div>
+          <p className="student-hero-kicker">Activity Feed</p>
+          <h1>Your recent actions, in one place.</h1>
+        </div>
 
-?
+        <Link className="student-notifications-back" to="/student">
+          <FiArrowLeft /> Back to dashboard
+        </Link>
+      </section>
 
-notifications.map((notification)=>(
+      <section className="student-section student-notifications-panel">
+        <div className="student-section-head">
+          <h3>Latest Activity</h3>
+          <span className="student-notification-count">
+            {recentActivities.length} item{recentActivities.length === 1 ? "" : "s"}
+          </span>
+        </div>
 
-<div key={notification._id}>
-
-<h3>
-{notification.title}
-</h3>
-
-<p>
-{notification.message}
-</p>
-
-<hr />
-
-</div>
-
-))
-
-:
-
-<p>
-No notifications
-</p>
-
-}
-
-</div>
-
-);
-
+        <div className="student-activity-list student-notifications-list">
+          {recentActivities.length > 0 ? (
+            recentActivities.map((item, index) => (
+              <motion.article
+                key={item._id || `${item.type}-${item.createdAt}-${index}`}
+                className="student-activity-item student-notification-card"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.32, delay: index * 0.03 }}
+              >
+                <span className="student-activity-icon" aria-hidden="true">
+                  {activityIconMap[item.type] || <FiClock />}
+                </span>
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.type.replaceAll("_", " ")}</p>
+                  <span>{formatTimeAgo(item.createdAt)}</span>
+                </div>
+              </motion.article>
+            ))
+          ) : (
+            <div className="student-empty-activity student-notification-empty">
+              <strong>New actions will show here</strong>
+              <p>Registering, enrolling, submitting, and joining live classes will appear here.</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </motion.main>
+  );
 }
 
 export default Notifications;
