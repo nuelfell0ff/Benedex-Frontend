@@ -1,10 +1,37 @@
+import { useEffect, useState } from "react";
+
 import { FiBell, FiChevronDown, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
+import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 function Topbar() {
   const { user } = useAuth();
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await API.get("/dashboard/student");
+        const count = res.data?.recentActivities?.length || 0;
+
+        if (isMounted) {
+          setNotificationCount(count);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchNotifications();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const initials = (user?.fullName || "Student")
     .split(" ")
@@ -26,8 +53,13 @@ function Topbar() {
       </label>
 
       <div className="student-top-actions">
-        <Link className="student-icon-button" to="/student/notifications" aria-label="Notifications">
+        <Link className="student-icon-button student-notification-button" to="/student/notifications" aria-label="Notifications">
           <FiBell />
+          {notificationCount > 0 ? (
+            <span className="student-notification-badge" aria-label={`${notificationCount} new notifications`}>
+              {notificationCount > 9 ? "9+" : notificationCount}
+            </span>
+          ) : null}
         </Link>
 
         <div className="student-user-chip">
