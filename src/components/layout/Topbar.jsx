@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
 import { FiBell, FiChevronDown, FiSearch } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 function Topbar() {
   const { user } = useAuth();
+  const location = useLocation();
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
@@ -16,7 +17,7 @@ function Topbar() {
     const fetchNotifications = async () => {
       try {
         const res = await API.get("/dashboard/student");
-        const count = res.data?.recentActivities?.length || 0;
+        const count = res.data?.unreadActivityCount || 0;
 
         if (isMounted) {
           setNotificationCount(count);
@@ -28,10 +29,17 @@ function Topbar() {
 
     fetchNotifications();
 
+    const handleActivitiesUpdated = () => {
+      fetchNotifications();
+    };
+
+    window.addEventListener("student-activities-updated", handleActivitiesUpdated);
+
     return () => {
       isMounted = false;
+      window.removeEventListener("student-activities-updated", handleActivitiesUpdated);
     };
-  }, []);
+  }, [location.pathname]);
 
   const initials = (user?.fullName || "Student")
     .split(" ")

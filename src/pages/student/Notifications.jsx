@@ -64,6 +64,9 @@ function Notifications() {
         if (isMounted) {
           setDashboard(res.data);
         }
+
+        await API.put("/student/dashboard/activities/viewed");
+        window.dispatchEvent(new Event("student-activities-updated"));
       } catch (error) {
         console.log(error);
       } finally {
