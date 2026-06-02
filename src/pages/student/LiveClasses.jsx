@@ -1,51 +1,48 @@
-import {
-  useEffect,
-  useState
-}
-  from "react";
-
+import "./LiveClasses.css";
+import { useEffect, useState } from "react";
 import API from "../../services/api";
+
+import {
+  FiVideo,
+  FiCalendar,
+  FiUsers,
+  FiPlayCircle,
+  FiClock,
+  FiActivity
+} from "react-icons/fi";
+
+import { BsBroadcast } from "react-icons/bs";
 
 function LiveClasses() {
 
-  const [classes, setClasses] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-
-
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
-    const fetchClasses =
-      async () => {
+    const fetchClasses = async () => {
 
-        try {
+      try {
 
-          const res =
-            await API.get(
-              "/live-classes/student"
-            );
+        const res = await API.get(
+          "/live-classes/student"
+        );
 
-          setClasses(
-            res.data
-          );
+        setClasses(res.data);
 
-        }
-        catch (error) {
+      }
+      catch (error) {
 
-          console.log(error);
+        console.log(error);
 
-        }
-        finally {
+      }
+      finally {
 
-          setLoading(false);
+        setLoading(false);
 
-        }
+      }
 
-      };
+    };
 
     fetchClasses();
 
@@ -61,10 +58,18 @@ function LiveClasses() {
         `/live-classes/join/${liveClass._id}`
       );
 
-      const meetingLink = res.data?.meetingLink || liveClass.meetingLink;
+      const meetingLink =
+        res.data?.meetingLink ||
+        liveClass.meetingLink;
 
       if (meetingLink) {
-        window.open(meetingLink, "_blank", "noopener,noreferrer");
+
+        window.open(
+          meetingLink,
+          "_blank",
+          "noopener,noreferrer"
+        );
+
       }
 
     }
@@ -78,23 +83,147 @@ function LiveClasses() {
 
 
 
+  const upcomingClasses =
+    classes.filter(
+      item =>
+        new Date(item.startTime) >
+        new Date()
+    );
+
+
 
   if (loading) {
 
-    return <h1>Loading...</h1>;
+    return (
+      <div className="student-loading-shell">
+        <div className="student-loading-card">
+          <span className="student-spinner" />
+          <strong>Loading Live Classes...</strong>
+          <span>Preparing available Live Classes.</span>
+        </div>
+      </div>
+    );
 
   }
 
 
 
-
   return (
 
-    <div>
+    <div className="live-page">
 
-      <h1>
-        Live Classes
-      </h1>
+      {/* Hero */}
+
+      <div className="live-hero">
+
+        <div>
+
+          <span className="hero-tag">
+
+            <BsBroadcast />
+
+            Live Learning
+
+          </span>
+
+          <h1>
+            Live Classes
+          </h1>
+
+          <p>
+            Join scheduled sessions,
+            workshops, mentorship calls
+            and interactive classes with
+            your instructors.
+          </p>
+
+        </div>
+
+        <div className="hero-stats">
+
+          <div>
+
+            <strong>
+              {classes.length}
+            </strong>
+
+            <span>
+              Total Classes
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Stats Row */}
+
+      <div className="row g-4 mb-4">
+
+        <div className="col-lg-4">
+
+          <div className="stats-card">
+
+            <div className="stats-icon">
+              <FiVideo />
+            </div>
+
+            <h3>
+              {classes.length}
+            </h3>
+
+            <p>
+              Available Classes
+            </p>
+
+          </div>
+
+        </div>
+
+        <div className="col-lg-4">
+
+          <div className="stats-card">
+
+            <div className="stats-icon">
+              <FiCalendar />
+            </div>
+
+            <h3>
+              {upcomingClasses.length}
+            </h3>
+
+            <p>
+              Upcoming Sessions
+            </p>
+
+          </div>
+
+        </div>
+
+        <div className="col-lg-4">
+
+          <div className="stats-card">
+
+            <div className="stats-icon">
+              <FiActivity />
+            </div>
+
+            <h3>
+              Active
+            </h3>
+
+            <p>
+              Learning Journey
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Classes Grid */}
 
       {
 
@@ -102,54 +231,133 @@ function LiveClasses() {
 
           ?
 
-          classes.map((liveClass) => (
+          <div className="row g-4">
 
-            <div key={liveClass._id}>
+            {
 
-              <h2>
-                {liveClass.title}
-              </h2>
+              classes.map((liveClass) => (
 
-              <p>
+                <div
+                  className="col-lg-6 col-xl-4"
+                  key={liveClass._id}
+                >
 
-                Instructor:
+                  <div className="class-card">
 
-                {liveClass.instructor?.fullName}
+                    <div className="class-top">
 
-              </p>
+                      <div className="class-status">
 
-              <p>
+                        <BsBroadcast />
 
-                Date:
+                        Live Session
 
-                {
-                  new Date(
-                    liveClass.startTime
-                  ).toLocaleString()
-                }
+                      </div>
 
-              </p>
+                    </div>
 
-              <button
-                type="button"
-                onClick={() => handleJoinClass(liveClass)}
-              >
+                    <h3>
+                      {liveClass.title}
+                    </h3>
 
-                Join Class
+                    <div className="class-info">
 
-              </button>
+                      <div className="info-row">
 
-              <hr />
+                        <FiUsers />
 
-            </div>
+                        <span>
 
-          ))
+                          {
+                            liveClass
+                              .instructor
+                              ?.fullName
+                          }
+
+                        </span>
+
+                      </div>
+
+                      <div className="info-row">
+
+                        <FiCalendar />
+
+                        <span>
+
+                          {
+                            new Date(
+                              liveClass.startTime
+                            ).toLocaleDateString()
+                          }
+
+                        </span>
+
+                      </div>
+
+                      <div className="info-row">
+
+                        <FiClock />
+
+                        <span>
+
+                          {
+                            new Date(
+                              liveClass.startTime
+                            ).toLocaleTimeString()
+                          }
+
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                    <button
+                      className="join-btn"
+                      onClick={() =>
+                        handleJoinClass(
+                          liveClass
+                        )
+                      }
+                    >
+
+                      <FiPlayCircle />
+
+                      Join Class
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+              ))
+
+            }
+
+          </div>
 
           :
 
-          <p>
-            No live classes available
-          </p>
+          <div className="empty-state">
+
+            <div className="empty-icon">
+
+              <FiVideo />
+
+            </div>
+
+            <h3>
+              No Live Classes Yet
+            </h3>
+
+            <p>
+              Scheduled classes will
+              appear here once your
+              instructors create them.
+            </p>
+
+          </div>
 
       }
 

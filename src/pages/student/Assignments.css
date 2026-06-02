@@ -1,0 +1,211 @@
+.assignment-page {
+  padding: 30px;
+  background: #f6f9fc;
+  min-height: 100vh;
+}
+
+.assignment-loading {
+  min-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.assignment-hero {
+  background: linear-gradient(
+    135deg,
+    #08345a,
+    #2e7fc1
+  );
+
+  color: white;
+
+  border-radius: 24px;
+
+  padding: 40px;
+
+  margin-bottom: 30px;
+
+  box-shadow:
+    0 20px 40px rgba(
+      8,
+      52,
+      90,
+      .15
+    );
+}
+
+.assignment-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.assignment-stat {
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 25px;
+
+  text-align: center;
+
+  transition: .3s;
+
+  box-shadow:
+    0 8px 20px rgba(
+      0,
+      0,
+      0,
+      .05
+    );
+}
+
+.assignment-stat:hover {
+  transform:
+    translateY(-4px);
+}
+
+.assignment-stat svg {
+  font-size: 28px;
+  color: #2e7fc1;
+  margin-bottom: 10px;
+}
+
+.assignment-card {
+  background: white;
+
+  border-radius: 24px;
+
+  padding: 24px;
+
+  height: 100%;
+
+  border: 1px solid #eef2f7;
+
+  transition: .3s;
+}
+
+.assignment-card:hover {
+  transform:
+    translateY(-5px);
+
+  box-shadow:
+    0 15px 30px rgba(
+      0,
+      0,
+      0,
+      .08
+    );
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assignment-header h3 {
+  color: #08345a;
+  font-size: 1.25rem;
+}
+
+.status {
+  padding: 8px 14px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.submitted {
+  background:
+    rgba(25,135,84,.1);
+
+  color:
+    #198754;
+}
+
+.pending {
+  background:
+    rgba(255,193,7,.15);
+
+  color:
+    #b8860b;
+}
+
+.assignment-description {
+  margin: 15px 0;
+  color: #555;
+}
+
+.assignment-meta {
+  margin-bottom: 20px;
+}
+
+.assignment-meta div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-btn {
+  width: 100%;
+
+  border: none;
+
+  margin-top: 15px;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #08345a,
+      #2e7fc1
+    );
+
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.submission-box {
+  background: #f8fafc;
+
+  border-radius: 14px;
+
+  padding: 15px;
+
+  margin-top: 20px;
+}
+
+.grade-box {
+  margin-top: 10px;
+  color: #198754;
+  font-weight: 600;
+}
+
+.feedback-box {
+  margin-top: 10px;
+  color: #495057;
+}
+
+@media(max-width:768px){
+
+  .assignment-page{
+    padding:20px;
+  }
+
+  .assignment-hero{
+    padding:25px;
+  }
+
+  .assignment-hero h1{
+    font-size:2rem;
+  }
+
+}

@@ -51,19 +51,17 @@ function InstructorLayout() {
 
   return (
 
-    <div>
-
-      <Sidebar links={links} />
-
-      <div>
-
-        <Topbar />
-
-        <Outlet />
-
-      </div>
-
-    </div>
+    <div className="student-shell">
+          <Sidebar links={links} />
+    
+          <div className="student-main">
+            <Topbar />
+    
+            <main className="student-content">
+              <Outlet />
+            </main>
+          </div>
+        </div>
 
   );
 

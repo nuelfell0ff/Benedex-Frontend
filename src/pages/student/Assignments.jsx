@@ -1,212 +1,523 @@
+import "./Assignments.css";
+
 import {
-useEffect,
-useState
+  useEffect,
+  useState
 }
-from "react";
+  from "react";
 
 import API from "../../services/api";
 
-function Assignments(){
+import {
 
-const [assignments,setAssignments] =
-useState([]);
-
-const [selectedFile,setSelectedFile] =
-useState(null);
-
-const [loading,setLoading] =
-useState(true);
-
-
-
-
-useEffect(()=>{
-
-const fetchAssignments =
-async()=>{
-
-try{
-
-const res =
-await API.get(
-"/assignments"
-);
-
-setAssignments(
-res.data
-);
+  FiFileText,
+  FiUpload,
+  FiCheckCircle,
+  FiClock,
+  FiAward,
+  FiMessageSquare
 
 }
-catch(error){
+  from "react-icons/fi";
 
-console.log(error);
+function Assignments() {
 
-}
-finally{
+  const [assignments, setAssignments] =
+    useState([]);
 
-setLoading(false);
+  const [submissions, setSubmissions] =
+    useState([]);
 
-}
+  const [selectedFiles, setSelectedFiles] =
+    useState({});
 
-};
+  const [loading, setLoading] =
+    useState(true);
 
-fetchAssignments();
 
-},[]);
 
+  useEffect(() => {
 
+    const fetchData =
+      async () => {
 
+        try {
 
-const handleFileChange =
-(e)=>{
+          const [
+            assignmentsRes,
+            submissionsRes
+          ] = await Promise.all([
 
-setSelectedFile(
-e.target.files[0]
-);
+            API.get(
+              "/assignments"
+            ),
 
-};
+            API.get(
+              "/assignments/my-submissions"
+            )
 
+          ]);
 
+          setAssignments(
+            assignmentsRes.data
+          );
 
+          setSubmissions(
+            submissionsRes.data
+          );
 
-const handleSubmit =
-async(assignmentId)=>{
+        }
+        catch (error) {
 
-try{
+          console.log(error);
 
-const formData =
-new FormData();
+        }
+        finally {
 
-formData.append(
-"assignment",
-assignmentId
-);
+          setLoading(false);
 
-formData.append(
-"file",
-selectedFile
-);
+        }
 
+      };
 
+    fetchData();
 
-await API.post(
+  }, []);
 
-"/assignments/submit",
 
-formData,
 
-{
+  const handleFileChange =
+    (assignmentId, file) => {
 
-headers:{
+      setSelectedFiles(
+        prev => ({
 
-"Content-Type":
-"multipart/form-data"
+          ...prev,
 
-}
+          [assignmentId]: file
 
-}
+        })
+      );
 
-);
+    };
 
 
 
-alert(
-"Assignment submitted successfully"
-);
+  const handleSubmit =
+    async (assignmentId) => {
 
-}
-catch(error){
+      try {
 
-console.log(error);
+        const file =
+          selectedFiles[
+          assignmentId
+          ];
 
-}
+        if (!file) {
 
-};
+          alert(
+            "Please select a file"
+          );
 
+          return;
 
+        }
 
+        const formData =
+          new FormData();
 
-if(loading){
+        formData.append(
+          "assignment",
+          assignmentId
+        );
 
-return <h1>Loading...</h1>;
+        formData.append(
+          "file",
+          file
+        );
 
-}
+        await API.post(
 
+          "/assignments/submit",
 
+          formData,
 
+          {
 
-return(
+            headers: {
 
-<div>
+              "Content-Type":
+                "multipart/form-data"
 
-<h1>
-Assignments
-</h1>
+            }
 
+          }
 
+        );
 
-{
+        const submissionsRes =
+          await API.get(
+            "/assignments/my-submissions"
+          );
 
-assignments.map((assignment)=>(
+        setSubmissions(
+          submissionsRes.data
+        );
 
-<div key={assignment._id}>
+      }
+      catch (error) {
 
-<h2>
-{assignment.title}
-</h2>
+        console.log(error);
 
-<p>
-{assignment.description}
-</p>
+      }
 
-<p>
+    };
 
-Due Date:
 
-{
-new Date(
-assignment.dueDate
-).toLocaleDateString()
-}
 
-</p>
+  const getSubmission =
+    (assignmentId) => {
 
+      return submissions.find(
 
+        submission =>
 
-<input
-type="file"
-onChange={handleFileChange}
-/>
+          submission.assignment?._id ===
+          assignmentId
 
+      );
 
+    };
 
-<button
 
-onClick={()=>
 
-handleSubmit(
-assignment._id
-)
+  if (loading) {
 
-}
+    return (
+      <div className="student-loading-shell">
+        <div className="student-loading-card">
+          <span className="student-spinner" />
+          <strong>Loading Assignments...</strong>
+          <span>Preparing available Assignments...</span>
+        </div>
+      </div>
+    );
 
->
+  }
 
-Submit Assignment
 
-</button>
 
-<hr />
+  const submittedCount =
+    submissions.length;
 
-</div>
+  const pendingCount =
+    assignments.length -
+    submittedCount;
 
-))
 
-}
 
-</div>
+  return (
 
-);
+    <div className="assignment-page">
+
+      {/* Hero */}
+
+      <div className="assignment-hero">
+
+        <div>
+
+          <h1>
+            Assignments
+          </h1>
+
+          <p>
+            Submit coursework,
+            track progress,
+            receive grades and
+            instructor feedback.
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      {/* Stats */}
+
+      <div className="row g-4 mb-4">
+
+        <div className="col-md-4">
+
+          <div className="assignment-stat">
+
+            <FiFileText />
+
+            <h3>
+              {assignments.length}
+            </h3>
+
+            <span>
+              Total Assignments
+            </span>
+
+          </div>
+
+        </div>
+
+        <div className="col-md-4">
+
+          <div className="assignment-stat">
+
+            <FiCheckCircle />
+
+            <h3>
+              {submittedCount}
+            </h3>
+
+            <span>
+              Submitted
+            </span>
+
+          </div>
+
+        </div>
+
+        <div className="col-md-4">
+
+          <div className="assignment-stat">
+
+            <FiClock />
+
+            <h3>
+              {pendingCount}
+            </h3>
+
+            <span>
+              Pending
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div className="row g-4">
+
+        {
+
+          assignments.map(
+            assignment => {
+
+              const submission =
+                getSubmission(
+                  assignment._id
+                );
+
+              return (
+
+                <div
+                  className="col-lg-6"
+                  key={assignment._id}
+                >
+
+                  <div className="assignment-card">
+
+                    <div className="assignment-header">
+
+                      <h3>
+                        {assignment.title}
+                      </h3>
+
+                      {
+
+                        submission
+
+                          ?
+
+                          <span className="status submitted">
+
+                            Submitted
+
+                          </span>
+
+                          :
+
+                          <span className="status pending">
+
+                            Pending
+
+                          </span>
+
+                      }
+
+                    </div>
+
+
+
+                    <p className="assignment-description">
+
+                      {
+                        assignment.description
+                      }
+
+                    </p>
+
+
+
+                    <div className="assignment-meta">
+
+                      <div>
+
+                        <FiClock />
+
+                        <span>
+
+                          Due:
+
+                          {
+
+                            new Date(
+                              assignment.dueDate
+                            ).toLocaleDateString()
+
+                          }
+
+                        </span>
+
+                      </div>
+
+                    </div>
+
+
+
+                    {
+
+                      submission &&
+
+                      <div className="submission-box">
+
+                        <div>
+
+                          <FiCheckCircle />
+
+                          Submitted Successfully
+
+                        </div>
+
+                        {
+
+                          submission.grade !==
+                          null &&
+
+                          <div className="grade-box">
+
+                            <FiAward />
+
+                            Grade:
+
+                            {
+                              submission.grade
+                            }%
+
+                          </div>
+
+                        }
+
+                        {
+
+                          submission.feedback &&
+
+                          <div className="feedback-box">
+
+                            <FiMessageSquare />
+
+                            {
+                              submission.feedback
+                            }
+
+                          </div>
+
+                        }
+
+                      </div>
+
+                    }
+
+
+
+                    {
+
+                      !submission &&
+
+                      <>
+
+                        <input
+
+                          type="file"
+
+                          className="form-control"
+
+                          onChange={(e) =>
+
+                            handleFileChange(
+
+                              assignment._id,
+
+                              e.target.files[0]
+
+                            )
+
+                          }
+
+                        />
+
+
+
+                        <button
+
+                          className="submit-btn"
+
+                          onClick={() =>
+
+                            handleSubmit(
+                              assignment._id
+                            )
+
+                          }
+
+                        >
+
+                          <FiUpload />
+
+                          Submit Assignment
+
+                        </button>
+
+                      </>
+
+                    }
+
+                  </div>
+
+                </div>
+
+              );
+
+            }
+
+          )
+
+        }
+
+      </div>
+
+    </div>
+
+  );
 
 }
 
