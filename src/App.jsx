@@ -22,11 +22,12 @@ import AdminLayout from "./layouts/AdminLayout";
 
 import StudentDashboard from "./pages/student/StudentDashboard";
 import StudentCourses from "./pages/student/StudentCourses";
-import CourseDetails from "./pages/student/CourseDetails";
+import CourseDetails from "./pages/student/StudentCourseDetails";
 import Assignments from "./pages/student/Assignments";
 import Notifications from "./pages/student/Notifications";
 import LiveClasses from "./pages/student/LiveClasses";
 import Messages from "./pages/student/Messages";
+import StudentQuiz from "./pages/student/StudentQuiz";
 
 
 
@@ -41,6 +42,9 @@ import CreateCourse from "./pages/instructor/CreateCourse";
 import CreateModule from "./pages/instructor/CreateModule";
 import CreateAssignment from "./pages/instructor/CreateAssignment";
 import InstructorStudents from "./pages/instructor/InstructorStudents";
+import InstructorCourseDetails from "./pages/instructor/InstructorCourseDetails";
+import InstructorLessons from "./pages/instructor/InstructorLessons";
+import InstructorQuizBuilder from "./pages/instructor/InstructorQuizBuilder";
 
 
 
@@ -159,11 +163,6 @@ function App() {
           />
 
           <Route
-            path="courses/:id"
-            element={<CourseDetails />}
-          />
-
-          <Route
             path="assignments"
             element={<Assignments />}
           />
@@ -183,7 +182,24 @@ function App() {
             element={<Messages />}
           />
 
+          {/* <Route
+            path="courses/:courseId"
+            element={<StudentCourseDetails />}
+          /> */}
+
+          <Route
+            path="/student/quiz/:quizId"
+            element={<StudentQuiz />}
+          />
+
         </Route>
+
+        <Route
+          path="/student/courses/:courseId"
+          element={<CourseDetails />}
+        />
+
+
 
 
 
@@ -260,6 +276,21 @@ function App() {
           <Route
             path="messages"
             element={<InstructorMessages />}
+          />
+
+          <Route
+            path="course/:courseId"
+            element={<InstructorCourseDetails />}
+          />
+
+          <Route
+            path="lessons/:moduleId"
+            element={<InstructorLessons />}
+          />
+
+          <Route
+            path="quiz-builder/:moduleId"
+            element={<InstructorQuizBuilder />}
           />
 
         </Route>

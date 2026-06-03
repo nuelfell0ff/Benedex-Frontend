@@ -1,150 +1,287 @@
-import {
-useEffect,
-useState
-}
-from "react";
+import "./InstructorCourses.css";
 
 import {
-Link
-}
-from "react-router-dom";
+  useEffect,
+  useState
+} from "react";
+
+import {
+  Link
+} from "react-router-dom";
 
 import API from "../../services/api";
 
-function InstructorCourses(){
+import {
+  FiBook,
+  FiPlus,
+  FiLayers,
+  FiFileText,
+  FiUsers,
+  FiBarChart2
+} from "react-icons/fi";
 
-const [courses,setCourses] =
-useState([]);
+function InstructorCourses() {
 
-const [loading,setLoading] =
-useState(true);
+  const [courses, setCourses] =
+    useState([]);
 
+  const [loading, setLoading] =
+    useState(true);
 
+  useEffect(() => {
 
+    const fetchCourses =
+      async () => {
 
-useEffect(()=>{
+        try {
 
-const fetchCourses =
-async()=>{
+          const res =
+            await API.get(
+              "/courses"
+            );
 
-try{
+          setCourses(
+            res.data
+          );
 
-const res =
-await API.get(
-"/courses"
-);
+        }
+        catch (error) {
 
-setCourses(
-res.data
-);
+          console.log(error);
 
-}
-catch(error){
+        }
+        finally {
 
-console.log(error);
+          setLoading(false);
 
-}
-finally{
+        }
 
-setLoading(false);
+      };
 
-}
+    fetchCourses();
 
-};
+  }, []);
 
-fetchCourses();
+  if (loading) {
 
-},[]);
+    return (
+      <div className="loading-page">
+        Loading courses...
+      </div>
+    );
 
+  }
 
+  return (
 
+    <div className="instructor-courses-page">
 
-if(loading){
+      <div className="page-header">
 
-return <h1>Loading...</h1>;
+        <div>
 
-}
+          <h1>
+            Course Management
+          </h1>
 
+          <p>
+            Create and manage all learning content.
+          </p>
 
+        </div>
 
+        <Link
+          to="/instructor/create-course"
+          className="create-course-btn"
+        >
 
-return(
+          <FiPlus />
 
-<div>
+          Create Course
 
-<h1>
-Instructor Courses
-</h1>
+        </Link>
 
+      </div>
 
+      <div className="row g-4">
 
-<Link to="/instructor/create-course">
+        {
 
-<button>
-Create Course
-</button>
+          courses.map((course) => (
 
-</Link>
+            <div
+              className="col-lg-6"
+              key={course._id}
+            >
 
+              <div className="course-card">
 
+                <div className="course-banner">
 
-<hr />
+                  {
 
+                    course.image
 
+                      ?
 
-{
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                      />
 
-courses.map((course)=>(
+                      :
 
-<div key={course._id}>
+                      <div className="placeholder-banner">
 
-<h2>
-{course.title}
-</h2>
+                        <FiBook />
 
-<p>
-{course.description}
-</p>
+                      </div>
 
+                  }
 
+                </div>
 
-<Link
-to={`/instructor/create-module/${course._id}`}
->
+                <div className="course-body">
 
-<button>
+                  <h3>
 
-Add Module
+                    {course.title}
 
-</button>
+                  </h3>
 
-</Link>
+                  <p>
 
+                    {course.description}
 
+                  </p>
 
-<Link
-to={`/instructor/create-assignment/${course._id}`}
->
+                  <div className="course-meta">
 
-<button>
+                    <span>
 
-Add Assignment
+                      ₦{
+                        Number(
+                          course.price
+                        ).toLocaleString()
+                      }
 
-</button>
+                    </span>
 
-</Link>
+                    <span>
 
-<hr />
+                      {
+                        course.students?.length || 0
+                      }
 
-</div>
+                      Students
 
-))
+                    </span>
 
-}
+                  </div>
 
-</div>
+                  <div className="course-actions">
 
-);
+                    <Link
+
+                      to={`/instructor/course/${course._id}`}
+
+                      className="action-btn"
+
+                    >
+
+                      <FiBook />
+
+                      Course
+
+                    </Link>
+
+                    <Link
+
+                      to={`/instructor/create-module/${course._id}`}
+
+                      className="action-btn"
+
+                    >
+
+                      <FiLayers />
+
+                      Modules
+
+                    </Link>
+
+                    {/* <Link
+
+                      to={`/instructor/lessons/${course._id}`}
+
+                      className="action-btn"
+
+                    >
+
+                      <FiFileText />
+
+                      Lessons
+
+                    </Link> */}
+
+                    <Link
+
+                      to={`/instructor/create-assignment/${course._id}`}
+
+                      className="action-btn"
+
+                    >
+
+                      <FiFileText />
+
+                      Assignments
+
+                    </Link>
+
+                    <Link
+
+                      to={`/instructor/students/${course._id}`}
+
+                      className="action-btn"
+
+                    >
+
+                      <FiUsers />
+
+                      Students
+
+                    </Link>
+
+                    <Link
+
+                      to={`/instructor/analytics/${course._id}`}
+
+                      className="action-btn"
+
+                    >
+
+                      <FiBarChart2 />
+
+                      Analytics
+
+                    </Link>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          ))
+
+        }
+
+      </div>
+
+    </div>
+
+  );
 
 }
 

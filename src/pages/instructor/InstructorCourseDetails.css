@@ -1,0 +1,81 @@
+.instructor-course-details {
+  padding: 30px;
+  min-height: 100vh;
+  background: #f6f9fc;
+}
+
+.course-header {
+  margin-bottom: 30px;
+}
+
+.course-header h1 {
+  color: #08345a;
+  font-weight: 700;
+  font-size: 2.5rem;
+}
+
+.course-header p {
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.course-actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #2e7fc1;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+.modules-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.module-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.module-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.module-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #08345a;
+  font-size: 1.3rem;
+}
+
+.module-info {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.module-actions {
+  display: flex;
+  gap: 10px;
+}

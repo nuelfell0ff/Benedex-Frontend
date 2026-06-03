@@ -1,19 +1,34 @@
+import "./CreateModule.css";
+
 import {
   useState
-}
-  from "react";
+} from "react";
 
 import {
-  useParams
-}
-  from "react-router-dom";
+  useParams,
+  useNavigate
+} from "react-router-dom";
 
 import API from "../../services/api";
+
+import {
+  FiLayers,
+  FiBookOpen,
+  FiHash,
+  FiArrowRight
+}
+from "react-icons/fi";
 
 function CreateModule() {
 
   const { courseId } =
     useParams();
+
+  const navigate =
+    useNavigate();
+
+  const [loading, setLoading] =
+    useState(false);
 
   const [formData, setFormData] =
     useState({
@@ -21,11 +36,9 @@ function CreateModule() {
       title: "",
       description: "",
       month: 1,
-      order: 1,
-      videoUrl: ""
+      order: 1
 
     });
-
 
 
 
@@ -35,6 +48,7 @@ function CreateModule() {
       setFormData({
 
         ...formData,
+
         [e.target.name]:
           e.target.value
 
@@ -44,13 +58,14 @@ function CreateModule() {
 
 
 
-
   const handleSubmit =
     async (e) => {
 
       e.preventDefault();
 
       try {
+
+        setLoading(true);
 
         await API.post(
 
@@ -68,29 +83,27 @@ function CreateModule() {
               courseId,
 
             month:
-              Number(formData.month),
+              Number(
+                formData.month
+              ),
 
             order:
-              Number(formData.order),
+              Number(
+                formData.order
+              ),
 
-            content: [
-
-              {
-
-                title: "Lesson",
-                videoUrl:
-                  formData.videoUrl
-
-              }
-
-            ]
+            content: []
 
           }
 
         );
 
         alert(
-          "Module created"
+          "Module created successfully"
+        );
+
+        navigate(
+          `/instructor/course/${courseId}`
         );
 
       }
@@ -99,71 +112,243 @@ function CreateModule() {
         console.log(error);
 
       }
+      finally {
+
+        setLoading(false);
+
+      }
 
     };
 
 
 
-
   return (
 
-    <div>
+    <div className="create-module-page">
 
-      <h1>
-        Create Module
-      </h1>
+      <div className="module-header">
 
-      <form onSubmit={handleSubmit}>
+        <div>
 
-        <input
-          type="text"
-          name="title"
-          placeholder="Module Title"
-          onChange={handleChange}
-          required
-        />
+          <h1>
 
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          onChange={handleChange}
-          required
-        />
+            <FiLayers />
 
-        <input
-          type="number"
-          name="month"
-          placeholder="Month"
-          onChange={handleChange}
-          min="1"
-          required
-        />
+            Create Module
 
-        <input
-          type="number"
-          name="order"
-          placeholder="Order"
-          onChange={handleChange}
-          min="1"
-          required
-        />
+          </h1>
 
-        <input
-          type="text"
-          name="videoUrl"
-          placeholder="Video URL"
-          onChange={handleChange}
-          required
-        />
+          <p>
 
-        <button type="submit">
+            Organize your course into structured learning modules.
 
-          Create Module
+          </p>
 
-        </button>
+        </div>
 
-      </form>
+      </div>
+
+
+
+      <div className="module-card">
+
+        <form
+          onSubmit={handleSubmit}
+        >
+
+          <div className="form-group">
+
+            <label>
+
+              Module Title
+
+            </label>
+
+            <div className="input-wrapper">
+
+              <FiBookOpen />
+
+              <input
+
+                type="text"
+
+                name="title"
+
+                value={
+                  formData.title
+                }
+
+                onChange={
+                  handleChange
+                }
+
+                placeholder="Introduction to UI Design"
+
+                required
+
+              />
+
+            </div>
+
+          </div>
+
+
+
+          <div className="form-group">
+
+            <label>
+
+              Description
+
+            </label>
+
+            <textarea
+
+              name="description"
+
+              value={
+                formData.description
+              }
+
+              onChange={
+                handleChange
+              }
+
+              rows="5"
+
+              placeholder="Describe what students will learn..."
+
+              required
+
+            />
+
+          </div>
+
+
+
+          <div className="row">
+
+            <div className="col-md-6">
+
+              <div className="form-group">
+
+                <label>
+
+                  Learning Month
+
+                </label>
+
+                <div className="input-wrapper">
+
+                  <FiHash />
+
+                  <input
+
+                    type="number"
+
+                    min="1"
+
+                    name="month"
+
+                    value={
+                      formData.month
+                    }
+
+                    onChange={
+                      handleChange
+                    }
+
+                    required
+
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <div className="col-md-6">
+
+              <div className="form-group">
+
+                <label>
+
+                  Module Order
+
+                </label>
+
+                <div className="input-wrapper">
+
+                  <FiHash />
+
+                  <input
+
+                    type="number"
+
+                    min="1"
+
+                    name="order"
+
+                    value={
+                      formData.order
+                    }
+
+                    onChange={
+                      handleChange
+                    }
+
+                    required
+
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          <button
+
+            type="submit"
+
+            className="create-module-btn"
+
+            disabled={loading}
+
+          >
+
+            {
+
+              loading
+
+                ?
+
+                "Creating..."
+
+                :
+
+                <>
+
+                  Create Module
+
+                  <FiArrowRight />
+
+                </>
+
+            }
+
+          </button>
+
+        </form>
+
+      </div>
 
     </div>
 
