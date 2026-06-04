@@ -33,7 +33,9 @@ function StudentQuiz() {
         setLoading(true);
 
         // PRIMARY: quizId route
-        let res = await API.get(`/quizzes/${quizId}`).catch(() => null);
+        let res = await API.get(
+          `/quizzes/${quizId}`
+        ).catch(() => null);
 
         // FALLBACK: module-based quiz (VERY IMPORTANT FIX)
         if (!res?.data) {
@@ -126,10 +128,16 @@ function StudentQuiz() {
     clearInterval(timerRef.current);
 
     try {
-      await API.post(`/quizzes/submit/${quizId}`, {
-        answers,
-        score: total,
-      });
+      const res = await API.post(
+        `/quizzes/submit/${quizId}`,
+        {
+          answers,
+        }
+      );
+
+      setScore(
+        res.data.correct
+      );
     } catch (err) {
       console.log(err);
     }
@@ -188,9 +196,8 @@ function StudentQuiz() {
             {(question?.options || []).map((opt, i) => (
               <button
                 key={i}
-                className={`quiz-option ${
-                  answers[current] === opt ? "active" : ""
-                }`}
+                className={`quiz-option ${answers[current] === opt ? "active" : ""
+                  }`}
                 onClick={() => handleSelect(opt)}
               >
                 {opt}

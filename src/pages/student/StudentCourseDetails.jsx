@@ -1,9 +1,16 @@
 import "./StudentCourseDetails.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import API from "../../services/api";
 import { motion } from "framer-motion";
-import { FiArrowLeft, FiFileText } from "react-icons/fi";
+
+import {
+  FiArrowLeft,
+  FiFileText,
+  FiCheckCircle,
+  FiBookOpen,
+  FiPlayCircle
+} from "react-icons/fi";
 
 function StudentCourseDetails() {
   const { courseId } = useParams();
@@ -18,15 +25,15 @@ function StudentCourseDetails() {
 
   const [progress, setProgress] = useState([]);
   const [quiz, setQuiz] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  /* ---------------- COURSE + MODULES ---------------- */
+  /* ================= COURSE ================= */
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourse = async () => {
       try {
         const [courseRes, modulesRes] = await Promise.all([
           API.get(`/courses/${courseId}`),
-          API.get(`/modules/${courseId}`),
+          API.get(`/modules/${courseId}`)
         ]);
 
         setCourse(courseRes.data);
@@ -36,46 +43,41 @@ function StudentCourseDetails() {
       }
     };
 
-    fetchData();
+    fetchCourse();
   }, [courseId]);
 
-  /* ---------------- LESSONS + QUIZ ---------------- */
+  /* ================= MODULE DATA ================= */
+
   useEffect(() => {
     const fetchModuleData = async () => {
       if (!modules.length) return;
 
-      setLoading(true);
-
       try {
         const moduleId = modules[selectedModuleIndex]?._id;
-        if (!moduleId) return;
 
         const [lessonRes, quizRes] = await Promise.all([
           API.get(`/lessons/module/${moduleId}`),
-          API.get(`/quizzes/module/${moduleId}`).catch(() => null),
+          API.get(`/quizzes/module/${moduleId}`).catch(() => null)
         ]);
 
-        const lessonData = lessonRes.data || [];
-
-        setLessons(lessonData);
+        setLessons(lessonRes.data || []);
         setQuiz(quizRes?.data || null);
 
         setSelectedLessonIndex(0);
       } catch (err) {
         console.log(err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchModuleData();
-  }, [selectedModuleIndex, modules]);
+  }, [modules, selectedModuleIndex]);
 
-  /* ---------------- PROGRESS ---------------- */
+  /* ================= PROGRESS ================= */
+
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const res = await API.get(`/lessons/progress`);
+        const res = await API.get("/lessons/progress");
         setProgress(res.data || []);
       } catch (err) {
         console.log(err);
@@ -85,19 +87,29 @@ function StudentCourseDetails() {
     fetchProgress();
   }, []);
 
-  /* ---------------- HELPERS ---------------- */
+  /* ================= HELPERS ================= */
+
   const currentLesson = lessons[selectedLessonIndex];
 
   const isCompleted = (lessonId) =>
-    progress.some((p) => p.lesson === lessonId);
+    progress.some(
+      (item) =>
+        item.lesson === lessonId ||
+        item.lesson?._id === lessonId
+    );
 
   const markComplete = async () => {
     if (!currentLesson) return;
 
     try {
-      await API.post(`/lessons/complete/${currentLesson._id}`);
+      await API.post(
+        `/lessons/complete/${currentLesson._id}`
+      );
 
-      const res = await API.get(`/lessons/progress`);
+      const res = await API.get(
+        "/lessons/progress"
+      );
+
       setProgress(res.data || []);
     } catch (err) {
       console.log(err);
@@ -105,14 +117,21 @@ function StudentCourseDetails() {
   };
 
   const nextLesson = () => {
-    if (selectedLessonIndex < lessons.length - 1) {
-      setSelectedLessonIndex((i) => i + 1);
+    if (
+      selectedLessonIndex <
+      lessons.length - 1
+    ) {
+      setSelectedLessonIndex(
+        (prev) => prev + 1
+      );
     }
   };
 
   const prevLesson = () => {
     if (selectedLessonIndex > 0) {
-      setSelectedLessonIndex((i) => i - 1);
+      setSelectedLessonIndex(
+        (prev) => prev - 1
+      );
     }
   };
 
@@ -125,136 +144,329 @@ function StudentCourseDetails() {
       url.match(/embed\/([^?]+)/);
 
     const id = match?.[1];
-    return id ? `https://www.youtube.com/embed/${id}` : url;
+
+    return id
+      ? `https://www.youtube.com/embed/${id}`
+      : url;
   };
 
-  /* ---------------- LOADING ---------------- */
+  /* ================= LOADING ================= */
+
   if (!course) {
     return (
       <div className="scd-loader">
-        <div className="spinner" />
-        Loading course...
+        Loading Course...
       </div>
     );
   }
 
   return (
     <div className="scd-page">
+      <div className="scd-container">
 
-      {/* TOP BAR */}
-      <div className="scd-topbar">
-        <button onClick={() => navigate("/student/courses")} className="back-btn">
-          <FiArrowLeft /> Back to Courses
+        <button
+          className="back-btn"
+          onClick={() =>
+            navigate("/student/courses")
+          }
+        >
+          <FiArrowLeft />
+          Back to Courses
         </button>
 
-        <h1>{course.title}</h1>
-      </div>
+        <div className="course-layout">
 
-      <div className="scd-layout">
+          {/* ================= LEFT SIDE ================= */}
 
-        {/* MODULES */}
-        <aside className="scd-sidebar">
-          {modules.map((m, i) => (
-            <div
-              key={m._id}
-              className={`module ${i === selectedModuleIndex ? "active" : ""}`}
-              onClick={() => setSelectedModuleIndex(i)}
-            >
-              <strong>{m.title}</strong>
-              <span>{lessons.length} lessons</span>
-            </div>
-          ))}
-        </aside>
+          <div>
 
-        {/* MAIN CONTENT */}
-        <main className="scd-main">
+            {/* VIDEO HERO */}
 
-          {currentLesson && (
             <motion.div
-              key={currentLesson._id}
-              className="lesson-card"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="video-hero"
+              initial={{
+                opacity: 0,
+                y: 20
+              }}
+              animate={{
+                opacity: 1,
+                y: 0
+              }}
             >
+              <div className="video-wrapper">
 
-              {/* VIDEO / CONTENT */}
-              <div className="lesson-media">
-
-                {currentLesson.type === "video" && currentLesson.videoUrl && (
+                {currentLesson?.type ===
+                  "video" &&
+                  currentLesson?.videoUrl ? (
                   <iframe
-                    src={getYoutubeEmbed(currentLesson.videoUrl)}
-                    title="lesson"
+                    src={getYoutubeEmbed(
+                      currentLesson.videoUrl
+                    )}
+                    title="Lesson Video"
                     allowFullScreen
+                  />
+                ) : (
+                  <img
+                    src={
+                      course.thumbnail ||
+                      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
+                    }
+                    alt={course.title}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
                   />
                 )}
 
-                {currentLesson.type === "text" && (
-                  <div className="text-content">
-                    {currentLesson.content}
-                  </div>
-                )}
-
-                {currentLesson.type === "document" && (
-                  <a href={currentLesson.documentUrl} target="_blank" rel="noreferrer">
-                    <FiFileText /> Open Document
-                  </a>
-                )}
-
               </div>
-
-              <h2>{currentLesson.title}</h2>
-
-              {/* NAVIGATION */}
-              <div className="lesson-actions">
-
-                <button onClick={prevLesson} disabled={selectedLessonIndex === 0}>
-                  Prev
-                </button>
-
-                <button
-                  onClick={markComplete}
-                  disabled={isCompleted(currentLesson._id)}
-                  className="complete"
-                >
-                  {isCompleted(currentLesson._id) ? "Completed" : "Mark Complete"}
-                </button>
-
-                <button
-                  onClick={nextLesson}
-                  disabled={selectedLessonIndex === lessons.length - 1}
-                >
-                  Next
-                </button>
-
-              </div>
-
-              {/* QUIZ */}
-              {selectedLessonIndex === lessons.length - 1 && quiz && (
-                <div className="quiz-box">
-                  <h3>Module Quiz</h3>
-                  <p>{quiz.title}</p>
-
-                  <Link to={`/student/quiz/${quiz._id}`} className="quiz-btn">
-                    Take Quiz
-                  </Link>
-                </div>
-              )}
-
             </motion.div>
-          )}
 
-        </main>
+            {/* COURSE INFO */}
 
-        {/* RIGHT PANEL */}
-        <aside className="scd-progress">
-          <h3>Progress</h3>
+            <div className="course-info">
 
-          <div className="progress-box">
-            Completed Lessons: {progress.length}
+              <h1 className="course-title">
+                {course.title}
+              </h1>
+
+              <p className="course-description">
+                {course.description}
+              </p>
+
+            </div>
+
+            {/* MODULES */}
+
+            <div className="modules-section">
+
+              <h2 className="modules-title">
+                Course Modules
+              </h2>
+
+              {modules.map((module, index) => (
+                <div
+                  key={module._id}
+                  className="module-card"
+                >
+                  <div
+                    className={`module-header ${selectedModuleIndex ===
+                      index
+                      ? "active"
+                      : ""
+                      }`}
+                    onClick={() => {
+                      setSelectedModuleIndex(
+                        index
+                      );
+                    }}
+                  >
+                    <div className="module-name">
+                      {module.title}
+                    </div>
+                  </div>
+
+                  {selectedModuleIndex ===
+                    index && (
+                      <div className="lesson-list">
+
+                        {lessons.map(
+                          (
+                            lesson,
+                            lessonIndex
+                          ) => (
+                            <div
+                              key={lesson._id}
+                              className={`lesson-item ${selectedLessonIndex ===
+                                lessonIndex
+                                ? "active"
+                                : ""
+                                }`}
+                              onClick={() =>
+                                setSelectedLessonIndex(
+                                  lessonIndex
+                                )
+                              }
+                            >
+                              {lesson.title}
+                            </div>
+                          )
+                        )}
+
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+
+            {/* LESSON CONTENT */}
+
+            {currentLesson && (
+              <motion.div
+                className="lesson-content"
+                key={currentLesson._id}
+                initial={{
+                  opacity: 0
+                }}
+                animate={{
+                  opacity: 1
+                }}
+              >
+                <h2>
+                  {currentLesson.title}
+                </h2>
+
+                {currentLesson.type ===
+                  "text" && (
+                    <div className="lesson-text">
+                      {
+                        currentLesson.content
+                      }
+                    </div>
+                  )}
+
+                {currentLesson.type ===
+                  "document" && (
+                    <a
+                      href={
+                        currentLesson.documentUrl
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="document-btn"
+                    >
+                      <FiFileText />
+                      Open Document
+                    </a>
+                  )}
+
+                <div className="lesson-actions">
+
+                  <button
+                    className="prev-btn"
+                    onClick={prevLesson}
+                    disabled={
+                      selectedLessonIndex === 0
+                    }
+                  >
+                    Previous
+                  </button>
+
+                  <button
+                    className="complete-btn"
+                    onClick={markComplete}
+                    disabled={isCompleted(
+                      currentLesson._id
+                    )}
+                  >
+                    {isCompleted(
+                      currentLesson._id
+                    )
+                      ? "Completed"
+                      : "Mark Complete"}
+                  </button>
+
+                  <button
+                    className="next-btn"
+                    onClick={nextLesson}
+                    disabled={
+                      selectedLessonIndex ===
+                      lessons.length - 1
+                    }
+                  >
+                    Next
+                  </button>
+
+                </div>
+
+                {/* QUIZ */}
+
+                {selectedLessonIndex ===
+                  lessons.length - 1 &&
+                  quiz && (
+                    <div className="quiz-box">
+
+                      <h3>
+                        Module Quiz
+                      </h3>
+
+                      <p>
+                        You have completed
+                        this module.
+                        Take the quiz to
+                        continue.
+                      </p>
+
+                      <Link
+                        to={`/student/quiz/${modules[selectedModuleIndex]._id}`}
+                      >
+                        Take Quiz
+                      </Link>
+
+                    </div>
+                  )}
+              </motion.div>
+            )}
           </div>
 
-        </aside>
+          {/* ================= RIGHT SIDEBAR ================= */}
 
+          <aside className="course-sidebar">
+
+            <div className="sidebar-card">
+
+              <h3>
+                Course Progress
+              </h3>
+
+              <div className="progress-value">
+                {progress.length}
+              </div>
+
+              <p>
+                Lessons Completed
+              </p>
+
+            </div>
+
+            <div className="sidebar-card">
+
+              <h3>
+                Course Details
+              </h3>
+
+              <ul className="sidebar-list">
+
+                <li>
+                  <FiBookOpen />
+                  {" "}
+                  {modules.length}
+                  {" "}
+                  Modules
+                </li>
+
+                <li>
+                  <FiPlayCircle />
+                  {" "}
+                  {lessons.length}
+                  {" "}
+                  Lessons
+                </li>
+
+                <li>
+                  <FiCheckCircle />
+                  {" "}
+                  Student Access
+                </li>
+
+              </ul>
+
+            </div>
+
+          </aside>
+
+        </div>
       </div>
     </div>
   );

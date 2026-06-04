@@ -22,7 +22,7 @@ import AdminLayout from "./layouts/AdminLayout";
 
 import StudentDashboard from "./pages/student/StudentDashboard";
 import StudentCourses from "./pages/student/StudentCourses";
-import CourseDetails from "./pages/student/StudentCourseDetails";
+import CourseDetails from "./pages/student/StudentsCourseDetails";
 import Assignments from "./pages/student/Assignments";
 import Notifications from "./pages/student/Notifications";
 import LiveClasses from "./pages/student/LiveClasses";
