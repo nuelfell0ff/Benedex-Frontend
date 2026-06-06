@@ -12,7 +12,9 @@ import {
   FiActivity,
   FiChevronDown,
   FiBookOpen,
-  FiHelpCircle
+  FiHelpCircle,
+  FiLock,
+  FiRefreshCw
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
@@ -24,25 +26,41 @@ function StudentQuiz() {
 
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasAttempted, setHasAttempted] = useState(false); // Only locks out if they PASSED
 
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [serverPassed, setServerPassed] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
 
-  /* ---------------- FETCH QUIZ ---------------- */
+  /* ---------------- FETCH QUIZ + CHECK PRIOR ATTEMPTS ---------------- */
   useEffect(() => {
-    const fetchQuiz = async () => {
+    const fetchQuizAndStatus = async () => {
       try {
         setLoading(true);
+
+        // Security check: Query progress tracker to see if the user already passed this quiz
+        const progressRes = await API.get(`/quizzes/progress`).catch(() => ({ data: [] }));
+        
+        const alreadyPassed = (progressRes.data || []).some(
+          (q) => String(q.quiz?._id || q.quiz) === String(quizId) && q.passed === true
+        );
+
+        // If they have already passed, explicitly lock them out
+        if (alreadyPassed) {
+          setHasAttempted(true);
+          setLoading(false);
+          return;
+        }
 
         // PRIMARY: quizId route
         let res = await API.get(`/quizzes/${quizId}`).catch(() => null);
 
-        // FALLBACK: module-based quiz
+        // FALLBACK: module-based quiz lookup
         if (!res?.data) {
           res = await API.get(`/quizzes/module/${quizId}`).catch(() => null);
         }
@@ -64,12 +82,12 @@ function StudentQuiz() {
       }
     };
 
-    fetchQuiz();
+    fetchQuizAndStatus();
   }, [quizId]);
 
   /* ---------------- TIMER ---------------- */
   useEffect(() => {
-    if (!quiz || submitted) return;
+    if (!quiz || submitted || hasAttempted) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -83,7 +101,7 @@ function StudentQuiz() {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [quiz, submitted]);
+  }, [quiz, submitted, hasAttempted]);
 
   const formatTime = (sec = 0) => {
     const m = Math.floor(sec / 60);
@@ -98,6 +116,7 @@ function StudentQuiz() {
 
   /* ---------------- ANSWERS ---------------- */
   const handleSelect = (value) => {
+    if (submitted || hasAttempted) return;
     setAnswers((prev) => ({
       ...prev,
       [current]: value,
@@ -117,9 +136,21 @@ function StudentQuiz() {
     }
   };
 
+  /* ---------------- RETAKE RESET TRIGGER ---------------- */
+  const handleRetakeReset = () => {
+    setAnswers({});
+    setCurrent(0);
+    setSubmitted(false);
+    setScore(0);
+    setServerPassed(false);
+    if (quiz) {
+      setTimeLeft(quiz.questions.length * 60);
+    }
+  };
+
   /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async () => {
-    if (submitted || !quiz) return;
+    if (submitted || !quiz || hasAttempted) return;
 
     let total = 0;
     questions.forEach((q, i) => {
@@ -135,18 +166,11 @@ function StudentQuiz() {
     try {
       const res = await API.post(`/quizzes/submit/${quizId}`, { answers });
       setScore(res.data.correct);
+      setServerPassed(res.data.passed);
     } catch (err) {
       console.log(err);
     }
   };
-
-  /* Avatar initials helper */
-  const initials = (user?.fullName || "Student")
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   /* ---------------- LOADING STATE ---------------- */
   if (loading) {
@@ -154,6 +178,22 @@ function StudentQuiz() {
       <div className="scd-loader-container">
         <div className="scd-spinner" />
         <p>Assembling Quiz Environment...</p>
+      </div>
+    );
+  }
+
+  /* ---------------- SECURITY EXPLICIT ATTEMPT GUARDRAIL ---------------- */
+  if (hasAttempted) {
+    return (
+      <div className="scd-loader-container benedex-quiz-lockout">
+        <FiCheckCircle size={50} style={{ color: "#10b981", marginBottom: "16px" }} />
+        <h2>Assessment Completed Successfully</h2>
+        <p style={{ maxWidth: "460px", margin: "0 auto", color: "var(--text-muted)" }}>
+          You have already passed this evaluation block. To maintain academic tracking integrity, retakes are restricted once a passing grade is recorded.
+        </p>
+        <button onClick={() => navigate(-1)} className="nav-control-button buy-action-btn-styled" style={{ marginTop: "24px" }}>
+          Return to Learning Workspace
+        </button>
       </div>
     );
   }
@@ -173,44 +213,8 @@ function StudentQuiz() {
 
   return (
     <div className="benedex-lms-theme quiz-workspace-layout">
-      
-      {/* GLOBAL PLATFORM TOPBAR */}
-        {/* <header className="student-topbar">
-          <div className="student-topbar-brand-container">
-            <div className="student-sidebar-brand">
-              <span className="student-sidebar-mark" aria-hidden="true">
-                <FiActivity />
-              </span>
-              <div className="student-sidebar-brand-copy">
-                <strong>Benedex Digital</strong>
-                <span>Academic Assessment</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="quiz-running-tracker-mid">
-            <span className="quiz-badge-indicator">LIVE EVALUATION TRACK</span>
-            <h2 className="quiz-topbar-title-truncate">{quiz.title}</h2>
-          </div>
-
-          <div className="student-top-actions">
-            <div className="student-user-chip">
-              <span className="student-user-avatar" aria-hidden="true">
-                {initials}
-              </span>
-              <div className="student-user-copy">
-                <strong>{user?.fullName || "Kwame Mensah"}</strong>
-                <span>Student Account</span>
-              </div>
-              <FiChevronDown aria-hidden="true" className="student-user-chevron" />
-            </div>
-          </div>
-        </header> */}
-
-      {/* TWO COLUMN WORKSPACE CONTAINER */}
       <div className="benedex-container">
-        
-        {/* LINEAR PROGRESSIVE STRIP ACCENT */}
+
         {!submitted && (
           <div className="quiz-global-progress-wrapper">
             <div className="progress-text-row">
@@ -218,8 +222,8 @@ function StudentQuiz() {
               <strong>{current + 1} of {questions.length} Questions</strong>
             </div>
             <div className="progress-track-bar-bg">
-              <div 
-                className="progress-fill-bar-active" 
+              <div
+                className="progress-fill-bar-active"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -227,7 +231,7 @@ function StudentQuiz() {
         )}
 
         <div className="benedex-grid">
-          
+
           {/* LEFT PRIMARY TESTING CANVAS */}
           <main className="main-content-flow">
             <AnimatePresence mode="wait">
@@ -255,7 +259,7 @@ function StudentQuiz() {
                   <div className="quiz-interactive-options-stack">
                     {(question?.options || []).map((opt, i) => {
                       const isSelected = answers[current] === opt;
-                      const alphabetIndex = String.fromCharCode(65 + i); // A, B, C, D
+                      const alphabetIndex = String.fromCharCode(65 + i);
 
                       return (
                         <button
@@ -273,11 +277,10 @@ function StudentQuiz() {
                     })}
                   </div>
 
-                  {/* NAV-CONTROLS REBALANCED WITHIN LOWER TRACK CARD CONTAINER */}
                   <div className="workspace-navigation-row-bar quiz-inner-controls">
-                    <button 
-                      className="nav-control-button" 
-                      onClick={prev} 
+                    <button
+                      className="nav-control-button"
+                      onClick={prev}
                       disabled={current === 0}
                     >
                       <FiArrowLeft /> Previous Question
@@ -295,7 +298,7 @@ function StudentQuiz() {
                   </div>
                 </motion.div>
               ) : (
-                /* GRADUATED / SUBMITTED REPORT INTERFACE */
+                /* SUBMITTED SCORE REPORT PANEL */
                 <motion.div
                   className="media-player-card quiz-results-score-card"
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -303,28 +306,33 @@ function StudentQuiz() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="results-celebration-graphic">
-                    <div className="award-icon-crown">
+                    <div className={`award-icon-crown ${serverPassed ? "passed-crown" : "failed-crown"}`}>
                       <FiAward size={44} />
                     </div>
                   </div>
-                  
+
                   <span className="results-sub-heading">EVALUATION METRICS COMPLETED</span>
                   <h2>Performance Scoreboard</h2>
-                  
+
                   <div className="score-numerical-display">
                     <span className="earned-points">{score}</span>
                     <span className="total-possible-points">/ {questions.length}</span>
                   </div>
 
                   <p className="results-feedback-prose">
-                    {score / questions.length >= 0.7 
-                      ? "Excellent track execution! You have demonstrated conceptual mastery over this specific course milestone." 
-                      : "Good attempt. Review the referenced manual modules inside your learning workspace timeline to fortify core logic errors."}
+                    {serverPassed
+                      ? "Excellent track execution! You have demonstrated conceptual mastery over this specific course milestone and unlocked subsequent modules."
+                      : "You did not achieve the required pass mark for this segment module. Please review your study resources and attempt the evaluation block again."}
                   </p>
 
-                  <div className="results-action-row-group">
-                    <button onClick={() => navigate("/student/courses")} className="btn-primary-action-buy">
-                      Return to Course Dashboard
+                  <div className="results-action-row-group" style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                    {!serverPassed && (
+                      <button onClick={handleRetakeReset} className="nav-control-button next" style={{ background: "var(--accent-gold)", color: "#000" }}>
+                        <FiRefreshCw style={{ marginRight: "6px" }} /> Retake Assessment
+                      </button>
+                    )}
+                    <button onClick={() => navigate(-1)} className="btn-primary-action-buy" style={{ margin: 0 }}>
+                      Return to Course Studio
                     </button>
                   </div>
                 </motion.div>
@@ -334,12 +342,10 @@ function StudentQuiz() {
 
           {/* RIGHT SIDEBAR STATS TRACKER */}
           <aside className="sidebar-sticky-flow">
-            
-            {/* INTERACTIVE PROGRESS ASSESSMENT MAP */}
             <div className="checkout-widget-card quiz-matrix-widget">
               <h4>Assessment Map</h4>
               <p className="matrix-helper-text">Select maps cleanly to skip or jump between criteria blocks directly.</p>
-              
+
               <div className="quiz-question-grid-matrix">
                 {questions.map((_, index) => {
                   const isAnswered = answers[index] !== undefined;
@@ -359,7 +365,7 @@ function StudentQuiz() {
               </div>
 
               <hr className="divider-line" />
-              
+
               <div className="matrix-legend-row">
                 <div className="legend-item">
                   <span className="legend-dot active" />
@@ -376,7 +382,6 @@ function StudentQuiz() {
               </div>
             </div>
 
-            {/* INTEGRITY / EXAM RULES WIDGET */}
             <div className="requirements-widget-card integrity-card">
               <div className="integrity-title-lockup">
                 <FiHelpCircle />
@@ -385,15 +390,13 @@ function StudentQuiz() {
               <ul>
                 <li>Do not refresh or exit the browser runtime matrix mid-session.</li>
                 <li>When the timer track reaches zero, an auto-submit payload fires.</li>
-                <li>Each question is scaled at average benchmarks of 60 seconds.</li>
+                <li>Retakes are permitted only if your score falls below the required threshold.</li>
               </ul>
             </div>
-
           </aside>
         </div>
       </div>
 
-      {/* MASTER FOOTER ACCENT */}
       <footer className="benedex-footer-wrapper">
         <div className="footer-top-row">
           <div className="footer-brand-column">

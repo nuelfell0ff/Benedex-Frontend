@@ -762,11 +762,14 @@ input {
 .student-icon-button:hover {
   background: rgba(8, 52, 90, 0.06);
   transform: translateY(-1px);
+  display: flex !important;
+  align-items: center !important;
+  justify-items: center !important;
 }
 
 .student-user-chip {
   height: 44px;
-  padding: 0 12px 0 6px;
+  padding: 15px 12px !important;
   border-radius: 16px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: #ffffff;
@@ -776,8 +779,8 @@ input {
 }
 
 .student-user-avatar {
-  width: 30px;
-  height: 30px;
+  width: 30px !important;
+  height: 30px !important;
   border-radius: 50%;
   background: #08345a;
   color: #ffffff;
@@ -2212,7 +2215,7 @@ input {
   .student-sidebar-label,
   .student-user-copy,
   .student-user-chevron {
-    display: none;
+    display: none !important;
   }
 
   .student-sidebar-link {
@@ -2254,19 +2257,23 @@ input {
 @media (max-width: 820px) {
   .student-topbar {
     padding-inline: 14px;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 5px !important;
+    justify-content: flex-end !important;
   }
 
   .student-search {
     min-height: 40px;
+    width: 70% !important;
     padding-inline: 12px;
+    display: flex !important;
+    justify-content: flex-start !important;
   }
 
   .student-top-actions {
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 8px;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    gap: 5px !important;
     min-width: 0;
   }
 

@@ -1,211 +1,487 @@
-.assignment-page {
-  padding: 30px;
-  background: #f6f9fc;
-  min-height: 100vh;
+/* ==========================================================================
+   BENEDEX WORKSPACE THEME - ASSIGNMENTS CORE STYLING (MOBILE-FIRST)
+   ========================================================================== */
+
+/* GLOBAL COMPONENT BOX PREPARATION SAFETY MATRIX */
+.assignment-layout-root,
+.assignment-layout-root *,
+.assignment-layout-root *::before,
+.assignment-layout-root *::after {
+  box-sizing: border-box; /* Ensures padding doesn't widen elements beyond 100% */
 }
 
-.assignment-loading {
-  min-height: 70vh;
+.assignment-layout-root {
+  min-height: 100vh;
+  background-color: var(--bg-main, #f8fafc);
+  padding-bottom: 3rem;
+  width: 100%;
+  overflow-x: hidden; /* Hard viewport boundary armor */
+}
+
+/* 1. HERO BRAND BANNER */
+.assignment-hero-banner {
+  background: linear-gradient(135deg, #021a30 0%, #07335c 50%, #155187 100%);
+  border-radius: 24px;
+  padding: 2.5rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 40px rgba(2, 26, 48, 0.12);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .assignment-hero-banner {
+    padding: 3.5rem 3rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+.assignment-hero-banner::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(46, 127, 193, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.assignment-hero-banner .hero-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #63b3ed;
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+}
+
+.assignment-hero-banner h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .assignment-hero-banner h1 {
+    font-size: 2.75rem;
+  }
+}
+
+.assignment-hero-banner p {
+  font-size: 1rem;
+  color: #cbd5e1;
+  max-width: 720px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .assignment-hero-banner p {
+    font-size: 1.1rem;
+  }
+}
+
+/* 2. METRICS PANEL CARDS */
+.metrics-summary-grid {
+  display: grid;
+  /* Default: Stacks perfectly down to 1 item per line on mobile phones */
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+
+/* Break strings smoothly onto multiple lines on tablet and desktops */
+@media (min-width: 576px) {
+  .metrics-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .metrics-summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 3.5rem;
+  }
+}
+
+.metric-panel-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+  width: 100%;
+}
+
+.metric-panel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05), 0 8px 8px -5px rgba(0, 0, 0, 0.03);
+  border-color: #cbd5e1;
+}
+
+.metric-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 22px;
+  flex-shrink: 0;
 }
 
-.assignment-hero {
-  background: linear-gradient(
-    135deg,
-    #08345a,
-    #2e7fc1
-  );
-
-  color: white;
-
-  border-radius: 24px;
-
-  padding: 40px;
-
-  margin-bottom: 30px;
-
-  box-shadow:
-    0 20px 40px rgba(
-      8,
-      52,
-      90,
-      .15
-    );
-}
-
-.assignment-hero h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-
-.assignment-stat {
-  background: white;
-
-  border-radius: 20px;
-
-  padding: 25px;
-
-  text-align: center;
-
-  transition: .3s;
-
-  box-shadow:
-    0 8px 20px rgba(
-      0,
-      0,
-      0,
-      .05
-    );
-}
-
-.assignment-stat:hover {
-  transform:
-    translateY(-4px);
-}
-
-.assignment-stat svg {
-  font-size: 28px;
+.metric-icon-box.primary-variant {
+  background-color: rgba(46, 127, 193, 0.08);
   color: #2e7fc1;
-  margin-bottom: 10px;
 }
 
-.assignment-card {
-  background: white;
+.metric-icon-box.success-variant {
+  background-color: rgba(16, 185, 129, 0.08);
+  color: #10b981;
+}
 
-  border-radius: 24px;
+.metric-icon-box.warning-variant {
+  background-color: rgba(245, 158, 11, 0.08);
+  color: #f59e0b;
+}
 
-  padding: 24px;
+.metric-info-data h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #021a30;
+  margin: 0;
+  line-height: 1.2;
+}
 
+.metric-info-data span {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* 3. GRID CONTENT SECTIONS & MASONRY STRUCTURAL ARCHITECTURE */
+.workspace-section-heading {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #021a30;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.5px;
+}
+
+@media (min-width: 768px) {
+  .workspace-section-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.assignments-masonry-grid {
+  display: grid;
+  /* CRITICAL MOBILE FIX: Force exactly ONE card per row on small screens */
+  grid-template-columns: 1fr; 
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Base adjustment for side-by-side splitting ONLY on larger monitors */
+@media (min-width: 992px) {
+  .assignments-masonry-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+}
+
+.workspace-assignment-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  
+  /* FLUID CELL STABILIZATION ARRESTORS */
+  max-width: 100% !important;
+  width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  hyphens: auto;
 
-  border: 1px solid #eef2f7;
-
-  transition: .3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
 }
 
-.assignment-card:hover {
-  transform:
-    translateY(-5px);
-
-  box-shadow:
-    0 15px 30px rgba(
-      0,
-      0,
-      0,
-      .08
-    );
+@media (min-width: 768px) {
+  .workspace-assignment-card {
+    padding: 2rem;
+    border-radius: 24px;
+  }
 }
 
-.assignment-header {
+.workspace-assignment-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+.workspace-assignment-card.is-submitted {
+  background: #ffffff;
+  border-left: 4px solid #10b981;
+}
+
+.assignment-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.assignment-header h3 {
-  color: #08345a;
-  font-size: 1.25rem;
-}
-
-.status {
-  padding: 8px 14px;
-  border-radius: 50px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.submitted {
-  background:
-    rgba(25,135,84,.1);
-
-  color:
-    #198754;
-}
-
-.pending {
-  background:
-    rgba(255,193,7,.15);
-
-  color:
-    #b8860b;
-}
-
-.assignment-description {
-  margin: 15px 0;
-  color: #555;
-}
-
-.assignment-meta {
-  margin-bottom: 20px;
-}
-
-.assignment-meta div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.submit-btn {
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
   width: 100%;
-
-  border: none;
-
-  margin-top: 15px;
-
-  padding: 12px;
-
-  border-radius: 12px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #08345a,
-      #2e7fc1
-    );
-
-  color: white;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
 }
 
-.submission-box {
-  background: #f8fafc;
-
-  border-radius: 14px;
-
-  padding: 15px;
-
-  margin-top: 20px;
+.assignment-card-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #021a30;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
 }
 
-.grade-box {
-  margin-top: 10px;
-  color: #198754;
+@media (min-width: 768px) {
+  .assignment-card-header h3 {
+    font-size: 1.25rem;
+  }
+}
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.feedback-box {
-  margin-top: 10px;
-  color: #495057;
+.status-badge.variant-completed {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
 }
 
-@media(max-width:768px){
+.status-badge.variant-pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
 
-  .assignment-page{
-    padding:20px;
-  }
+.assignment-card-description {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
 
-  .assignment-hero{
-    padding:25px;
-  }
+.assignment-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed #e2e8f0;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
 
-  .assignment-hero h1{
-    font-size:2rem;
-  }
+.meta-timestamp-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
 
+.meta-timestamp-tag svg {
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+/* 4. THEMED UPLOAD CONTROL WORKSPACE */
+.assignment-upload-control-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.custom-file-upload-canvas {
+  width: 100%;
+  max-width: 100%;
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  background-color: #f8fafc;
+  overflow: hidden; /* Clips wild filename text layouts */
+  transition: all 0.2s ease;
+}
+
+.custom-file-upload-canvas:hover {
+  background-color: #f1f5f9;
+  border-color: #2e7fc1;
+}
+
+.custom-file-upload-canvas .clip-icon {
+  color: #64748b;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.file-truncate-text {
+  font-size: 0.9rem;
+  color: #475569;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0; /* Forces text layout container compression inside flex elements */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hidden-native-input {
+  display: none !important;
+}
+
+.width-full-override {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  padding: 0.85rem 1.5rem;
+}
+
+/* 5. SUBMISSION BOX & GRADING RECEIPT SHEETS */
+.submission-receipt-workspace {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+  width: 100%;
+}
+
+.receipt-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #10b981;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.receipt-success-banner svg {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.receipt-evaluation-score-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(16, 185, 129, 0.05);
+  border: 1px dashed rgba(16, 185, 129, 0.3);
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #065f46;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.receipt-evaluation-score-box svg {
+  color: #10b981;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.receipt-feedback-workspace-block {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+}
+
+.feedback-header-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.feedback-header-label svg {
+  flex-shrink: 0;
+}
+
+.feedback-body-copy {
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+  word-wrap: break-word;
+}
+
+/* EMPTY STATE WORKSPACE FALLBACK */
+.empty-state-workspace-card {
+  background-color: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 24px;
+  padding: 5rem 2rem;
+  text-align: center;
+  color: #64748b;
+  width: 100%;
+}
+
+.empty-state-workspace-card svg {
+  color: #94a3b8;
+  margin-bottom: 1.25rem;
+}
+
+.empty-state-workspace-card h4 {
+  font-size: 1.25rem;
+  color: #021a30;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-workspace-card p {
+  font-size: 0.95rem;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.6;
 }

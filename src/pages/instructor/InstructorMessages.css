@@ -1,0 +1,135 @@
+/* ==========================================================================
+   SYSTEM INTERACTION LOADING ADDITIONS FOR BENEDEX COMMUNICATION INTERFACES
+   ========================================================================== */
+.chat-viewport-inline-loader {
+  margin: auto;
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.scd-spinner-sm {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: inlineSpin 0.8s linear infinite;
+}
+
+@keyframes inlineSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.scd-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #64748b;
+  font-size: 0.95rem;
+  gap: 12px;
+}
+
+.scd-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: inlineSpin 1s linear infinite;
+}
+
+.faculty-list-scroll-area::-webkit-scrollbar,
+.chat-messages-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.faculty-list-scroll-area::-webkit-scrollbar-track,
+.chat-messages-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.faculty-list-scroll-area::-webkit-scrollbar-thumb,
+.chat-messages-viewport::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+/* ==========================================================================
+   DYNAMIC NOTIFICATION BADGES & INTERACTION MATRIX STATES
+   ========================================================================== */
+
+/* Layout alignment wrapper for badges inside channel rows */
+.roster-badge-cell-zone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Base Pill Layout Styling Token */
+.roster-badge-indicator {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* 1. Live Socket Alert Mode (Bright Red Pulse) */
+.roster-badge-indicator.live-new-red {
+  background-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  animation: pulseLiveNotice 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+/* 2. Historical Unread Backup State (Slate Slate/Gray Accent) */
+.roster-badge-indicator.historical-unread-gray {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+/* Micro-Pulse Highlight for live incoming message rows */
+.faculty-channel-item.has-new-alert {
+  background-color: rgba(239, 68, 68, 0.02);
+}
+
+.faculty-channel-item.has-new-alert:hover {
+  background-color: #f1f5f9;
+}
+
+/* Keyframes for the live red notice alert */
+@keyframes pulseLiveNotice {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+  }
+
+  70% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}

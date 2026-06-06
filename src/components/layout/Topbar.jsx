@@ -76,7 +76,7 @@ function Topbar() {
           </span>
           <div className="student-user-copy">
             <strong>{user?.fullName || "Kwame Mensah"}</strong>
-            <span>Level 12 Warrior</span>
+            <span>{user.role}</span>
           </div>
           <FiChevronDown aria-hidden="true" className="student-user-chevron" />
         </div>
