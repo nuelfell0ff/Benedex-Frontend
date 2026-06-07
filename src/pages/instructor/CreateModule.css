@@ -1,89 +1,174 @@
-.create-module-page{
-  padding:30px;
-  min-height:100vh;
-  background:#f7f9fc;
+/* CreateModule.css */
+
+.bx-cm-workspace {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+  letter-spacing: -0.01em;
 }
 
-.module-header{
-  margin-bottom:30px;
+/* BACK CONSOLE INTERACTIVE DIRECTIVE ROUTE ACTION TRIGGER BUTTON */
+.bx-cm-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.module-header h1{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  color:#08345a;
-  font-weight:700;
+.bx-cm-back-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
 }
 
-.module-header p{
-  color:#6c757d;
+/* PREMIUM CONTAINER PANEL BLOCK COMPONENT FOR METADATA CONTROL DRAFTS */
+.bx-cm-card-panel {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 16px rgba(0, 0, 0, 0.01);
 }
 
-.module-card{
-  background:white;
-  border-radius:24px;
-  padding:30px;
-  box-shadow:
-  0 10px 30px rgba(0,0,0,.05);
+/* INPUT COMPONENT SPECIFIC FIELD GROUP ELEMENT SETS */
+.bx-cm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.form-group{
-  margin-bottom:20px;
+.bx-cm-field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.form-group label{
-  display:block;
-  margin-bottom:8px;
-  font-weight:600;
-  color:#08345a;
+.bx-cm-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.input-wrapper{
-  position:relative;
+.bx-cm-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #64748b;
+  font-size: 1rem;
+  pointer-events: none;
 }
 
-.input-wrapper svg{
-  position:absolute;
-  top:50%;
-  left:15px;
-  transform:translateY(-50%);
-  color:#2e7fc1;
+.bx-cm-form-group input,
+.bx-cm-form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  transition: all 0.15s ease;
 }
 
-.input-wrapper input{
-  width:100%;
-  padding:12px 15px 12px 45px;
-  border:1px solid #dee2e6;
-  border-radius:12px;
+.bx-cm-form-group input {
+  padding-left: 40px;
 }
 
-textarea{
-  width:100%;
-  border:1px solid #dee2e6;
-  border-radius:12px;
-  padding:15px;
-  resize:none;
+.bx-cm-form-group textarea {
+  resize: vertical;
 }
 
-.create-module-btn{
-  width:100%;
-  border:none;
-  padding:14px;
-  border-radius:14px;
-  background:
-  linear-gradient(
-    135deg,
-    #08345a,
-    #2e7fc1
-  );
+.bx-cm-form-group input:focus,
+.bx-cm-form-group textarea:focus {
+  outline: none;
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.08);
+}
 
-  color:white;
+/* CORE CONTROL SUBMISSION CONTAINER INTERACTION PATHWAY BUTTONS */
+.bx-cm-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #07335c;
+  color: #ffffff;
+  border: 1px solid #07335c;
+  padding: 11px 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  font-weight:600;
+.bx-cm-submit-btn:hover:not(:disabled) {
+  background-color: #05233f;
+  border-color: #05233f;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.18);
+}
 
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
+.bx-cm-submit-btn svg {
+  font-size: 0.95rem;
+  transition: transform 0.15s ease;
+}
+
+.bx-cm-submit-btn:hover:not(:disabled) svg {
+  transform: translateX(2px);
+}
+
+.bx-cm-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* DISCRETE FEEDBACK NOTIFICATION FLOATING STRIP LAYOUT */
+.bx-cm-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.92rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.bx-cm-toast.success { background-color: #10b981; }
+.bx-cm-toast.error { background-color: #ef4444; }
+
+.bx-cm-toast svg {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* CORE REFRESH MECHANISM ROTATING LOAD INDICATORS */
+.bx-cm-spinner-sm {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: cmSpin 0.6s linear infinite;
+}
+
+@keyframes cmSpin {
+  to { transform: rotate(360deg); }
 }

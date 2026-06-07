@@ -1,0 +1,476 @@
+/* ==========================================================================
+   BENEDEX INSTRUCTOR PORTAL - LIVE CLASSES MANAGEMENT ARCHITECTURE
+   ========================================================================== */
+
+.bx-live-workspace-container {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+}
+
+/* SYSTEM MAIN LOADER SPINNERS */
+.bx-live-loader-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+}
+
+.bx-live-spinner {
+  width: 42px;
+  height: 42px;
+  border: 3.5px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: liveSpinEngine 0.8s linear infinite;
+}
+
+.bx-live-loader-screen p {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* MODULE MASTER HEADER TIERS */
+.bx-live-header-panel {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 28px;
+  margin-bottom: 36px;
+}
+
+.bx-live-title-block h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #07335c;
+  letter-spacing: -0.025em;
+  margin: 0 0 6px 0;
+}
+
+.bx-live-title-block p {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* TARGET FILTERS DROP PANEL HEADER */
+.bx-course-select-module {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.bx-course-select-module label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* CUSTOM APP SELECT DROPDOWNS */
+.bx-custom-dropdown {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.bx-custom-dropdown select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.15s ease;
+}
+
+.bx-custom-dropdown select:focus {
+  border-color: #07335c;
+}
+
+.bx-custom-dropdown::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #64748b;
+  pointer-events: none;
+}
+
+/* WORKSPACE LAYOUT GRID CONTROLS */
+.bx-live-split-matrix {
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  align-items: start;
+  gap: 40px;
+}
+
+.bx-live-form-column h2,
+.bx-feed-meta-row h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px 0;
+}
+
+/* PREMIUM LIVE FORM INPUT TIERS */
+.bx-live-premium-form {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.01);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bx-live-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bx-live-field-row label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.bx-live-premium-form input[type="text"],
+.bx-live-premium-form textarea,
+.bx-live-premium-form input[type="datetime-local"] {
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bx-live-premium-form input[type="text"]:focus,
+.bx-live-premium-form textarea:focus,
+.bx-live-premium-form input[type="datetime-local"]:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.04);
+}
+
+.bx-live-premium-form textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.bx-live-form-grid-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ACTION EXECUTE DISPATCH SUBMIT TERMINAL BUTTON */
+.bx-live-submit-action-btn {
+  background-color: #07335c;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 12.5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.bx-live-submit-action-btn:hover:not(:disabled) {
+  background-color: #052443;
+}
+
+.bx-live-submit-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bx-live-inline-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: liveSpinEngine 0.6s linear infinite;
+}
+
+/* STREAM TIMELINE LAYOUT CONTROLS */
+.bx-feed-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.bx-feed-meta-row h2 {
+  margin: 0;
+}
+
+.bx-feed-count-tag {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.bx-live-scroll-frame {
+  max-height: 640px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.bx-inner-feed-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 0;
+}
+
+.bx-live-spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: liveSpinEngine 0.8s linear infinite;
+}
+
+.bx-inner-feed-loader p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ACTIVE CLASS DATA SLOT CARDS */
+.bx-classes-vertical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bx-live-class-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(7, 51, 92, 0.005);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bx-live-class-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(7, 51, 92, 0.03);
+}
+
+.bx-class-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.bx-platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.bx-platform-badge.zoom-theme {
+  background-color: rgba(45, 140, 254, 0.08);
+  color: #2d8cfe;
+}
+
+.bx-platform-badge.meet-theme {
+  background-color: rgba(15, 157, 88, 0.08);
+  color: #0f9d58;
+}
+
+.bx-p-icon {
+  font-size: 0.85rem;
+}
+
+.bx-class-duration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  background-color: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.bx-live-class-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
+}
+
+.bx-class-card-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #475569;
+  margin: 0 0 18px 0;
+}
+
+.bx-class-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 14px;
+}
+
+.bx-footer-date-stamp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.bx-join-stream-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #07335c;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.bx-join-stream-action:hover {
+  color: #3b82f6;
+}
+
+/* SYSTEM FALLBACK CONFIG BANNER */
+.bx-live-empty-banner {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+}
+
+.bx-live-empty-icon-box {
+  font-size: 1.8rem;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.bx-live-empty-banner h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.bx-live-empty-banner p {
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 360px;
+}
+
+/* SYSTEM CUSTOM CHROME SCROLLBARS */
+.bx-live-scroll-frame::-webkit-scrollbar {
+  width: 5px;
+}
+.bx-live-scroll-frame::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bx-live-scroll-frame::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* CORE ROTATE ENGINE KEYFRAMES */
+@keyframes liveSpinEngine {
+  to { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE LAYOUT MATRIX SWITCHES */
+@media (max-width: 992px) {
+  .bx-live-header-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .bx-course-select-module {
+    max-width: 100%;
+  }
+  .bx-live-split-matrix {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bx-live-form-grid-inner {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .bx-class-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .bx-class-duration-badge {
+    width: 100%;
+    justify-content: center;
+  }
+}

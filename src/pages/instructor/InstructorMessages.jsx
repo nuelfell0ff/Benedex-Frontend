@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import io from "socket.io-client";
 import API from "../../services/api";
 import { FiSend, FiMessageSquare, FiUser, FiClock, FiBookOpen, FiChevronRight, FiArrowLeft } from "react-icons/fi";
 import "../student/Messages.css"; 
-import "./InstructorMessages.css"; // Pulling instructor-specific badging layout rules safely
+import "./InstructorMessages.css";
 
 const socket = io("https://benedex-backend.onrender.com");
 
 function InstructorMessages() {
+  const location = useLocation();
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [activeStudent, setActiveStudent] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -15,10 +17,9 @@ function InstructorMessages() {
   const [loadingStudents, setLoadingStudents] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   
-  // Tracking infrastructure for individual student chat statuses
   const [lastMessageTimestamps, setLastMessageTimestamps] = useState({});
-  const [unreadStatusMap, setUnreadStatusMap] = useState({}); // Historical unread state
-  const [newLiveIncomingMap, setNewLiveIncomingMap] = useState({}); // Live socket runtime alerts
+  const [unreadStatusMap, setUnreadStatusMap] = useState({}); 
+  const [newLiveIncomingMap, setNewLiveIncomingMap] = useState({}); 
 
   const [mobileView, setMobileView] = useState("list");
 
@@ -34,7 +35,7 @@ function InstructorMessages() {
     scrollToBottom();
   }, [messages]);
 
-  // PHASE 1: Fetch rosters, extract timelines, and build historical tracking maps
+  // PHASE 1: Fetch rosters, construct maps, and intercept remote routing instructions
   useEffect(() => {
     const fetchEnrolledStudents = async () => {
       try {
@@ -47,7 +48,6 @@ function InstructorMessages() {
         const initialUnreadMap = {};
 
         if (res.data && Array.isArray(res.data)) {
-          // Collect all students safely
           for (const courseItem of res.data) {
             if (courseItem.students && Array.isArray(courseItem.students)) {
               for (const student of courseItem.students) {
@@ -62,7 +62,7 @@ function InstructorMessages() {
             }
           }
 
-          // Query message meta-histories for precise sorting and historical tracking
+          // Build history maps for metadata tracking
           await Promise.all(
             uniqueStudents.map(async (student) => {
               try {
@@ -73,16 +73,15 @@ function InstructorMessages() {
                   
                   initialTimestamps[student._id] = new Date(lastMsg.createdAt).getTime();
 
-                  // If the last message was from the student and not read yet
                   const isIncoming = (typeof lastMsg.sender === "object" ? lastMsg.sender?._id : lastMsg.sender) === student._id;
                   if (isIncoming && lastMsg.read === false) {
                     initialUnreadMap[student._id] = true;
                   }
                 } else {
-                  initialTimestamps[student._id] = 0; // Default fallback for empty interactions
+                  initialTimestamps[student._id] = 0;
                 }
               } catch (err) {
-                console.error(`Error pulling timeline matrix for student ${student._id}:`, err);
+                console.error(`Error pulling timeline data for student ${student._id}:`, err);
                 initialTimestamps[student._id] = 0;
               }
             })
@@ -93,8 +92,28 @@ function InstructorMessages() {
         setUnreadStatusMap(initialUnreadMap);
         setEnrolledStudents(uniqueStudents);
         
-        // Auto-select top message thread container profile on desktop
-        if (uniqueStudents.length > 0 && window.innerWidth > 768) {
+        // 🚨 CHAT THREAD REDIRECTION INTERCEPTOR LOGIC
+        if (location.state?.redirectedFromRoster && location.state?.targetStudentData) {
+          const targetedStudent = location.state.targetStudentData;
+          
+          // Verify if the targeted student object exists in our unique manifest matching state
+          const existingProfileMatch = uniqueStudents.find(s => s._id === targetedStudent._id);
+          
+          if (existingProfileMatch) {
+            setActiveStudent(existingProfileMatch);
+          } else {
+            // Fallback strategy if student wasn't inside the array compilation structure
+            setEnrolledStudents(prev => [targetedStudent, ...prev]);
+            setActiveStudent(targetedStudent);
+          }
+          
+          setMobileView("chat");
+
+          // Clear history markers out
+          window.history.replaceState({}, document.title);
+          
+        } else if (uniqueStudents.length > 0 && window.innerWidth > 768) {
+          // Standard execution layer fallback if no explicit route navigation trigger exists
           const sortedInitialList = [...uniqueStudents].sort((a, b) => {
             const timeA = initialTimestamps[a._id] || 0;
             const timeB = initialTimestamps[b._id] || 0;
@@ -105,7 +124,6 @@ function InstructorMessages() {
           setActiveStudent(defaultActive);
           setMobileView("chat");
           
-          // Instantly clear out initial unread tokens for the active user
           if (initialUnreadMap[defaultActive._id]) {
             setUnreadStatusMap(prev => ({ ...prev, [defaultActive._id]: false }));
           }
@@ -118,7 +136,7 @@ function InstructorMessages() {
     };
 
     fetchEnrolledStudents();
-  }, []);
+  }, [location.state]);
 
   // PHASE 2: Live Room Streaming Channel Control Setup
   useEffect(() => {
@@ -145,12 +163,10 @@ function InstructorMessages() {
 
     fetchChatHistory();
 
-    // Setup live incoming messaging capture stream
     socket.on("receive-message", (incomingMsg) => {
       const incomingSenderId = typeof incomingMsg.sender === "object" ? incomingMsg.sender?._id : incomingMsg.sender;
       const timestamp = new Date(incomingMsg.createdAt).getTime();
 
-      // Dynamically bump sender to the top of our workspace ledger state
       setLastMessageTimestamps((prev) => ({
         ...prev,
         [incomingSenderId]: timestamp
@@ -159,7 +175,6 @@ function InstructorMessages() {
       if (incomingSenderId === activeChatPartnerId) {
         setMessages((prev) => [...prev, incomingMsg]);
       } else {
-        // Drop a red live badge notice since this target isn't the open view window
         setNewLiveIncomingMap((prev) => ({
           ...prev,
           [incomingSenderId]: true
@@ -195,7 +210,6 @@ function InstructorMessages() {
 
     setMessages((prev) => [...prev, optimisticMessage]);
     
-    // Elevate active communication layout positioning to top
     setLastMessageTimestamps((prev) => ({
       ...prev,
       [activeChatPartnerId]: new Date(currentTimeString).getTime()
@@ -234,8 +248,6 @@ function InstructorMessages() {
   const handleSelectStudent = (student) => {
     setActiveStudent(student);
     setMobileView("chat");
-    
-    // Clear out both unread & active live socket state maps upon window access
     setNewLiveIncomingMap((prev) => ({ ...prev, [student._id]: false }));
     setUnreadStatusMap((prev) => ({ ...prev, [student._id]: false }));
   };
@@ -249,7 +261,6 @@ function InstructorMessages() {
     return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
   };
 
-  // Perform dynamic timeline-based list sorting safely before rendering the sidebar view
   const sortedStudents = [...enrolledStudents].sort((a, b) => {
     const timeA = lastMessageTimestamps[a._id] || 0;
     const timeB = lastMessageTimestamps[b._id] || 0;
@@ -304,7 +315,6 @@ function InstructorMessages() {
                       <span title={student.courseContext}>{student.courseContext}</span>
                     </div>
 
-                    {/* DYNAMIC ALERT BADGING RENDERING GRID */}
                     <div className="roster-badge-cell-zone">
                       {hasNewLiveAlert ? (
                         <span className="roster-badge-indicator live-new-red">New</span>
@@ -329,7 +339,6 @@ function InstructorMessages() {
         <div className="chat-window-surface">
           {activeStudent ? (
             <>
-              {/* CHANNEL HEADER PLATFORM */}
               <div className="chat-stream-header">
                 <div className="chat-header-identity">
                   <button type="button" className="mobile-back-button" onClick={handleBackToRoster}>

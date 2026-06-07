@@ -1,0 +1,225 @@
+/* CreateAssignment.css */
+
+.bx-task-workspace {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #1e293b;
+}
+
+/* BACK NAVIGATION INTERFACE CONTAINER TRIGGER */
+.bx-task-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bx-task-back-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+/* CARDS DATA CONTROLLER PANELS */
+.bx-task-card-panel {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.01);
+}
+
+.bx-card-header-node {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 18px;
+}
+
+.bx-card-title-icon {
+  font-size: 1.6rem;
+  color: #07335c;
+  background-color: #f0f4f8;
+  padding: 8px;
+  box-sizing: content-box;
+  border-radius: 8px;
+}
+
+/* FORM FIELD INPUT MATRICES STRUCTURAL LAYOUT */
+.bx-task-input-field {
+  display: flex;
+  flex-column: uppercase;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bx-task-input-field label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bx-task-input-field label svg {
+  font-size: 0.95rem;
+  color: #07335c;
+}
+
+.bx-task-input-field input,
+.bx-task-input-field select,
+.bx-task-input-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.bx-task-input-field textarea {
+  resize: vertical;
+}
+
+.bx-task-input-field input:focus,
+.bx-task-input-field select:focus,
+.bx-task-input-field textarea:focus {
+  outline: none;
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.08);
+  background-color: #ffffff;
+}
+
+.bx-task-input-field select:disabled,
+.bx-task-input-field input:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ACTION PROCESSING CTAS ELEMENT PANEL */
+.bx-task-submit-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #07335c;
+  color: #ffffff;
+  border: 1px solid #07335c;
+  padding: 11px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bx-task-submit-cta:hover:not(:disabled) {
+  background-color: #05233f;
+  border-color: #05233f;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.18);
+}
+
+.bx-task-submit-cta:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* SIDEBAR REINFORCEMENT BLOCKS BANNER ELEMENT */
+.bx-briefing-card {
+  background-color: #07335c;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(7, 51, 92, 0.1);
+}
+
+.bx-briefing-card.outlined {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.bx-briefing-card h4, .bx-briefing-card h5 {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.bx-briefing-card.outlined h5 {
+  color: #0f172a;
+}
+
+/* ANIMATED TOAST NOTIFICATION PLATFORMS */
+.bx-task-toast-alert {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+}
+
+.bx-task-toast-alert.success {
+  background-color: #10b981;
+}
+
+.bx-task-toast-alert.error {
+  background-color: #ef4444;
+}
+
+.bx-task-toast-alert svg {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* FULL-PAGE REFRESH LOADING SYSTEM CONSOLE */
+.bx-task-loader-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  gap: 16px;
+}
+
+.bx-task-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: taskSpin 0.8s linear infinite;
+}
+
+.bx-task-spinner-sm {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: taskSpin 0.6s linear infinite;
+}
+
+@keyframes taskSpin {
+  to { transform: rotate(360deg); }
+}

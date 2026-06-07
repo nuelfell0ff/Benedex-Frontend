@@ -1,0 +1,419 @@
+/* ==========================================================================
+   BENEDEX INSTRUCTOR PORTAL - GRADE SUBMISSIONS COMPONENT
+   ========================================================================== */
+
+.bx-grading-container {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+}
+
+/* LOADER SPIN ENGINE SCREEN */
+.bx-instructor-loader-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+}
+
+.bx-instructor-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3.5px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: bxSpinEngine 0.8s linear infinite;
+}
+
+.bx-instructor-loader-frame p {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* HEADER BOARD TIERS */
+.bx-grading-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 28px;
+  margin-bottom: 36px;
+}
+
+.bx-header-text-block h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #07335c;
+  letter-spacing: -0.025em;
+  margin: 0 0 6px 0;
+}
+
+.bx-header-text-block p {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 760px;
+}
+
+.bx-header-badge-metrics {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.bx-metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.bx-metric-pill.pending {
+  background-color: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #d97706;
+}
+
+/* SUBMISSION MANAGEMENT CARDS GRID */
+.bx-grading-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.bx-submission-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.02);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.bx-submission-card:hover {
+  box-shadow: 0 8px 24px rgba(7, 51, 92, 0.05);
+  border-color: #cbd5e1;
+}
+
+/* Highlight layer if evaluation is completed successfully */
+.bx-submission-card.state-graded {
+  border-left: 4px solid #10b981;
+}
+
+/* IDENTITY CONTAINER STYLES */
+.bx-card-top-identity {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.bx-assignment-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.bx-doc-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background-color: rgba(7, 51, 92, 0.06);
+  color: #07335c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.bx-assignment-info h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.bx-student-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.88rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.bx-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bx-status-pill.pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.bx-status-pill.graded {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* FILE ATTACHMENT ROW */
+.bx-attachment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+}
+
+.bx-attachment-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.bx-sub-arrow {
+  color: #cbd5e1;
+}
+
+.bx-view-submission-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #07335c;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.bx-view-submission-btn:hover {
+  color: #3b82f6;
+}
+
+/* INPUT CONTROL MANAGEMENT ZONE */
+.bx-grading-control-board {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.bx-input-group-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bx-input-group-cell.span-full-width {
+  grid-column: 1 / -1;
+}
+
+.bx-input-group-cell label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bx-input-wrapper-inner {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.bx-input-wrapper-inner:focus-within {
+  border-color: #07335c;
+}
+
+.bx-input-wrapper-inner input {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.bx-input-unit-tag {
+  background-color: #f1f5f9;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #64748b;
+  border-left: 1px solid #e2e8f0;
+}
+
+.bx-input-group-cell textarea {
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #0f172a;
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.bx-input-group-cell textarea:focus {
+  border-color: #07335c;
+}
+
+/* FOOTER SUBMISSION TIERS */
+.bx-card-action-footer {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 18px;
+}
+
+.bx-commit-grade-btn {
+  background-color: #07335c;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+  transition: background-color 0.2s ease;
+}
+
+.bx-commit-grade-btn:hover:not(:disabled) {
+  background-color: #052443;
+}
+
+.bx-commit-grade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bx-commit-grade-btn.btn-regrade {
+  background-color: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.bx-commit-grade-btn.btn-regrade:hover:not(:disabled) {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* INLINE ASYNC ACTIONS ACTION SPINNER */
+.bx-inline-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: bxSpinEngine 0.6s linear infinite;
+}
+
+/* EMPTY PORTAL BANNER STATES */
+.bx-grading-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 60px 24px;
+  max-width: 580px;
+  margin: 40px auto 0 auto;
+}
+
+.bx-empty-icon-frame {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #f8fafc;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+}
+
+.bx-grading-empty-state h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+}
+
+.bx-grading-empty-state p {
+  font-size: 0.92rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 400px;
+}
+
+/* BASE CORE KEYFRAME ANIMATIONS */
+@keyframes bxSpinEngine {
+  to { transform: rotate(360deg); }
+}
+
+/* ADAPTIVE RESPONSIOS CODES */
+@media (max-width: 768px) {
+  .bx-grading-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .bx-grading-control-board {
+    grid-template-columns: 1fr;
+  }
+  .bx-attachment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .bx-commit-grade-btn {
+    width: 100%;
+  }
+}

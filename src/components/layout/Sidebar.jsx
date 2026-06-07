@@ -22,7 +22,7 @@ function Sidebar({ links }) {
           <NavLink
             key={link.path}
             to={link.path}
-            end={link.path === "/student"}
+            end={link.path === "/student" || link.path === "/instructor" || link.path === "/admin"}
             className={({ isActive }) =>
               `student-sidebar-link${isActive ? " is-active" : ""}`
             }

@@ -1,0 +1,315 @@
+/* ==========================================================================
+   BENEDEX INSTRUCTOR PORTAL - NOTIFICATIONS MODULE DESIGN
+   ========================================================================== */
+
+.bx-notify-container {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+}
+
+/* FULL FRAME IDENTITY BLOCK LOADERS */
+.bx-notify-loader-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+}
+
+.bx-notify-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3.5px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: notifySpin 0.8s linear infinite;
+}
+
+.bx-notify-loader-frame p {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* MODULE TITLES BANNER */
+.bx-notify-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 24px;
+  margin-bottom: 36px;
+}
+
+.bx-notify-title-zone h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #07335c;
+  letter-spacing: -0.025em;
+  margin: 0 0 6px 0;
+}
+
+.bx-notify-title-zone p {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* SPLIT VIEWPORT WRAPPER MATRIX */
+.bx-notify-layout-split {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  align-items: start;
+  gap: 40px;
+}
+
+/* SECTION CARD TITLE SUBHEADERS */
+.bx-notify-form-panel h2,
+.bx-feed-header-row h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px 0;
+}
+
+/* FORM DISPATCH SYSTEM CONTROLS */
+.bx-premium-form {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bx-form-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bx-form-cell label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.bx-premium-form input[type="text"],
+.bx-premium-form textarea,
+.bx-premium-form select {
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bx-premium-form input[type="text"]:focus,
+.bx-premium-form textarea:focus,
+.bx-premium-form select:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+.bx-premium-form textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* SYSTEM DISPATCH SUBMIT TERMINAL BUTTON */
+.bx-notify-submit-btn {
+  background-color: #07335c;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.bx-notify-submit-btn:hover:not(:disabled) {
+  background-color: #052443;
+}
+
+.bx-notify-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bx-notify-inline-loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: notifySpin 0.6s linear infinite;
+}
+
+/* HISTORIC BACKLOG ACTIVE STREAM */
+.bx-feed-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.bx-feed-header-row h2 {
+  margin: 0;
+}
+
+.bx-feed-counter-pill {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.bx-feed-scroll-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* CUSTOM STREAM CARDS */
+.bx-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bx-notify-feed-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(7, 51, 92, 0.01);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bx-notify-feed-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(7, 51, 92, 0.03);
+}
+
+.bx-feed-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.bx-feed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* METRIC BADGE CATEGORY MAPS */
+.bx-feed-badge.type-announcement { background-color: rgba(7, 51, 92, 0.07); color: #07335c; }
+.bx-feed-badge.type-sys { background-color: rgba(100, 116, 139, 0.1); color: #475569; }
+.bx-feed-badge.type-live { background-color: rgba(239, 68, 68, 0.08); color: #ef4444; }
+.bx-feed-badge.type-task { background-color: rgba(59, 130, 246, 0.08); color: #3b82f6; }
+
+.bx-feed-timestamp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.bx-notify-feed-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.bx-notify-feed-card p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #475569;
+  margin: 0;
+}
+
+/* ARCHIVE LOG EMPTY FALLBACK SYSTEMS */
+.bx-notify-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+}
+
+.bx-notify-empty-icon {
+  font-size: 1.8rem;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.bx-notify-empty-state h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.bx-notify-empty-state p {
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+/* SCROLLBAR ENGINE DECORATIONS */
+.bx-feed-scroll-container::-webkit-scrollbar {
+  width: 5px;
+}
+.bx-feed-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bx-feed-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* BASE ENGINES KEYFRAMES */
+@keyframes notifySpin {
+  to { transform: rotate(360deg); }
+}
+
+/* DEVICE BREAKPOINT MEDIA RESPONSES */
+@media (max-width: 992px) {
+  .bx-notify-layout-split {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
