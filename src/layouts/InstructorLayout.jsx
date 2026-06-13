@@ -10,6 +10,7 @@ import {
   FiMessageSquare,
   FiPlayCircle,
   FiClipboard,
+  FiUsers
 } from "react-icons/fi";
 
 
@@ -42,7 +43,7 @@ function InstructorLayout() {
       {
         label: "Students",
         path: "/instructor/students",
-        icon: <FiMessageSquare />
+        icon: <FiUsers />
       },
 
       {

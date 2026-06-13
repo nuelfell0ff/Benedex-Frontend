@@ -1,0 +1,224 @@
+/* AdminSettings.css */
+
+.bx-st-workspace {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+}
+
+/* BRAND HEADER COMPONENTS */
+.bx-st-icon-box {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background-color: #07335c;
+  color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bx-st-pulse-light {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+}
+
+.bx-st-ver-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+/* PANEL CARD BOX CONTAINER LAYOUTS */
+.bx-st-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+}
+
+/* INPUT FORM CONTEXT GROUPS */
+.bx-st-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bx-st-input-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bx-st-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.bx-st-field-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 2;
+}
+
+.bx-st-input-wrapper input {
+  width: 100%;
+  padding: 12px 14px 12px 44px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 0.88rem;
+  color: #0f172a !important; /* FIXED HIGH CONTRAST INPUT TEXT */
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.bx-st-input-wrapper input:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+/* PREMIUM INTERACTIVE TOGGLE SLIDERS */
+.bx-st-toggle-row {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.extra-small {
+  font-size: 0.7rem;
+}
+
+.bx-st-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.bx-st-switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.bx-st-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 34px;
+}
+
+.bx-st-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+}
+
+input:checked + .bx-st-slider {
+  background-color: #ef4444; /* Alert color representation for maintenance overrides */
+}
+
+input:focus + .bx-st-slider {
+  box-shadow: 0 0 1px #ef4444;
+}
+
+input:checked + .bx-st-slider:before {
+  transform: translateX(22px);
+}
+
+/* WARNING BOX SYSTEMS */
+.bx-st-warning-box {
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+}
+
+.text-warning-muted {
+  color: #b45309;
+  line-height: 1.5;
+}
+
+/* COMMAND ACTION SUBMIT CONTROLLERS */
+.bx-st-submit-btn {
+  background-color: #07335c;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bx-st-submit-btn:hover {
+  background-color: #052442;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.15);
+}
+
+.bx-st-submit-btn:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* NOTIFICATION OVERLAYS TOASTS */
+.bx-st-toast {
+  border-radius: 12px;
+  font-size: 0.88rem;
+}
+
+.bx-st-spin-icon {
+  animation: stSpin 1s linear infinite;
+}
+
+@keyframes stSpin { to { transform: rotate(360deg); } }
+
+/* EXACT BRAND MATCH LOADER PANE */
+.bx-st-loading-pane {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+}
+
+.bx-st-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: stSpin 1s linear infinite;
+}

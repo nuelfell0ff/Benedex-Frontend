@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import API from "../../services/api";
+import API from "../../services/api"; // Axios configuration bundle containing global JWT mapping headers
 import {
   FiBookOpen,
   FiUsers,
@@ -13,8 +13,8 @@ import {
   FiArrowRight,
   FiActivity,
   FiBarChart2,
-  FiLoader,
-  FiCpu
+  FiCpu,
+  FiRefreshCw
 } from "react-icons/fi";
 import "./InstructorDashboard.css";
 
@@ -22,70 +22,79 @@ function InstructorDashboard() {
   const [loading, setLoading] = useState(true);
   const [errorState, setErrorState] = useState(null);
   
-  // Real State Registers connected to API payloads
-  const [metrics, setMetrics] = useState({
-    totalStudents: 0,
-    completionRate: 0,
-    pendingGrading: 0,
-    activeCourses: 0
+  // Normalized single-source structural registers
+  const [dashboardData, setDashboardData] = useState({
+    metrics: { totalStudents: 0, completionRate: 0, pendingGrading: 0, activeCourses: 0 },
+    courses: [],
+    weeklyEngagement: [],
+    atRiskStudents: [] // Used to safely stream active student roster arrays
   });
-  
-  const [courses, setCourses] = useState([]);
-  const [weeklyEngagement, setWeeklyEngagement] = useState([]);
-  const [atRiskStudents, setAtRiskStudents] = useState([]);
+
+  const fetchDashboardTelemetry = async () => {
+    try {
+      setLoading(true);
+      setErrorState(null);
+      
+      // Hit the single unified instructor aggregation analytics endpoint
+      const res = await API.get("/instructor/dashboard");
+      setDashboardData(res.data);
+    } catch (error) {
+      console.error("Critical dashboard telemetry fetch failure:", error);
+      setErrorState(
+        error.response?.data?.message || 
+        "Pipeline Synchronization Error: Check authorization headers or routing connectivity."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDashboardTelemetry = async () => {
-      try {
-        setLoading(true);
-        setErrorState(null);
-        
-        // Parallelized network dispatches to optimize performance pipelines
-        const [metricsRes, coursesRes, engagementRes, analyticsRes] = await Promise.all([
-          API.get("/instructor/analytics/overview"),
-          API.get("/instructor/courses"),
-          API.get("/instructor/analytics/weekly-engagement"),
-          API.get("/instructor/analytics/students-at-risk")
-        ]);
-
-        setMetrics(metricsRes.data);
-        setCourses(coursesRes.data);
-        setWeeklyEngagement(engagementRes.data); 
-        setAtRiskStudents(analyticsRes.data);
-      } catch (error) {
-        console.error("Critical dashboard telemetry fetch failure:", error);
-        setErrorState("Pipeline Synchronization Error: Check backend routing connectivity.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardTelemetry();
   }, []);
 
+  // EXACT MATCHING UNIFORM PLATFORM SYSTEM LOADER ACROSS PANELS
   if (loading) {
     return (
-      <div className="bx-id-loading-screen d-flex flex-column align-items-center justify-content-center">
-        <FiLoader className="bx-id-spinner" size={40} />
-        <p className="mt-3 text-muted font-weight-bold">Compiling Real-Time LMS Telemetry...</p>
+      <div className="bx-id-loading-screen">
+        <div className="bx-id-spinner"></div>
+        <p className="mt-3 text-muted font-weight-bold">Compiling Real-Time LMS Telemetry Matrices...</p>
       </div>
     );
   }
 
   if (errorState) {
     return (
-      <div className="container py-5 text-center">
-        <div className="alert alert-danger d-inline-block px-4 py-3" role="alert">
-          <FiAlertTriangle className="me-2" /> {errorState}
-        </div>
+      <div className="bx-id-error-pane container py-5 text-center">
+        <motion.div 
+          className="alert alert-danger d-inline-block px-4 py-4 shadow-sm rounded-4" 
+          role="alert"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="d-flex align-items-center justify-content-center gap-2 text-danger mb-2">
+            <FiAlertTriangle size={24} />
+            <span className="font-weight-bold h5 mb-0">LMS Telemetry Disconnect</span>
+          </div>
+          <p className="text-muted small px-3 mb-0">{errorState}</p>
+          <button 
+            className="bx-id-retry-btn mt-3 font-weight-bold"
+            onClick={fetchDashboardTelemetry}
+          >
+            <FiRefreshCw size={14} />
+            <span>Retry Sync Connection</span>
+          </button>
+        </motion.div>
       </div>
     );
   }
 
+  const { metrics, courses, weeklyEngagement, atRiskStudents } = dashboardData;
+
   return (
     <div className="bx-id-workspace container-fluid py-4">
       
-      {/* PREMIUM REDESIGNED CONSOLE HEADER */}
+      {/* PREMIUM HEADER CONSOLE BANNER */}
       <header className="bx-id-premium-banner mb-4">
         <div className="row align-items-center g-3">
           <div className="col-12 col-md-7 col-lg-8">
@@ -105,7 +114,10 @@ function InstructorDashboard() {
               </div>
             </div>
           </div>
-          <div className="col-12 col-md-5 col-lg-4 text-md-end">
+          <div className="col-12 col-md-5 col-lg-4 text-md-end d-flex justify-content-md-end gap-2">
+            <button onClick={fetchDashboardTelemetry} className="bx-id-refresh-action-btn">
+              <FiRefreshCw />
+            </button>
             <Link to="/instructor/courses/new" className="bx-id-action-trigger-btn">
               <FiPlus size={18} />
               <span>Initialize Course Blueprint</span>
@@ -117,13 +129,18 @@ function InstructorDashboard() {
       {/* METRIC KPI MONITOR STRIPS */}
       <section className="row g-3 mb-4">
         {[
-          { label: "Aggregate Registered Students", val: metrics.totalStudents.toLocaleString(), icon: <FiUsers />, color: "blue" },
-          { label: "Mean Completion Rate", val: `${metrics.completionRate}%`, icon: <FiTrendingUp />, color: "green" },
-          { label: "Pending Evaluation Queue", val: metrics.pendingGrading, icon: <FiCheckSquare />, color: "amber" },
-          { label: "Active Syllabus Managed", val: metrics.activeCourses, icon: <FiBookOpen />, color: "purple" }
+          { label: "Aggregate Registered Students", val: metrics.totalStudents?.toLocaleString() || 0, icon: <FiUsers />, color: "blue" },
+          { label: "Mean Completion Rate", val: `${metrics.completionRate || 0}%`, icon: <FiTrendingUp />, color: "green" },
+          { label: "Pending Evaluation Queue", val: metrics.pendingGrading || 0, icon: <FiCheckSquare />, color: "amber" },
+          { label: "Active Syllabus Managed", val: metrics.activeCourses || 0, icon: <FiBookOpen />, color: "purple" }
         ].map((kpi, idx) => (
           <div className="col-12 col-sm-6 col-xl-3" key={idx}>
-            <div className="bx-id-kpi-card">
+            <motion.div 
+              className="bx-id-kpi-card"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+            >
               <div className="d-flex align-items-center justify-content-between">
                 <div>
                   <span className="bx-id-kpi-label">{kpi.label}</span>
@@ -133,15 +150,22 @@ function InstructorDashboard() {
                   {kpi.icon}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         ))}
       </section>
 
-      {/* MID-LEVEL RESPONSIVE MATRIX: CHART vs GRADING QUEUE */}
+      {/* CENTRAL ANALYTICAL GRID ROWS */}
       <section className="row g-4 mb-4">
+        
+        {/* WEEKLY ENGAGEMENT CHART AREA */}
         <div className="col-12 col-lg-8">
-          <div className="bx-id-card-panel h-100">
+          <motion.div 
+            className="bx-id-card-panel h-100"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="bx-id-panel-title mb-0">
                 <FiBarChart2 />
@@ -150,35 +174,45 @@ function InstructorDashboard() {
               <span className="bx-id-badge-info">Live Telemetry</span>
             </div>
             
-            <div className="bx-id-chart-placeholder-frame d-flex align-items-end justify-content-between px-1">
-              {weeklyEngagement.length > 0 ? (
+            <div className="bx-id-chart-placeholder-frame">
+              {weeklyEngagement && weeklyEngagement.length > 0 ? (
                 weeklyEngagement.map((height, idx) => (
-                  <div className="bx-id-chart-column-wrapper d-flex flex-column align-items-center flex-grow-1" key={idx}>
-                    <motion.div 
-                      className="bx-id-chart-bar" 
-                      initial={{ height: 0 }}
-                      animate={{ height: `${height}%` }}
-                      transition={{ duration: 0.6, delay: idx * 0.04 }}
-                    />
-                    <span className="bx-id-chart-label-text mt-2">Wk {idx + 1}</span>
+                  <div className="bx-id-chart-column-wrapper" key={idx}>
+                    <div className="bx-id-bar-track">
+                      <motion.div 
+                        className="bx-id-chart-bar" 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${height}%` }}
+                        transition={{ duration: 0.6, ease: "easeOut", delay: idx * 0.04 }}
+                      >
+                        <span className="bx-id-bar-tooltip">{height}%</span>
+                      </motion.div>
+                    </div>
+                    <span className="bx-id-chart-label-text">Wk {idx + 1}</span>
                   </div>
                 ))
               ) : (
                 <div className="w-100 text-center py-5 text-muted small">No structural tracking metrics calculated yet for this period.</div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
 
+        {/* PENDING GRADING ITEM BLOCK LIST */}
         <div className="col-12 col-lg-4">
-          <div className="bx-id-card-panel h-100 d-flex flex-column">
+          <motion.div 
+            className="bx-id-card-panel h-100 d-flex flex-column"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+          >
             <h3 className="bx-id-panel-title mb-3">
               <FiCheckSquare />
               <span>Pending Grading Queue</span>
             </h3>
             
             <div className="bx-id-grading-scroll-list d-flex flex-column gap-2 flex-grow-1">
-              {courses.some(c => c.pendingTasks?.length > 0) ? (
+              {courses && courses.some(c => c.pendingTasks?.length > 0) ? (
                 courses.flatMap(c => c.pendingTasks || []).map((item, idx) => (
                   <div className="bx-id-grading-item-row" key={idx}>
                     <div className="min-w-0 flex-grow-1">
@@ -193,25 +227,32 @@ function InstructorDashboard() {
                 ))
               ) : (
                 <div className="bx-id-empty-queue-message text-center py-5 m-auto">
-                  <p className="text-muted small mb-0">Grading clear. No items pending human verification arrays.</p>
+                  <p className="text-muted small mb-0">Grading clear. No items pending manual human verification arrays.</p>
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* LOWER RESPONSIVE MATRIX: COURSE SHELVES vs RISK MONITORS */}
+      {/* LOWER ARCHITECTURE ROWS: MANAGEMENT TILES vs MONITOR ROSTER */}
       <section className="row g-4">
+        
+        {/* ACTIVE COURSE BLUEPRINTS TILES */}
         <div className="col-12 col-xl-8">
-          <div className="bx-id-card-panel">
+          <motion.div 
+            className="bx-id-card-panel"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <h3 className="bx-id-panel-title mb-4">
               <FiBookOpen />
               <span>Active Course Directory Architecture</span>
             </h3>
 
             <div className="row g-3">
-              {courses.length > 0 ? (
+              {courses && courses.length > 0 ? (
                 courses.map((course) => (
                   <div className="col-12" key={course._id || course.id}>
                     <div className="bx-id-course-strip-card">
@@ -219,23 +260,28 @@ function InstructorDashboard() {
                         <div className="col-12 col-md-6">
                           <h4 className="bx-id-course-strip-title mb-2">{course.title}</h4>
                           <div className="d-flex flex-wrap gap-2 gap-md-3 text-muted small">
-                            <span><strong>{course.studentsCount}</strong> Enrolled Students</span>
+                            <span><strong>{course.studentsCount || 0}</strong> Enrolled Students</span>
                             <span className="d-none d-sm-inline">•</span>
-                            <span><strong>{course.modulesCount}</strong> Architecture Modules</span>
+                            <span><strong>{course.modulesCount || 0}</strong> Architecture Modules</span>
                           </div>
                         </div>
 
                         <div className="col-12 col-md-4">
                           <div className="d-flex justify-content-between align-items-center mb-1 small text-muted">
                             <span>Mean Course Completion</span>
-                            <span className="font-weight-bold text-dark">{course.completionRate}%</span>
+                            <span className="font-weight-bold text-dark">{course.completionRate || 0}%</span>
                           </div>
                           <div className="bx-id-progress-track">
-                            <div className="bx-id-progress-bar" style={{ width: `${course.completionRate}%` }} />
+                            <motion.div 
+                              className="bx-id-progress-bar" 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${course.completionRate || 0}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut" }}
+                            />
                           </div>
                         </div>
 
-                        <div className="col-12 col-md-2 text-end">
+                        <div className="col-12 col-md-2 text-md-end">
                           <Link to={`/instructor/lessons/module/${course._id || course.id}`} className="bx-id-arrow-btn w-100 w-md-auto" title="Open module system builder">
                             <FiArrowRight />
                           </Link>
@@ -250,39 +296,47 @@ function InstructorDashboard() {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
 
+        {/* ACTIVE STUDENT MONITOR ROSTER */}
         <div className="col-12 col-xl-4">
-          <div className="bx-id-card-panel">
+          <motion.div 
+            className="bx-id-card-panel"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
             <div className="d-flex align-items-center gap-2 mb-2">
-              <FiAlertTriangle className="text-warning" size={18} />
-              <h3 className="bx-id-panel-title mb-0">Student At-Risk Radar</h3>
+              <FiActivity className="text-primary" size={18} />
+              <h3 className="bx-id-panel-title mb-0">Active Student Monitor</h3>
             </div>
-            <p className="text-muted small mb-3">Identifies student performance records dropping significantly below baseline course benchmarks.</p>
+            <p className="text-muted small mb-3">Live performance index tracking active student profiles registered across your blueprints.</p>
 
             <div className="table-responsive">
               <table className="bx-id-radar-table w-100">
                 <thead>
                   <tr>
                     <th>Student Node</th>
-                    <th>Engagement Delta</th>
-                    <th className="text-end">Action</th>
+                    <th>Status Matrix</th>
+                    <th className="text-end">Roster</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {atRiskStudents.length > 0 ? (
+                  {atRiskStudents && atRiskStudents.length > 0 ? (
                     atRiskStudents.map((student, idx) => (
                       <tr key={idx}>
                         <td>
                           <span className="bx-id-student-name d-block">{student.studentName}</span>
-                          <span className="bx-id-student-meta text-muted">{student.lastActiveWindow}</span>
+                          <span className="bx-id-student-meta text-muted">{student.lastActiveWindow || "Active Matrix"}</span>
                         </td>
                         <td>
-                          <span className="bx-id-deviation-badge">{student.performanceDropPercentage}% Drop</span>
+                          <span className={`bx-id-deviation-badge ${student.performanceDropPercentage > 20 ? "is-danger" : "is-warning"}`}>
+                            {student.performanceDropPercentage}% Delta
+                          </span>
                         </td>
                         <td className="text-end">
-                          <button type="button" className="bx-id-action-icon-btn" title="Dispatch intervention notification">
+                          <button type="button" className="bx-id-action-icon-btn" title="View Detailed Student Log">
                             <FiArrowRight size={14} />
                           </button>
                         </td>
@@ -290,14 +344,15 @@ function InstructorDashboard() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={3} className="text-center py-4 text-muted small">All tracking lines are within normal operational parameters.</td>
+                      <td colSpan={3} className="text-center py-4 text-muted small">No active student matrix data flowing into this roster block yet.</td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
         </div>
+
       </section>
 
     </div>

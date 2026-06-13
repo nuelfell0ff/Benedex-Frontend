@@ -1,0 +1,315 @@
+/* AdminUsers.css */
+
+.bx-ur-workspace {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+}
+
+/* SEARCH SYSTEM WRAPPER */
+.bx-ur-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+}
+
+.bx-ur-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 2;
+}
+
+.bx-ur-search-wrapper input {
+  width: 100%;
+  padding: 10px 14px 10px 42px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 0.88rem;
+  color: #0f172a !important; /* Forces typed character values to dark text slate */
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.bx-ur-search-wrapper input:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+/* DYNAMIC ROLE FILTER CONTROLS */
+.bx-ur-filter-bar {
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.bx-ur-filter-label {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.bx-ur-filter-options {
+  display: flex;
+}
+
+.bx-ur-filter-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bx-ur-filter-btn:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+.bx-ur-filter-btn.is-active {
+  background-color: #e6f0fa;
+  color: #07335c;
+  font-weight: 700;
+}
+
+/* MAIN DATAGRID PANEL */
+.bx-ur-card-panel {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+}
+
+.bx-ur-table {
+  border-collapse: collapse;
+}
+
+.bx-ur-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  letter-spacing: 0.03em;
+}
+
+.bx-ur-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+/* PROFILE INFORMATION AND REGISTRY BADGES */
+.bx-ur-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bx-ur-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+}
+
+.bx-ur-avatar.is-admin { background: #07335c; }
+.bx-ur-avatar.is-instructor { background: #9333ea; }
+.bx-ur-avatar.is-student { background: #2563eb; }
+
+.bx-ur-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.bx-ur-role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.bx-ur-role-badge.is-admin { background: #e6f0fa; color: #07335c; }
+.bx-ur-role-badge.is-instructor { background: #faf5ff; color: #9333ea; }
+.bx-ur-role-badge.is-student { background: #eff6ff; color: #2563eb; }
+
+/* ACCOUNT SECURITY INDICATORS */
+.bx-ur-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.bx-ur-status-indicator .bx-ur-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.bx-ur-status-indicator.is-active { color: #16a34a; }
+.bx-ur-status-indicator.is-active .bx-ur-dot { background: #16a34a; }
+.bx-ur-status-indicator.is-suspended { color: #ef4444; }
+.bx-ur-status-indicator.is-suspended .bx-ur-dot { background: #ef4444; }
+
+/* SYSTEM TRIGGER CONTROLLERS */
+.bx-ur-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.bx-ur-action-btn:hover {
+  border-color: #07335c;
+  color: #07335c;
+  background: #f8fafc;
+}
+
+.bx-ur-action-btn.is-danger:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+/* MASTER CONFIRMATION MODALS */
+.bx-ur-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.bx-ur-modal-card {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+}
+
+.bx-ur-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.bx-ur-warning-icon { font-size: 2.5rem; }
+.bx-ur-warning-icon.is-delete { color: #ef4444; }
+.bx-ur-warning-icon.is-role { color: #07335c; }
+.bx-ur-warning-icon.is-status { color: #f59e0b; }
+
+.bx-ur-close-modal {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+/* RESOLVED: ROLE SELECT INTERACTIVE ELEMENTS STATE */
+.bx-ur-role-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.bx-ur-role-opt {
+  padding: 10px 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b !important; /* Resolves contrast issue: Inactive roles now display as slate-black */
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bx-ur-role-opt:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.bx-ur-role-opt.current {
+  background: #07335c !important;
+  color: #ffffff !important; /* High contrast white text for the single active selection */
+  border-color: #07335c !important;
+}
+
+.bx-ur-modal-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.bx-ur-cancel-btn, .bx-ur-confirm-btn {
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border: none;
+}
+
+.bx-ur-cancel-btn { background: #f1f5f9; color: #475569; }
+.bx-ur-confirm-btn { color: white; }
+.bx-ur-confirm-btn.is-delete { background: #ef4444; }
+.bx-ur-confirm-btn.is-status { background: #f59e0b; }
+
+/* TELEMETRY LOADING PIN OVERLAYS */
+.bx-ur-loading-pane {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.bx-ur-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f1f5f9;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: urSpin 0.8s linear infinite;
+}
+
+@keyframes urSpin { to { transform: rotate(360deg); } }

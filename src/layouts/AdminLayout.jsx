@@ -1,61 +1,82 @@
 import { Outlet } from "react-router-dom";
 
+import { useMemo } from "react";
+
+import {
+  FiBell,
+  FiBookOpen,
+  FiGrid,
+  FiMessageSquare,
+  FiPlayCircle,
+  FiClipboard,
+  FiUsers,
+} from "react-icons/fi";
+
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
+import { MdPayments } from "react-icons/md";
+import { GrAnalytics } from "react-icons/gr";
+import { CiSettings } from "react-icons/ci";
 
-function AdminLayout(){
+function AdminLayout() {
 
-const links = [
+  const links = useMemo(
+    () => [
 
-{
-label:"Dashboard",
-path:"/admin"
-},
+      {
+        label: "Dashboard",
+        path: "/admin",
+        icon: <FiGrid />
+      },
 
-{
-label:"Users",
-path:"/admin/users"
-},
+      {
+        label: "Users",
+        path: "/admin/users",
+        icon: <FiUsers />
+      },
 
-{
-label:"Courses",
-path:"/admin/courses"
-},
+      {
+        label: "Courses",
+        path: "/admin/courses",
+        icon: <FiBookOpen />
+      },
 
-{
-label:"Payments",
-path:"/admin/payments"
-},
+      {
+        label: "Payments",
+        path: "/admin/payments",
+        icon: <MdPayments />
+      },
 
-{
-label:"Analytics",
-path:"/admin/analytics"
-},
+      {
+        label: "Analytics",
+        path: "/admin/analytics",
+        icon: <GrAnalytics />
+      },
 
-{
-label:"Settings",
-path:"/admin/settings"
-}
+      {
+        label: "Settings",
+        path: "/admin/settings",
+        icon: <CiSettings />
+      }
 
-];
+    ]
+  )
 
-return(
+  return (
 
-<div>
+    <div className="student-shell">
+      <Sidebar links={links} />
 
-<Sidebar links={links} />
+      <div className="student-main">
+        <Topbar />
 
-<div>
+        <main className="student-content">
+          <Outlet />
+        </main>
+      </div>
+    </div>
 
-<Topbar />
-
-<Outlet />
-
-</div>
-
-</div>
-
-);
+  );
 
 }
 

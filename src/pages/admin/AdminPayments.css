@@ -1,0 +1,231 @@
+/* AdminPayments.css */
+
+.bx-pm-workspace {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+}
+
+/* HEADER CONFIGURATIONS */
+.bx-pm-icon-box {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background-color: #07335c;
+  color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bx-pm-pulse-light {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+}
+
+.bx-pm-ver-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: #07335c;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+/* HIGH-CONTRAST STABLE SEARCH MECHANISMS */
+.bx-pm-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+}
+
+.bx-pm-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 2;
+}
+
+.bx-pm-search-wrapper input {
+  width: 100%;
+  padding: 10px 14px 10px 42px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 0.88rem;
+  color: #0f172a !important; /* FIXES ERRONEOUS WHITE TEXT INPUT */
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.bx-pm-search-wrapper input:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+/* METRIC CARDS */
+.bx-pm-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+}
+
+.bx-pm-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bx-pm-stat-val {
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.bx-pm-stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.bx-pm-stat-icon.is-gold { background-color: #fefce8; color: #ca8a04; }
+.bx-pm-stat-icon.is-green { background-color: #f0fdf4; color: #16a34a; }
+.bx-pm-stat-icon.is-amber { background-color: #fffbeb; color: #d97706; }
+
+/* REVENUE FILTER CONTROLS */
+.bx-pm-filter-bar {
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.bx-pm-filter-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bx-pm-filter-btn:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+.bx-pm-filter-btn.is-active {
+  background-color: #e6f0fa;
+  color: #07335c;
+  font-weight: 700;
+}
+
+/* DATA TABLE LOG COMPONENT */
+.bx-pm-card-panel {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+}
+
+.bx-pm-table {
+  border-collapse: collapse;
+}
+
+.bx-pm-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  letter-spacing: 0.03em;
+}
+
+.bx-pm-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.bx-pm-text-primary {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.bx-pm-reference-tag {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-size: 0.82rem;
+  background-color: #f1f5f9;
+  color: #334155;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.bx-pm-text-money {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* PAYSTACK TRANSACTIONS STATUS PILLS */
+.bx-pm-status-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-block;
+}
+
+.bx-pm-status-pill.is-success { background-color: #f0fdf4; color: #16a34a; }
+.bx-pm-status-pill.is-pending { background-color: #fffbeb; color: #d97706; }
+.bx-pm-status-pill.is-failed { background-color: #fef2f2; color: #ef4444; }
+
+/* UNIFORM DASHBOARD LOADER - PRECISE BRAND DUPLICATION */
+.bx-pm-loading-pane {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+}
+
+.bx-pm-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: pmSpin 1s linear infinite;
+}
+
+@keyframes pmSpin { to { transform: rotate(360deg); } }

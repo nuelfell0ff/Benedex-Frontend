@@ -1,0 +1,251 @@
+/* AdminCourses.css */
+
+.bx-cr-workspace {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+}
+
+/* HEADER ELEMENTS */
+.bx-cr-icon-box {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background-color: #07335c;
+  color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bx-cr-pulse-light {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+}
+
+.bx-cr-ver-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+/* SEARCH SYSTEM - DARK TEXT FIXED */
+.bx-cr-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+.bx-cr-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.bx-cr-search-wrapper input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  font-size: 0.85rem;
+  color: #0f172a !important; /* FIXED DARK TEXT */
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.bx-cr-search-wrapper input:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+.bx-cr-kpi-bar {
+  background: white;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: inline-flex !important;
+}
+
+.bx-cr-kpi-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* COURSE CARDS */
+.bx-cr-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bx-cr-card:hover {
+  transform: translateY(-5px);
+  border-color: #07335c;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.bx-cr-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.bx-cr-card-icon {
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  color: #07335c;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.bx-cr-delete-trigger {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bx-cr-delete-trigger:hover {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.bx-cr-course-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.bx-cr-course-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.bx-cr-card-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bx-cr-id-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #f8fafc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.bx-cr-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+/* MODAL SYSTEM */
+.bx-cr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.bx-cr-modal-card {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 24px;
+  padding: 30px;
+}
+
+.bx-cr-warning-icon {
+  font-size: 3rem;
+  color: #ef4444;
+}
+
+.bx-cr-modal-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.bx-cr-abort-btn, .bx-cr-confirm-btn {
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.bx-cr-abort-btn { background: #f1f5f9; color: #475569; }
+.bx-cr-confirm-btn { background: #ef4444; color: white; }
+
+/* LOADING SYSTEM - EXACT MATCH */
+.bx-cr-loading-pane {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+}
+
+.bx-cr-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #07335c;
+  border-radius: 50%;
+  animation: crSpin 1s linear infinite;
+}
+
+@keyframes crSpin { to { transform: rotate(360deg); } }
