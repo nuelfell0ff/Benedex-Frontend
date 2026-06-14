@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import "./Workflow.css";
+import "./WorkFlow.css";
 
 function Workflow() {
   const steps = [
