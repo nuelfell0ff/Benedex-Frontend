@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FiCheckCircle, FiCpu, FiGrid, FiBarChart2, FiLayers, FiSmartphone } from "react-icons/fi";
+import { Link } from "react-router-dom";
 import "./Hero.css";
 
 function Hero() {
@@ -17,9 +18,9 @@ function Hero() {
       <div className="bx-hero-grid-matrix" />
 
       <div className="bx-hero-container">
-        
+
         {/* UPPER CONSOLE CHIP BADGE */}
-        <motion.div 
+        <motion.div
           className="bx-hero-badge-chip"
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -30,7 +31,7 @@ function Hero() {
         </motion.div>
 
         {/* MAIN TYPOGRAPHY HEADER STACK */}
-        <motion.h1 
+        <motion.h1
           className="bx-hero-main-title"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -41,18 +42,18 @@ function Hero() {
         </motion.h1>
 
         {/* CALL TO ACTION BUTTON CLUSTERS */}
-        <motion.div 
+        <motion.div
           className="bx-hero-action-row"
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <button className="bx-hero-btn-primary">Sign In to Portal</button>
+          <Link to="/login" className="bx-hero-btn-primary">Sign In to Portal</Link >
           <button className="bx-hero-btn-secondary">Request Demo</button>
         </motion.div>
 
         {/* INLINE SUB-FEATURE INDEX STRIP */}
-        <motion.div 
+        <motion.div
           className="bx-hero-feature-tags"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -86,12 +87,12 @@ function Hero() {
                   className={`bx-hero-wave-card-node card-position-${idx + 1} ${panel.isCenter ? "is-central-node" : ""}`}
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    duration: 0.7, 
+                  transition={{
+                    duration: 0.7,
                     delay: 0.2 + (idx * 0.05),
                     ease: [0.16, 1, 0.3, 1]
                   }}
-                  whileHover={{ 
+                  whileHover={{
                     y: -12,
                     scale: 1.03,
                     transition: { duration: 0.2 }
@@ -100,11 +101,11 @@ function Hero() {
                   <div className="bx-hero-card-inner-shell">
                     <div className="bx-hero-card-header-accent">
                       <div className="bx-hero-card-window-dots">
-                        <span/><span/><span/>
+                        <span /><span /><span />
                       </div>
                       <span className="bx-hero-card-tag-text">SYSTEM ACTIVE</span>
                     </div>
-                    
+
                     <div className="bx-hero-card-body-telemetry">
                       <div className="bx-hero-card-icon-frame">
                         {panel.icon}
@@ -121,7 +122,7 @@ function Hero() {
               ))}
             </div>
           </div>
-          
+
           {/* VISUAL SWIPE PROMPT HUD FOR SMARTPHONES */}
           <div className="bx-hero-mobile-swipe-indicator">
             <span>Swipe to explore systems</span>

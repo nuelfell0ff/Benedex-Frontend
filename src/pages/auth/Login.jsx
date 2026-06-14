@@ -1,18 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-
 import { FiArrowRight, FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
-
 import { AnimatePresence, motion } from "framer-motion";
-
 import { useAuth } from "../../context/AuthContext";
-
 import "../../App.css";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user: contextUser } = useAuth(); // Gather live state context variables safely
 
   const [formData, setFormData] = useState({
     email: "",
@@ -51,7 +46,6 @@ function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((current) => ({
       ...current,
       [name]: value,
@@ -64,11 +58,30 @@ function Login() {
     setError("");
 
     try {
-      await login(formData);
-      navigate("/");
+      // 1. Submit form payload details to backend context pipeline
+      const loggedInUser = await login(formData);
+
+      // 2. Identify active target account configurations (Fallback back-check logic)
+      // Checks the directly returned user object first, then checks the global auth context
+      const targetUser = loggedInUser || contextUser;
+      const targetRole = targetUser?.role || loggedInUser?.user?.role;
+
+      // 3. Routing matrix configuration
+      if (targetRole === "student") {
+        navigate("/student");
+      } else if (targetRole === "instructor") {
+        navigate("/instructor");
+      } else if (targetRole === "admin") {
+        navigate("/admin");
+      } else {
+        // Fallback option if user state data exists but role is missing
+        console.warn("User authenticated, but no role configuration was identified:", targetUser);
+        navigate("/");
+      }
+
     } catch (loginError) {
       setError("We could not sign you in right now. Check your details and try again.");
-      console.log(loginError);
+      console.error("Login submission failure pipeline summary:", loginError);
     } finally {
       setLoading(false);
     }

@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* --- TIMELINE ROOT WRAPPER SYSTEM --- */
+.bx-workflow-section {
+  background-color: #fafbfc;
+  /* Matches the clean crisp light layout */
+  padding: 7.5rem 2rem;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.bx-workflow-section *,
+.bx-workflow-section *::before,
+.bx-workflow-section *::after {
+  box-sizing: border-box;
+}
+
+.bx-workflow-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- UPPER CHIP HEADER METRICS --- */
+.bx-workflow-sub-label {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  color: #194066;
+  /* Deep brand blue theme focus color */
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.2px;
+  text-align: center;
+}
+
+.bx-workflow-main-desc {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 0 6rem 0;
+  letter-spacing: -0.3px;
+}
+
+/* --- TIMELINE DECK STRUCTURE CONNECTOR --- */
+.bx-workflow-timeline-track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  width: 100%;
+  position: relative;
+  /* Context foundation for absolute placement lines */
+}
+
+/* Horizontal track centerline segment separating badges */
+.bx-workflow-horizontal-bar {
+  position: absolute;
+  top: 40px;
+  /* Aligns squarely with center height of circle badges */
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+/* --- STEP MODULE NODES (ALWAYS STACKED VERTICALLY) --- */
+.bx-workflow-step-node {
+  display: flex !important;
+  flex-direction: column !important;
+  /* Force vertical stacking of elements */
+  align-items: center !important;
+  text-align: center !important;
+  position: relative;
+  z-index: 2;
+  /* Sits cleanly on top of the connection line profile */
+  width: 100%;
+}
+
+.bx-workflow-circle-badge {
+  width: 80px;
+  height: 80px;
+  background-color: #194066;
+  /* Matching dark brand blue circle elements */
+  border-radius: 50%;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0 0 0 10px #fafbfc;
+  /* Masks connection line backdrop seamlessly */
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+  flex-shrink: 0 !important;
+}
+
+.bx-workflow-circle-badge span {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: block !important;
+  line-height: 1 !important;
+}
+
+.bx-workflow-step-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #194066;
+  margin: 0 0 0.75rem 0 !important;
+  letter-spacing: -0.2px;
+  width: 100% !important;
+  display: block !important;
+}
+
+.bx-workflow-step-desc {
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.6;
+  max-width: 250px;
+  margin: 0 !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* --- SIMPLE INTERACTION HOVER MECHANICS --- */
+.bx-workflow-step-node:hover .bx-workflow-circle-badge {
+  transform: scale(1.06);
+  background-color: #12304d;
+  /* Slight deep hue shift on user interaction */
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+@media (max-width: 991px) {
+  .bx-workflow-section {
+    padding: 5rem 1.5rem;
+  }
+
+  .bx-workflow-main-desc {
+    font-size: 1.15rem;
+    margin-bottom: 4rem;
+  }
+
+  /* Completely overrides grid columns and structures layout into an explicit column stack */
+  .bx-workflow-timeline-track {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4rem !important;
+    align-items: center !important;
+  }
+
+  /* Safely hides the desktop horizontal connection bar */
+  .bx-workflow-horizontal-bar {
+    display: none !important;
+  }
+
+  /* Explicitly locks layout to centered columns, neutralizing side-by-side styles */
+  .bx-workflow-step-node {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 400px !important;
+  }
+
+  .bx-workflow-circle-badge {
+    width: 74px !important;
+    height: 74px !important;
+    margin-bottom: 1.25rem !important;
+    box-shadow: none !important;
+    display: flex !important;
+  }
+
+  .bx-workflow-circle-badge span {
+    font-size: 1.3rem !important;
+  }
+
+  .bx-workflow-step-desc {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .bx-workflow-section {
+    padding: 4rem 1.25rem;
+  }
+
+  .bx-workflow-timeline-track {
+    gap: 3.5rem !important;
+  }
+
+  .bx-workflow-step-node {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 400px !important;
+  }
+}

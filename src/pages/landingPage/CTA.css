@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* --- MAIN OUTER WRAPPER WITH CENTERED TELEMETRY --- */
+.bx-cta-outer-wrapper {
+  position: relative;
+  background-color: #ffffff;
+  /* Fresh clean background framework */
+  min-height: 580px;
+  padding: 6rem 2rem;
+  display: flex;
+  align-items: center;
+  /* Vertically centers the inner content box */
+  justify-content: center;
+  /* Horizontally centers the inner content box */
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bx-cta-outer-wrapper *,
+.bx-cta-outer-wrapper *::before,
+.bx-cta-outer-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* --- THE HERO STYLE GRID BACKDROP LAYERS --- */
+.bx-cta-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Faint grid mesh line matrix styling */
+.bx-cta-grid-lines {
+  width: 100%;
+  height: 100%;
+  opacity: 0.05;
+  /* Keeps lines clean, faint, and unobtrusive */
+  background-image:
+    linear-gradient(to right, #000000 1px, transparent 1px),
+    linear-gradient(to bottom, #000000 1px, transparent 1px);
+  background-size: 40px 40px;
+  /* Precise dimensions for structural alignment layout */
+}
+
+/* --- INTERIOR LAYER CONSOLE HOUSING --- */
+.bx-cta-content-container {
+  position: relative;
+  z-index: 2;
+  /* Forces contents over the grid template lines matrix */
+  width: 100%;
+  max-width: 1140px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Core card block frame built directly from image_2a1c5f.png design specs */
+.bx-cta-card-shell {
+  width: 100%;
+  background-color: #194066;
+  /* Deep signature blue brand color canvas */
+  border-radius: 28px;
+  /* Sleek curved geometry layout */
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(25, 64, 102, 0.15);
+}
+
+/* Atmospheric center glow gradient profile */
+.bx-cta-radial-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(30, 132, 79, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bx-cta-card-inner {
+  padding: 5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 3;
+}
+
+/* --- TEXT STRUCTURE ELEMENT INTERFACE --- */
+.bx-cta-subtitle {
+  color: #ffffff;
+  font-size: 1rem !important;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.2px;
+  opacity: 0.95;
+}
+
+.bx-cta-main-text {
+  color: #ffffff;
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1.55;
+  max-width: 820px;
+  margin: 0 0 3.25rem 0;
+  letter-spacing: -0.3px;
+  opacity: 0.9;
+}
+
+/* --- CTA BUTTON ACTION DECK ASSEMBLY --- */
+.bx-cta-button-cluster {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Core Accent Green Button Style (#1E844F) */
+.bx-btn-primary-green {
+  background-color: #ffffff !important;
+  color: #194066;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 100px;
+  /* Pills capsule profile */
+  cursor: pointer;
+  /* box-shadow: 0 4px 14px rgba(30, 132, 79, 0.3); */
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+/* Corporate Secondary Deep Transparent Outline Button Profile */
+.bx-btn-secondary-outline {
+  background-color: transparent;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 13px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+.bx-btn-secondary-outline:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- RESPONSIVE MEDIA VIEWPORT ADAPTATIONS --- */
+@media (max-width: 991px) {
+  .bx-cta-card-inner {
+    padding: 4rem 2.5rem;
+  }
+
+  .bx-cta-main-text {
+    font-size: 1.4rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+@media (max-width: 650px) {
+  .bx-cta-outer-wrapper {
+    padding: 4rem 1rem;
+    min-height: auto;
+  }
+
+  .bx-cta-card-shell {
+    border-radius: 20px;
+  }
+
+  .bx-cta-card-inner {
+    padding: 3.5rem 1.5rem;
+  }
+
+  .bx-cta-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .bx-cta-main-text {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    margin-bottom: 2.25rem;
+  }
+
+  /* Stack option action arrays cleanly into line blocks for mobile screens */
+  .bx-cta-button-cluster {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .bx-btn-primary-green,
+  .bx-btn-secondary-outline {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+}

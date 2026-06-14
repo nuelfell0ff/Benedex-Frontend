@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* --- MAIN FOOTER WRAPPER GRID DESIGN --- */
+.bx-footer-section {
+  background-color: #fafdff; /* Faint blueprint contrast profile background from screenshot */
+  border-top: 1px solid #edf4f9;
+  padding: 6rem 2rem 3rem 2rem;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.bx-footer-section *,
+.bx-footer-section *::before,
+.bx-footer-section *::after {
+  box-sizing: border-box;
+}
+
+.bx-footer-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- UPPER TWO-PANEL SPLIT ARRANGEMENT --- */
+.bx-footer-top-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr; /* Symmetrical weighting layout columns */
+  gap: 4rem;
+  padding-bottom: 5rem;
+}
+
+/* --- BRAND PANEL LOGO COLUMNS --- */
+.bx-footer-brand-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bx-footer-logo-link {
+  text-decoration: none;
+}
+
+/* Matches Navbar Brand Typography exactly */
+.bx-footer-brand-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #194066; /* Signature deep brand blue */
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.bx-footer-brand-desc {
+  font-size: 0.925rem;
+  font-weight: 400;
+  color: #475569;
+  line-height: 1.65;
+  max-width: 320px;
+  margin: 0 0 2rem 0;
+}
+
+/* --- UTILITY CIRCULAR EMBEDS --- */
+.bx-footer-social-row {
+  display: flex;
+  gap: 12px;
+}
+
+.bx-footer-social-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #eff4fa;
+  color: #194066;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* --- LINK GRID MODULE DECK ASSEMBLY --- */
+.bx-footer-links-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.bx-footer-link-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.bx-footer-col-heading {
+  font-size: 0.825rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #194066;
+  letter-spacing: 0.8px;
+  margin: 0 0 1.75rem 0;
+}
+
+.bx-footer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.bx-footer-link-item {
+  font-size: 0.925rem;
+  font-weight: 400;
+  color: #475569;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+/* Clean structural mouse-over animations */
+.bx-footer-link-item:hover {
+  color: #194066; /* Shifts focus target color back to primary bold tone */
+}
+
+/* --- COMPLIANCE BOTTOM SUB-FOOTER BAR --- */
+.bx-footer-bottom-bar {
+  border-top: 1px solid #edf4f9;
+  padding-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bx-footer-bottom-bar p {
+  font-size: 0.825rem;
+  color: #64748b;
+  margin: 0;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: -0.1px;
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+@media (max-width: 991px) {
+  .bx-footer-top-grid {
+    grid-template-columns: 1fr; /* Flattens main outer structure array safely on tablets */
+    gap: 3.5rem;
+    padding-bottom: 4rem;
+  }
+
+  .bx-footer-brand-col {
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bx-footer-section {
+    padding: 4.5rem 1.5rem 2.5rem 1.5rem;
+  }
+
+  /* Compresses link columns into stacked blocks on mobile devices */
+  .bx-footer-links-wrapper {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .bx-footer-col-heading {
+    margin-bottom: 1.25rem;
+  }
+
+  .bx-footer-list {
+    gap: 0.95rem;
+  }
+
+  .bx-footer-bottom-bar {
+    padding-top: 2rem;
+  }
+}

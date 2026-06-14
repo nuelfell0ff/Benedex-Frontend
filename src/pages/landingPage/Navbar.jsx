@@ -13,13 +13,13 @@ function Navbar() {
   return (
     <nav className="bx-nav-container">
       <div className="bx-nav-wrapper">
-        
+
         {/* LOGO NODE WITH RECTANGLE ICON HOLDER */}
         <Link to="/" className="bx-nav-brand-group">
           <div className="bx-nav-logo-box">
-            <span className="bx-nav-logo-dot" />
+            {/* <span className="bx-nav-logo-dot" /> */}
           </div>
-          <span className="bx-nav-brand-text">Benedex Portal</span>
+          <span className="bx-nav-brand-text">Benedex</span>
         </Link>
 
         {/* DESKTOP CENTER LINKS */}
@@ -65,7 +65,7 @@ function Navbar() {
               <Link to="/ai-subsystems" className="bx-nav-drawer-link" onClick={toggleMenu}>AI Subsystems</Link>
               <Link to="/support" className="bx-nav-drawer-link" onClick={toggleMenu}>Support Workspace</Link>
             </div>
-            
+
             <div className="bx-nav-drawer-actions">
               <Link to="/how-it-works" className="bx-nav-drawer-btn-outline" onClick={toggleMenu}>How It Works</Link>
               <Link to="/login" className="bx-nav-drawer-btn-solid" onClick={toggleMenu}>Sign In</Link>
