@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 import Hero from './Hero';
 import Features from './Features';
 import SplitCTA from './SplitCTA';
-import WorkFlow from './Workflow';
+import WorkFlow from './WorkFlow';
 import CTA from './CTA';
 import Footer from './Footer';
 
