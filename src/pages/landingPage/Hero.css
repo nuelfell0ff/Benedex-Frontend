@@ -1,0 +1,378 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* --- HERO CORE ARCHITECTURE & POPPINS SYSTEM --- */
+.bx-hero-section {
+  position: relative;
+  background-color: #ffffff;
+  padding: 5rem 1.5rem 8rem 1.5rem;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.bx-hero-section *,
+.bx-hero-section *::before,
+.bx-hero-section *::after {
+  box-sizing: border-box;
+}
+
+/* Crisp technical architectural grid line overlay (Black lines over White background) */
+.bx-hero-grid-matrix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 44px 44px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bx-hero-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* --- UPPER INDICATOR BADGE --- */
+.bx-hero-badge-chip {
+  background-color: #e8f5e9;
+  border: 1px solid rgba(30, 132, 79, 0.15);
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: #1e844f;
+  margin-bottom: 2rem;
+}
+
+/* --- HERO HEADLINE STACKS --- */
+.bx-hero-main-title {
+  font-size: 3.25rem;
+  font-weight: 800;
+  color: #194066;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  max-width: 900px;
+  margin: 0;
+}
+
+.bx-hero-title-accent {
+  color: #194066;
+  opacity: 0.9;
+}
+
+/* --- ACTION CLUSTERS --- */
+.bx-hero-action-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.bx-hero-btn-primary {
+  height: 48px;
+  padding: 0 2rem;
+  background-color: #194066;
+  color: #ffffff;
+  border-radius: 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(25, 64, 102, 0.15);
+  transition: transform 0.2s ease, background-color 0.15s;
+}
+
+.bx-hero-btn-primary:hover {
+  background-color: #12304d;
+  transform: translateY(-1px);
+}
+
+.bx-hero-btn-secondary {
+  height: 48px;
+  padding: 0 2rem;
+  background-color: #ffffff;
+  color: #718096;
+  border-radius: 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bx-hero-btn-secondary:hover {
+  border-color: #cbd5e1;
+  color: #4a5568;
+}
+
+/* --- BOTTOM STRIP INLINE LABELS --- */
+.bx-hero-feature-tags {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 5rem;
+  flex-wrap: wrap;
+}
+
+.bx-hero-tag-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #718096;
+}
+
+.bx-hero-tag-icon {
+  color: #1e844f;
+  font-size: 1rem;
+}
+
+/* --- PERSPECTIVE HARDWARE DISPLAY CORE --- */
+.bx-hero-wave-display {
+  position: relative;
+  width: 100%;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bx-hero-wave-emitter-node {
+  width: 54px;
+  height: 54px;
+  background-color: #edf2f7;
+  border-radius: 50%;
+  margin-bottom: 2rem;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.bx-hero-scroll-wrapper {
+  width: 100%;
+}
+
+.bx-hero-wave-grid-flow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 1140px;
+  align-items: flex-end;
+  perspective: 1000px;
+}
+
+/* INDIVIDUAL SYSTEM CONSOLE CARD SPECIFICATION */
+.bx-hero-wave-card-node {
+  background: linear-gradient(145deg, #1e425e, #142e42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bx-hero-card-inner-shell {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.bx-hero-card-header-accent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.bx-hero-card-window-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.bx-hero-card-window-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.bx-hero-card-tag-text {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #1e844f;
+}
+
+.bx-hero-card-icon-frame {
+  color: #63b3ed;
+  margin-bottom: 1rem;
+}
+
+.bx-hero-card-title-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.bx-hero-card-fake-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bx-hero-card-fake-bars span {
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+.bx-hero-card-fake-bars .bar-long { width: 85%; }
+.bx-hero-card-fake-bars .bar-med { width: 60%; background-color: rgba(255, 255, 255, 0.12); }
+.bx-hero-card-fake-bars .bar-short { width: 40%; }
+
+/* --- SYMMETRICAL DESKTOP WAVE FORM PLANES --- */
+.card-position-1 { height: 230px; transform: rotateY(12deg) scale(0.93); }
+.card-position-2 { height: 260px; transform: rotateY(6deg) scale(0.97); }
+.card-position-3 { height: 300px; background: linear-gradient(145deg, #194066, #0e2740); border-color: rgba(255, 255, 255, 0.15); transform: translateZ(10px); }
+.card-position-4 { height: 260px; transform: rotateY(-6deg) scale(0.97); }
+.card-position-5 { height: 230px; transform: rotateY(-12deg) scale(0.93); }
+
+.bx-hero-wave-card-node.is-central-node .bx-hero-card-icon-frame {
+  color: #1e844f;
+}
+
+.bx-hero-mobile-swipe-indicator {
+  display: none;
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+@media (max-width: 991px) {
+  .bx-hero-main-title {
+    font-size: 2.25rem;
+    letter-spacing: -0.8px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Dynamic mobile track container conversion logic */
+  .bx-hero-scroll-wrapper {
+    overflow-x: auto;
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .bx-hero-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bx-hero-wave-grid-flow {
+    display: flex;
+    perspective: none;
+    width: max-content;
+    gap: 18px;
+    align-items: fill;
+  }
+
+  /* Normalize layout grid vectors to handle flat responsive swipes safely */
+  .bx-hero-wave-card-node {
+    width: 265px;
+    height: 275px !important;
+    transform: none !important;
+    scroll-snap-align: center;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+  }
+
+  .card-position-3 {
+    background: linear-gradient(145deg, #194066, #0e2740);
+  }
+
+  /* Reveal a minimalist swipe prompt HUD overlay */
+  .bx-hero-mobile-swipe-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: -0.5rem;
+  }
+
+  .bx-hero-mobile-swipe-indicator span {
+    font-size: 0.75rem;
+    color: #a0aec0;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  .bx-indicator-line {
+    width: 60px;
+    height: 3px;
+    background-color: #edf2f7;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bx-indicator-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 35%;
+    background-color: #1e844f;
+    border-radius: 2px;
+    animation: pulseSwipe 2.5s infinite ease-in-out;
+  }
+}
+
+@media (max-width: 575px) {
+  .bx-hero-main-title {
+    font-size: 1.85rem;
+  }
+
+  .bx-hero-feature-tags {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bx-hero-action-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .bx-hero-btn-primary,
+  .bx-hero-btn-secondary {
+    width: 100%;
+  }
+}
+
+/* --- SWIPE TRACK ANIMATION LOOP --- */
+@keyframes pulseSwipe {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(200%); }
+  100% { transform: translateX(-100%); }
+}

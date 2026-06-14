@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* --- NAVBAR GLOBAL RESET & TYPE CONFIGURATION --- */
+.bx-nav-container,
+.bx-nav-sidebar-drawer {
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
+
+.bx-nav-container {
+  background-color: #ffffff;
+  border-bottom: 1px solid #edf2f7;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 0 2rem;
+}
+
+.bx-nav-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 72px; /* Tightened layout header line height */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* --- RECTANGLE BRAND LOGO NODE LAYOUT --- */
+.bx-nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.bx-nav-logo-box {
+  width: 32px;
+  height: 32px;
+  background-color: #194066;
+  border-radius: 8px; /* Smooth professional rounded block edge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bx-nav-logo-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #1e844f; /* Accent green brand dot index */
+  border-radius: 50%;
+}
+
+.bx-nav-brand-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #194066;
+  letter-spacing: -0.3px;
+}
+
+/* --- DESKTOP FLUID LINK NETWORKS --- */
+.bx-nav-desktop-center {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.bx-nav-link {
+  font-size: 0.825rem; /* Downsized structural sizing */
+  font-weight: 500;
+  color: #4a5568;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.bx-nav-link:hover {
+  color: #194066;
+}
+
+/* --- DESKTOP COMPONENT CTAs --- */
+.bx-nav-desktop-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bx-nav-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px; /* Sleeker, low profile button dimensions */
+  padding: 0 1.25rem;
+  border: 1.5px solid #194066;
+  border-radius: 20px;
+  color: #194066;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: transparent;
+  transition: all 0.15s ease;
+}
+
+.bx-nav-btn-outline:hover {
+  background-color: rgba(25, 64, 102, 0.04);
+}
+
+.bx-nav-btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 1.35rem;
+  background-color: #194066;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  transition: background-color 0.15s ease;
+}
+
+.bx-nav-btn-solid:hover {
+  background-color: #12304d;
+  color: #ffffff;
+}
+
+/* --- MOBILE COMPONENT BUTTON LAYOUTS --- */
+.bx-nav-toggle-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #194066;
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* --- RIGHT SIDEBAR SLIDING PANEL SYSTEM --- */
+.bx-nav-sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 1999;
+}
+
+.bx-nav-sidebar-drawer {
+  position: fixed;
+  top: 0;
+  right: -280px; /* Hidden off-canvas right edge boundary */
+  width: 280px;
+  height: 100vh;
+  background-color: #ffffff;
+  box-shadow: -4px 0 25px rgba(0, 0, 0, 0.08);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bx-nav-sidebar-drawer.is-active {
+  transform: translateX(-280px); /* Transitions into view cleanly */
+}
+
+.bx-nav-drawer-header {
+  height: 72px;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.bx-nav-close-btn {
+  background: transparent;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.bx-nav-drawer-body {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.bx-nav-drawer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bx-nav-drawer-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+  text-decoration: none;
+}
+
+.bx-nav-drawer-link:hover {
+  color: #194066;
+}
+
+.bx-nav-drawer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bx-nav-drawer-btn-outline,
+.bx-nav-drawer-btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.bx-nav-drawer-btn-outline {
+  border: 1.5px solid #194066;
+  color: #194066;
+}
+
+.bx-nav-drawer-btn-solid {
+  background-color: #194066;
+  color: #ffffff;
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+@media (max-width: 991px) {
+  .bx-nav-desktop-center,
+  .bx-nav-desktop-right {
+    display: none; /* Safely strips inline elements on portable viewports */
+  }
+
+  .bx-nav-toggle-btn {
+    display: block;
+  }
+}

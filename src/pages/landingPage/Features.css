@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* --- GLOBAL SECTION CONFIG & RESET --- */
+.bx-features-section {
+  background-color: #ffffff;
+  padding: 6rem 2rem;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.bx-features-section *,
+.bx-features-section *::before,
+.bx-features-section *::after {
+  box-sizing: border-box;
+}
+
+.bx-features-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- UPPER CHIP BADGE --- */
+.bx-features-badge {
+  background-color: #eff4fa;
+  color: #194066;
+  font-size: 0.825rem;
+  font-weight: 500;
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.1px;
+}
+
+/* --- TEXT STRUCTURE SECTION HEADER --- */
+.bx-features-main-heading {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #194066;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 0 4.5rem 0;
+  line-height: 1.25;
+  letter-spacing: -0.8px;
+}
+
+/* --- CORE RESPONSIVE 3-COLUMN GRID DISPLAY --- */
+.bx-features-grid-shell {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+/* --- INDIVIDUAL FEATURE DECK MODULES --- */
+.bx-feature-card {
+  background-color: #fafdff; /* Ultra-soft faint blueprint profile background from image */
+  border: 1px solid #edf4f9;
+  border-radius: 16px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bx-feature-card-inner {
+  padding: 2.5rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+}
+
+/* --- CARD IMAGE ICON HOLDERS --- */
+.bx-feature-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+/* Color thematic styles pulled from brand guidelines */
+.bx-feature-icon-box.icon-blue {
+  background-color: #e3edf7;
+  color: #194066;
+}
+
+.bx-feature-icon-box.icon-green {
+  background-color: #e3f7ed;
+  color: #1e844f;
+}
+
+.bx-feature-icon-box.icon-dark {
+  background-color: #f0f4f8;
+  color: #334155;
+}
+
+/* --- TEXT ARCHITECTURE CONTENT LAYOUT --- */
+.bx-feature-card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.3px;
+  line-height: 1.4;
+}
+
+.bx-feature-card-desc {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #475569;
+  line-height: 1.65;
+  margin: 0 0 2.5rem 0;
+  flex-grow: 1; /* Pushes action link seamlessly to bottom index */
+}
+
+/* --- INTERACTIVE BASELINE LINKS --- */
+.bx-feature-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #194066;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.bx-link-arrow-icon {
+  font-size: 1rem;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Subtle link interaction animation matching requirements */
+.bx-feature-card-link:hover {
+  color: #1e844f; /* Shifts text focus color to accent green on hover */
+}
+
+.bx-feature-card-link:hover .bx-link-arrow-icon {
+  transform: translateX(4px); /* Clean forward-push icon movement */
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+@media (max-width: 1024px) {
+  .bx-features-grid-shell {
+    grid-template-columns: repeat(2, 1fr); /* Collapses smoothly to 2 columns on small laptop viewports */
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .bx-features-section {
+    padding: 4.5rem 1.5rem;
+  }
+
+  .bx-features-main-heading {
+    font-size: 1.85rem;
+    margin-bottom: 3rem;
+  }
+
+  .bx-features-grid-shell {
+    grid-template-columns: 1fr; /* Flattens to single column layout array for mobile frames */
+    gap: 16px;
+  }
+
+  .bx-feature-card-inner {
+    padding: 2rem;
+  }
+}
