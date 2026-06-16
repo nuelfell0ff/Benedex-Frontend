@@ -230,7 +230,7 @@ function StudentQuiz() {
           </div>
         )}
 
-        <div className="benedex-grid">
+        <div className="benedex-grid workspace-split-container">
 
           {/* LEFT PRIMARY TESTING CANVAS */}
           <main className="main-content-flow">
@@ -248,7 +248,7 @@ function StudentQuiz() {
                     <span className="question-index-tag">QUESTION {String(current + 1).padStart(2, '0')}</span>
                     <div className="live-clock-badge">
                       <FiClock />
-                      <span>{formatTime(timeLeft)} remaining</span>
+                      <span>{formatTime(timeLeft)}</span>
                     </div>
                   </div>
 
@@ -283,16 +283,16 @@ function StudentQuiz() {
                       onClick={prev}
                       disabled={current === 0}
                     >
-                      <FiArrowLeft /> Previous Question
+                      <FiArrowLeft /> <span>Prev</span>
                     </button>
 
                     {current < questions.length - 1 ? (
                       <button className="nav-control-button next" onClick={next}>
-                        Next Question <FiArrowRight />
+                        <span>Next</span> <FiArrowRight />
                       </button>
                     ) : (
                       <button className="nav-control-button center-complete submit-action-trigger" onClick={handleSubmit}>
-                        Submit Final Assessment
+                        Submit Assessment
                       </button>
                     )}
                   </div>
@@ -325,14 +325,14 @@ function StudentQuiz() {
                       : "You did not achieve the required pass mark for this segment module. Please review your study resources and attempt the evaluation block again."}
                   </p>
 
-                  <div className="results-action-row-group" style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                  <div className="results-action-row-group">
                     {!serverPassed && (
-                      <button onClick={handleRetakeReset} className="nav-control-button next" style={{ background: "var(--accent-gold)", color: "#000" }}>
-                        <FiRefreshCw style={{ marginRight: "6px" }} /> Retake Assessment
+                      <button onClick={handleRetakeReset} className="nav-control-button next retake-btn" style={{ background: "var(--accent-gold)", color: "#000" }}>
+                        <FiRefreshCw /> Retake Quiz
                       </button>
                     )}
-                    <button onClick={() => navigate(-1)} className="btn-primary-action-buy" style={{ margin: 0 }}>
-                      Return to Course Studio
+                    <button onClick={() => navigate(-1)} className="btn-primary-action-buy studio-return-btn" style={{ margin: 0 }}>
+                      Return to Studio
                     </button>
                   </div>
                 </motion.div>
@@ -401,12 +401,10 @@ function StudentQuiz() {
         <div className="footer-top-row">
           <div className="footer-brand-column">
             <h3>Benedex Digital</h3>
-            <p>© 2026 Benedex Digital Hub. Secure Assessment Engine.</p>
+            <p>© 2026 Benedex Digital Hub.</p>
           </div>
           <div className="footer-links-column">
-            <span>Identity Enforcement Verified</span>
-            <span>•</span>
-            <span>Server Clock Synchronized</span>
+            <span>Identity Verified</span>
           </div>
         </div>
       </footer>

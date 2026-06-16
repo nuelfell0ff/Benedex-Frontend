@@ -1,0 +1,747 @@
+/* Scoped Module Styling Configuration for Benedex Student Courses Module */
+/* Primary Theme Palette: Deep Blue (#08345a) & Premium Whites */
+
+.catalogPage {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Hard safety cap to completely block mobile horizontal page shaking */
+  background-color: #ffffff;
+}
+
+/* Loading Layout States */
+.loadingPane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  width: 100%;
+  background-color: #ffffff;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(8, 52, 90, 0.1);
+  border-top-color: #08345a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingPane p {
+  margin-top: 1.25rem;
+  color: #08345a;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+/* Hero Section Layout Architecture */
+.heroSection {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  background: linear-gradient(135deg, #08345a 0%, #041b30 100%);
+  border-radius: 20px;
+  padding: 3.5rem 3rem;
+  color: #ffffff;
+  margin-bottom: 3.5rem;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid #08345a;
+}
+
+.heroKicker {
+  color: #ffffff;
+  opacity: 0.9;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+}
+
+.heroSection h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 1.25rem 0;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+}
+
+.heroIntro {
+  color: #ffffff;
+  opacity: 0.8;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+/* Instructor Stack inside Hero */
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid #08345a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #08345a;
+  margin-left: -12px;
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.avatarCount {
+  background: #ffffff;
+  color: #08345a;
+  font-weight: 800;
+}
+
+.avatarCopy {
+  display: flex;
+  flex-direction: column;
+}
+
+.avatarCopy strong {
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+.avatarCopy span {
+  font-size: 0.85rem;
+  color: #ffffff;
+  opacity: 0.75;
+}
+
+/* Statistics Grid Panel */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.statIcon {
+  font-size: 1.35rem;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.statCard strong {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.statCard span {
+  font-size: 0.85rem;
+  color: #ffffff;
+  opacity: 0.8;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+/* Sections Structure Layout (Enrolled & Marketplace) */
+.sectionWrap {
+  margin-bottom: 4rem;
+}
+
+.sectionHeadRow {
+  margin-bottom: 2rem;
+}
+
+.sectionHeadRow h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #08345a;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  color: #08345a;
+  opacity: 0.7;
+  margin: 0.5rem 0 0 0;
+  font-size: 1rem;
+}
+
+/* Active Programs Header Component */
+.sectionBadgeTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.liveIndicator {
+  width: 10px;
+  height: 10px;
+  background-color: #08345a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(8, 52, 90, 0.4);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(8, 52, 90, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(8, 52, 90, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(8, 52, 90, 0); }
+}
+
+/* Global Dashboard Responsive Matrix Engine */
+.coursesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 2rem;
+}
+
+/* Unified Layout Card Elements */
+.courseCard {
+  background: #ffffff;
+  border: 1px solid rgba(8, 52, 90, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.courseCard:hover {
+  box-shadow: 0 12px 24px -8px rgba(8, 52, 90, 0.15);
+}
+
+.enrolledCard {
+  border-left: 4px solid #08345a;
+}
+
+.cardPreview {
+  width: 100%;
+  height: 170px;
+  position: relative;
+  background: rgba(8, 52, 90, 0.04);
+  overflow: hidden;
+}
+
+.cardPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: rgba(8, 52, 90, 0.2);
+}
+
+.cardBadges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.cardBadges span {
+  background: #08345a;
+  color: #ffffff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.cardBadges .hotBadge {
+  background: #ffffff;
+  color: #08345a;
+  border: 1px solid #08345a;
+}
+
+.cardBadges .enrolledBadge {
+  background: #08345a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Card Information Body Layout Frame */
+.cardBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  background-color: #ffffff;
+}
+
+.cardTopMeta, .enrolledTopMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #08345a;
+  opacity: 0.75;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.enrolledTopMeta {
+  justify-content: flex-start;
+  gap: 0.5rem;
+  color: #08345a;
+  opacity: 1;
+}
+
+.cardBody h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #08345a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.cardBody p {
+  font-size: 0.9rem;
+  color: #08345a;
+  opacity: 0.8;
+  line-height: 1.5;
+  margin: 0 0 1.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Tag Modules Setup */
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.tagsContainer span {
+  background: rgba(8, 52, 90, 0.06);
+  color: #08345a;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Metric Counters Block Frame */
+.statsContainer {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #08345a;
+  opacity: 0.75;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px dashed rgba(8, 52, 90, 0.15);
+  padding-bottom: 0.75rem;
+}
+
+.statsContainer span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Nested Instructor / Pricing Footer */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.priceContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.priceContainer span {
+  font-size: 0.75rem;
+  color: #08345a;
+  opacity: 0.6;
+}
+
+.priceContainer strong {
+  font-size: 1.15rem;
+  color: #08345a;
+  font-weight: 800;
+}
+
+.instructorMini {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.instructorMini span {
+  width: 28px;
+  height: 28px;
+  background: rgba(8, 52, 90, 0.05);
+  border: 1px solid rgba(8, 52, 90, 0.15);
+  color: #08345a;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instructorMini strong {
+  font-size: 0.8rem;
+  color: #08345a;
+  opacity: 0.8;
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Action Control Engine triggers */
+.cardActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.enrollButton, .viewButton, .primaryActionButton {
+  padding: 0.65rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.enrollButton {
+  background: #08345a;
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+
+.enrollButton:hover {
+  background: #05223c;
+}
+
+.viewButton {
+  background: #ffffff;
+  color: #08345a;
+  border: 1px solid rgba(8, 52, 90, 0.3);
+}
+
+.viewButton:hover {
+  background: rgba(8, 52, 90, 0.04);
+}
+
+.primaryActionButton {
+  grid-column: span 2;
+  background: #08345a;
+  color: #ffffff;
+  border: none;
+}
+
+.primaryActionButton:hover {
+  background: #05223c;
+}
+
+/* Scoped Filter Toolbar Engine */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filtersWrapper {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto; /* Handles swipe gesture controls on mobile layouts securely */
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filtersWrapper::-webkit-scrollbar {
+  display: none; /* Strip standard scrolling bar tracks */
+}
+
+.chipFilter {
+  padding: 0.55rem 1.15rem;
+  background: rgba(8, 52, 90, 0.05);
+  border: 1px solid transparent;
+  color: #08345a;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chipFilter:hover {
+  background: rgba(8, 52, 90, 0.1);
+}
+
+.chipFilter.isActive {
+  background: #08345a;
+  color: #ffffff;
+}
+
+.controlsWrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.moreFiltersBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1rem;
+  background: #ffffff;
+  border: 1px solid rgba(8, 52, 90, 0.25);
+  color: #08345a;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sorterLabel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(8, 52, 90, 0.25);
+  border-radius: 10px;
+  padding: 0 2.2rem 0 1rem;
+}
+
+.sorterLabel select {
+  padding: 0.55rem 0;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #08345a;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.sorterLabel svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: #08345a;
+}
+
+.gridHeaderCount {
+  font-size: 0.85rem;
+  color: #08345a;
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+
+/* Show More Pagination Engine Button */
+.moreRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+.moreButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #ffffff;
+  border: 1px solid rgba(8, 52, 90, 0.3);
+  color: #08345a;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.moreButton:hover {
+  background: rgba(8, 52, 90, 0.04);
+}
+
+/* Bottom CTA Structural Grid Section */
+.ctaSection {
+  background: rgba(8, 52, 90, 0.03);
+  border: 1px solid rgba(8, 52, 90, 0.12);
+  border-radius: 20px;
+  padding: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 5rem;
+  box-sizing: border-box;
+}
+
+.ctaCopy h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #08345a;
+  margin: 0 0 0.5rem 0;
+}
+
+.ctaCopy p {
+  color: #08345a;
+  opacity: 0.8;
+  margin: 0;
+  font-size: 0.95rem;
+  max-width: 540px;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.ctaPrimary, .ctaSecondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.ctaPrimary {
+  background: #08345a;
+  color: #ffffff;
+}
+
+.ctaPrimary:hover {
+  background: #05223c;
+}
+
+.ctaSecondary {
+  background: transparent;
+  color: #08345a;
+  border: 1px solid rgba(8, 52, 90, 0.3);
+}
+
+.ctaSecondary:hover {
+  background: #ffffff;
+}
+
+/* --- RESPONSIVE MEDIA QUERIES (FLAWLESS MOBILE SHIFT ENGINE) --- */
+
+@media (max-width: 1024px) {
+  .heroSection {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2.5rem;
+  }
+  .ctaSection {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2.5rem;
+  }
+  .ctaActions {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalogPage {
+    padding: 1rem; /* Closes down padding grid metrics uniformly */
+  }
+  .heroSection h1 {
+    font-size: 2.2rem;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .filtersWrapper {
+    width: 100%;
+    padding-bottom: 8px; /* Safe space pads elements when mobile gestures scroll horizontally */
+  }
+  .controlsWrapper {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .sorterLabel {
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+  .sorterLabel select {
+    width: 100%;
+  }
+  .coursesGrid {
+    grid-template-columns: 1fr; /* Drops track blocks into strict vertical alignment */
+    gap: 1.5rem;
+  }
+  .ctaActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ctaPrimary, .ctaSecondary {
+    justify-content: center;
+  }
+}

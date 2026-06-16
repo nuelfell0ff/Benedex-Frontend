@@ -67,6 +67,7 @@ const StudentsCourseDetails = () => {
 
       } catch (err) {
         console.log("Error loading baseline structural database info:", err);
+        setLoading(false);
       }
     };
     fetchInitialData();
@@ -120,8 +121,9 @@ const StudentsCourseDetails = () => {
         const moduleId = modules[selectedModuleIndex]?._id;
         if (!moduleId) return;
 
+        // FIXED: Catch local error if route is locked for unauthorized/unpaid members
         const [lessonRes, quizRes] = await Promise.all([
-          API.get(`/lessons/module/${moduleId}`),
+          API.get(`/lessons/module/${moduleId}`).catch(() => ({ data: [] })),
           API.get(`/quizzes/module/${moduleId}`).catch(() => null),
         ]);
 
@@ -129,26 +131,33 @@ const StudentsCourseDetails = () => {
         setQuiz(quizRes?.data || null);
         setSelectedLessonIndex(0);
 
-        const lessonRequests = modules.map((module) =>
-          API.get(`/lessons/module/${module._id}`)
-        );
-        const lessonResponses = await Promise.all(lessonRequests);
-        const total = lessonResponses.reduce(
-          (sum, response) => sum + (response.data?.length || 0),
-          0
-        );
-        setTotalLessons(total);
+        // FIXED: Intercept nested requests grid mapping gracefully if user is not enrolled yet
+        if (isEnrolled) {
+          const lessonRequests = modules.map((module) =>
+            API.get(`/lessons/module/${module._id}`).catch(() => ({ data: [] }))
+          );
+          const lessonResponses = await Promise.all(lessonRequests);
+          const total = lessonResponses.reduce(
+            (sum, response) => sum + (response.data?.length || 0),
+            0
+          );
+          setTotalLessons(total);
+        } else {
+          // If not enrolled, fallback cleanly to setting a placeholder count based on structural payload lengths
+          setTotalLessons(modules.length * 4); 
+        }
       } catch (err) {
-        console.log(err);
+        console.log("Error inside nested lesson tracking workflow processing:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchModuleData();
-  }, [selectedModuleIndex, modules]);
+  }, [selectedModuleIndex, modules, isEnrolled]);
 
   /* ---------------- PROGRESS HOOKS ---------------- */
   useEffect(() => {
+    if (!isEnrolled) return; // Save connection network cycles if client hasn't paid
     const fetchProgress = async () => {
       try {
         const res = await API.get(`/lessons/progress`);
@@ -158,7 +167,7 @@ const StudentsCourseDetails = () => {
       }
     };
     fetchProgress();
-  }, []);
+  }, [isEnrolled]);
 
   const currentLesson = lessons[selectedLessonIndex];
 
@@ -170,13 +179,14 @@ const StudentsCourseDetails = () => {
   };
 
   const isLessonLocked = (lessonIndex) => {
+    if (!isEnrolled) return true; // FIXED: If not paid, lock everything out cleanly
     if (lessonIndex === 0) return false;
     const previousLesson = lessons[lessonIndex - 1];
     return !isCompleted(previousLesson?._id);
   };
 
   const markComplete = async () => {
-    if (!currentLesson) return;
+    if (!currentLesson || !isEnrolled) return;
     try {
       await API.post(`/lessons/complete/${currentLesson._id}`);
       const progressRes = await API.get("/lessons/progress");
@@ -212,7 +222,6 @@ const StudentsCourseDetails = () => {
       setSelectedLessonIndex((prev) => prev - 1);
     } else if (selectedModuleIndex > 0) {
       setSelectedModuleIndex((prev) => prev - 1);
-      // Selected module change auto-sets selectedLessonIndex to 0 via useEffect
     }
   };
 
@@ -259,7 +268,7 @@ const StudentsCourseDetails = () => {
   return (
     <div className="benedex-lms-theme">
       
-      {/* 1. TOPBAR RECONFIGURED WITH BENEDEX BRANDING */}
+      {/* 1. TOPBAR WITH BENEDEX BRANDING */}
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
           <div className="student-sidebar-brand">
@@ -313,9 +322,19 @@ const StudentsCourseDetails = () => {
           {/* LEFT FLOW VIEWPORTS */}
           <main className="main-content-flow">
             
-            {/* MEDIA COMPONENT WRAPPER */}
+            {/* MEDIA COMPONENT WRAPPER (FIXED: Added Paid Enforcement Overlays) */}
             <div className="media-player-card">
-              {currentLesson && currentLesson.type === "video" && currentLesson.videoUrl ? (
+              {!isEnrolled ? (
+                /* Sleek Locked Premium Preview Box */
+                <div className="no-lesson-fallback premium-locked-viewport">
+                  <FiLock size={44} style={{ color: "#08345a", marginBottom: "1rem" }} />
+                  <h3>Premium Learning Content Vault</h3>
+                  <p>Enroll in this track to activate streaming modules, handbooks, and certification exams.</p>
+                  <button className="enrollButton" style={{ padding: "0.6rem 2rem", marginTop: "0.5rem" }} onClick={handleEnroll}>
+                    Unlock Full Access
+                  </button>
+                </div>
+              ) : currentLesson && currentLesson.type === "video" && currentLesson.videoUrl ? (
                 <div className="iframe-aspect-ratio">
                   <iframe
                     src={getYoutubeEmbed(currentLesson.videoUrl)}
@@ -324,7 +343,6 @@ const StudentsCourseDetails = () => {
                   />
                 </div>
               ) : currentLesson && currentLesson.type === "text" ? (
-                /* 3. RE-ARCHITECTED MODERN TERMINAL READER WORKSPACE FOR TEXT EXTENSIONS */
                 <div className="modern-text-workspace">
                   <div className="workspace-terminal-header">
                     <div className="terminal-dots">
@@ -346,7 +364,6 @@ const StudentsCourseDetails = () => {
                   </div>
                 </div>
               ) : currentLesson && currentLesson.type === "document" ? (
-                /* 3. RE-ARCHITECTED MODERN ASSET DISPLAY FOR ATTACHED DOCUMENTS */
                 <div className="modern-document-workspace">
                   <div className="document-glass-card">
                     <div className="document-icon-wrapper">
@@ -369,20 +386,20 @@ const StudentsCourseDetails = () => {
               
               <div className="media-overlay-details">
                 <span className="now-playing-badge">
-                  NOW PLAYING: MODULE {selectedModuleIndex + 1}
+                  {!isEnrolled ? "PREVIEW MODE" : `NOW PLAYING: MODULE ${selectedModuleIndex + 1}`}
                 </span>
                 <h3 className="playing-title">
-                  {currentLesson ? currentLesson.title : "Foundation Course Workspace"}
+                  {currentLesson && isEnrolled ? currentLesson.title : course.title}
                 </h3>
               </div>
             </div>
 
-            {/* 2. NEXT, MARK AS COMPLETE, AND PREVIOUS WORKFLOW BAR CONTAINER */}
+            {/* 2. NAVIGATION ROW (FIXED: Disables action triggers cleanly when not enrolled) */}
             <div className="workspace-navigation-row-bar">
               <button 
                 className="nav-control-button prev"
                 onClick={handlePrevLesson}
-                disabled={selectedModuleIndex === 0 && selectedLessonIndex === 0}
+                disabled={!isEnrolled || (selectedModuleIndex === 0 && selectedLessonIndex === 0)}
               >
                 <FiArrowLeft /> Previous
               </button>
@@ -390,7 +407,7 @@ const StudentsCourseDetails = () => {
               <button 
                 className={`nav-control-button center-complete ${currentLesson && isCompleted(currentLesson._id) ? "is-finished" : ""}`}
                 onClick={markComplete}
-                disabled={!currentLesson}
+                disabled={!currentLesson || !isEnrolled}
               >
                 {currentLesson && isCompleted(currentLesson._id) ? (
                   <><FiCheck /> Completed</>
@@ -403,6 +420,7 @@ const StudentsCourseDetails = () => {
                 className="nav-control-button next"
                 onClick={handleNextLesson}
                 disabled={
+                  !isEnrolled ||
                   (selectedModuleIndex === modules.length - 1 && selectedLessonIndex === lessons.length - 1) ||
                   isLessonLocked(selectedLessonIndex + 1)
                 }
@@ -451,7 +469,7 @@ const StudentsCourseDetails = () => {
               <div className="accordion-section-header">
                 <h2>Course Content</h2>
                 <span className="accordion-meta-total">
-                  {modules.length} Modules • {totalLessons} Lessons • 12h Total
+                  {modules.length} Modules • {isEnrolled ? totalLessons : "—"} Lessons • 12h Total
                 </span>
               </div>
 
@@ -474,7 +492,7 @@ const StudentsCourseDetails = () => {
                           <div className="module-title-text-group">
                             <h3>{module.title}</h3>
                             <span className="sub-lessons-count">
-                              {isOpen ? lessons.length : "Available"} Lessons
+                              {isOpen && isEnrolled ? `${lessons.length} Lessons` : "Syllabus Track Outline"}
                             </span>
                           </div>
                         </div>
@@ -493,52 +511,62 @@ const StudentsCourseDetails = () => {
                             className="custom-accordion-panel"
                           >
                             <div className="panel-inner-content">
-                              {lessons.map((lesson, lessonIndex) => {
-                                const completed = isCompleted(lesson._id);
-                                const locked = isLessonLocked(lessonIndex);
-                                const active = selectedLessonIndex === lessonIndex;
-
-                                return (
-                                  <div
-                                    key={lesson._id}
-                                    className={`interactive-lesson-row ${active ? "active-row" : ""} ${locked ? "locked-row" : ""}`}
-                                    onClick={() => {
-                                      if (locked) return;
-                                      setSelectedLessonIndex(lessonIndex);
-                                    }}
-                                  >
-                                    <div className="lesson-row-left">
-                                      {completed ? (
-                                        <FiCheckCircle className="status-icon completed-color" />
-                                      ) : active ? (
-                                        <FiPlayCircle className="status-icon active-color" />
-                                      ) : locked ? (
-                                        <FiLock className="status-icon locked-color" />
-                                      ) : (
-                                        <div className="status-dot-default" />
-                                      )}
-                                      <span className="lesson-row-title-text">{lesson.title}</span>
-                                    </div>
-                                    <div className="lesson-row-right">
-                                      {active && !completed && (
-                                        <button 
-                                          className="btn-inline-complete" 
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            markComplete();
-                                          }}
-                                        >
-                                          Complete ✓
-                                        </button>
-                                      )}
-                                      {/* 5. HARDCODED TIMERS DELETED CLEANLY FROM RUNTIME DISPLAY */}
-                                    </div>
+                              {!isEnrolled ? (
+                                <div className="interactive-lesson-row locked-row" style={{ cursor: "default" }}>
+                                  <div className="lesson-row-left">
+                                    <FiLock className="status-icon locked-color" />
+                                    <span className="lesson-row-title-text" style={{ fontStyle: "italic", opacity: 0.7 }}>
+                                      Syllabus modules and assets locked until payment verification.
+                                    </span>
                                   </div>
-                                );
-                              })}
+                                </div>
+                              ) : (
+                                lessons.map((lesson, lessonIndex) => {
+                                  const completed = isCompleted(lesson._id);
+                                  const locked = isLessonLocked(lessonIndex);
+                                  const active = selectedLessonIndex === lessonIndex;
+
+                                  return (
+                                    <div
+                                      key={lesson._id}
+                                      className={`interactive-lesson-row ${active ? "active-row" : ""} ${locked ? "locked-row" : ""}`}
+                                      onClick={() => {
+                                        if (locked) return;
+                                        setSelectedLessonIndex(lessonIndex);
+                                      }}
+                                    >
+                                      <div className="lesson-row-left">
+                                        {completed ? (
+                                          <FiCheckCircle className="status-icon completed-color" />
+                                        ) : active ? (
+                                          <FiPlayCircle className="status-icon active-color" />
+                                        ) : locked ? (
+                                          <FiLock className="status-icon locked-color" />
+                                        ) : (
+                                          <div className="status-dot-default" />
+                                        )}
+                                        <span className="lesson-row-title-text">{lesson.title}</span>
+                                      </div>
+                                      <div className="lesson-row-right">
+                                        {active && !completed && (
+                                          <button 
+                                            className="btn-inline-complete" 
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              markComplete();
+                                            }}
+                                          >
+                                            Complete ✓
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
 
                               {/* DYNAMIC QUIZ MOUNT AREA */}
-                              {quiz && (
+                              {quiz && isEnrolled && (
                                 <div className="panel-quiz-card-row">
                                   <div className="quiz-row-left">
                                     <FiAward className="quiz-award-icon" />
@@ -602,7 +630,7 @@ const StudentsCourseDetails = () => {
                 <h4>Course Includes:</h4>
                 <ul>
                   <li><FiVideo /> 12 hours on-demand video streaming</li>
-                  <li><FiFileText /> {totalLessons} dynamic class assets</li>
+                  <li><FiFileText /> {isEnrolled ? totalLessons : "Multiple"} dynamic class assets</li>
                   <li><FiCheckCircle /> Progress Tracking (Completed: {progress.length})</li>
                   <li><FiAward /> Digital certificate of completion</li>
                 </ul>

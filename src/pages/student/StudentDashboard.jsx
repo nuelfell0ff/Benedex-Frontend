@@ -285,12 +285,9 @@ function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="student-loading-shell">
-        <div className="student-loading-card">
-          <span className="student-spinner" />
-          <strong>Loading dashboard...</strong>
-          <span>Fetching your learning progress.</span>
-        </div>
+      <div className="bx-pm-loading-pane">
+        <div className="bx-pm-spinner"></div>
+        <p className="mt-3 text-muted font-weight-bold">Fetching your Learning Process...</p>
       </div>
     );
   }
