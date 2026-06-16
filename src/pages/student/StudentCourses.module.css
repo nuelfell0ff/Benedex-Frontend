@@ -95,6 +95,7 @@
 .avatarStack {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -743,5 +744,59 @@
   }
   .ctaPrimary, .ctaSecondary {
     justify-content: center;
+  }
+}
+
+/* ADDED: Strict Micro-Viewport Rules for pristine Small Mobile screens */
+@media (max-width: 480px) {
+  .heroSection {
+    padding: 1.75rem 1.25rem;
+    gap: 2rem;
+    border-radius: 14px;
+  }
+  
+  .heroSection h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .heroIntro {
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .avatarRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .avatarStack {
+    margin-left: 12px; /* Pull counterbalances first child negative margins */
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr; /* Stack statistics beautifully when horizontal room is depleted */
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  .statCard {
+    padding: 1.25rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .statCard strong {
+    font-size: 1.6rem;
+  }
+
+  .ctaSection {
+    padding: 1.75rem 1.25rem;
+    border-radius: 14px;
+  }
+
+  .ctaCopy h2 {
+    font-size: 1.4rem;
   }
 }
