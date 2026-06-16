@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../../services/api";
-import { 
-  FiUsers, FiShield, FiUserCheck, FiTrash2, FiAlertCircle, 
-  FiSearch, FiX, FiActivity, FiFilter 
+import {
+  FiUsers, FiShield, FiUserCheck, FiTrash2, FiAlertCircle,
+  FiSearch, FiX, FiActivity, FiFilter
 } from "react-icons/fi";
 import "./AdminUsers.css";
 
@@ -12,7 +12,7 @@ function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all"); // all | admin | instructor | student
-  
+
   // MODAL STATES
   const [modal, setModal] = useState({
     isOpen: false,
@@ -70,12 +70,12 @@ function AdminUsers() {
 
   // MULTI-TIER FILTER REGISTRY LOGIC
   const filteredUsers = users.filter(u => {
-    const matchesSearch = 
-      u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesRole = roleFilter === "all" || u.role === roleFilter;
-    
+
     return matchesSearch && matchesRole;
   });
 
@@ -90,7 +90,7 @@ function AdminUsers() {
 
   return (
     <div className="bx-ur-workspace container-fluid py-4">
-      
+
       {/* HEADER CONTROLS ZONE */}
       <header className="bx-ur-header d-flex flex-column gap-3 mb-4">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
@@ -104,9 +104,9 @@ function AdminUsers() {
 
           <div className="bx-ur-search-wrapper">
             <FiSearch className="bx-ur-search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search by name or email..." 
+            <input
+              type="text"
+              placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -119,7 +119,7 @@ function AdminUsers() {
             <FiFilter size={14} />
             <span>Clearance Filter:</span>
           </div>
-          <div className="bx-ur-filter-options d-flex gap-1">
+          <div className="bx-ur-filter-options d-flex gap-1" style={{ flexWrap: "wrap" }}>
             {[
               { id: "all", label: "All Nodes" },
               { id: "admin", label: "Administrators" },
@@ -154,7 +154,7 @@ function AdminUsers() {
             <tbody>
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user, idx) => (
-                  <motion.tr 
+                  <motion.tr
                     key={user._id}
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -184,22 +184,22 @@ function AdminUsers() {
                     </td>
                     <td className="text-end">
                       <div className="d-flex justify-content-end gap-2">
-                        <button 
-                          className="bx-ur-action-btn" 
+                        <button
+                          className="bx-ur-action-btn"
                           title="Modify System Role"
                           onClick={() => openModal("role", user)}
                         >
                           <FiUserCheck />
                         </button>
-                        <button 
-                          className="bx-ur-action-btn" 
+                        <button
+                          className="bx-ur-action-btn"
                           title="Toggle Status"
                           onClick={() => openModal("status", user)}
                         >
                           <FiActivity />
                         </button>
-                        <button 
-                          className="bx-ur-action-btn is-danger" 
+                        <button
+                          className="bx-ur-action-btn is-danger"
                           title="Purge Account"
                           onClick={() => openModal("delete", user)}
                         >
@@ -225,7 +225,7 @@ function AdminUsers() {
       <AnimatePresence>
         {modal.isOpen && (
           <div className="bx-ur-modal-overlay">
-            <motion.div 
+            <motion.div
               className="bx-ur-modal-card"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -247,8 +247,8 @@ function AdminUsers() {
                 {modal.type === "role" && (
                   <div className="bx-ur-role-selector mt-4">
                     {["student", "instructor", "admin"].map(r => (
-                      <button 
-                        key={r} 
+                      <button
+                        key={r}
                         className={`bx-ur-role-opt ${modal.user.role === r ? 'current' : ''}`}
                         onClick={() => handleAction(r)}
                         disabled={modal.processing}
@@ -263,7 +263,7 @@ function AdminUsers() {
               <div className="bx-ur-modal-footer">
                 <button className="bx-ur-cancel-btn" onClick={closeModal} disabled={modal.processing}>Abort</button>
                 {modal.type !== "role" && (
-                  <button 
+                  <button
                     className={`bx-ur-confirm-btn is-${modal.type}`}
                     onClick={() => handleAction()}
                     disabled={modal.processing}

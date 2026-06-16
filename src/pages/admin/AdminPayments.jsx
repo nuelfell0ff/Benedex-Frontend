@@ -131,7 +131,7 @@ function AdminPayments() {
             <FiFilter size={14} />
             <span>Transaction Filter:</span>
           </div>
-          <div className="bx-pm-filter-options d-flex gap-1">
+          <div className="bx-pm-filter-options d-flex gap-1" style={{ flexWrap: "wrap" }}>
             {[
               { id: "all", label: "All Records" },
               { id: "success", label: "Successful" },
