@@ -1,13 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-
 import { FiArrowRight, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
-
 import { AnimatePresence, motion } from "framer-motion";
-
 import { useAuth } from "../../context/AuthContext";
-
 import "../../App.css";
 
 function Register() {
@@ -53,7 +48,6 @@ function Register() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((current) => ({
       ...current,
       [name]: value,
@@ -66,11 +60,14 @@ function Register() {
     setError("");
 
     try {
+      // Submit registration data through AuthContext
       await register(formData);
+      
+      // Strictly navigate to the login screen upon successful registration
       navigate("/login");
     } catch (registerError) {
       setError("We could not create your account right now. Please check your details and try again.");
-      console.log(registerError);
+      console.error("Registration pipeline submission failure info:", registerError);
     } finally {
       setLoading(false);
     }

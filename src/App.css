@@ -64,10 +64,11 @@ input {
   flex-direction: column;
   justify-content: space-between;
   color: #fff;
-  background:
+  /* background:
     linear-gradient(180deg, rgba(8, 52, 90, 0.95), rgba(13, 90, 160, 0.98)),
     radial-gradient(circle at top right, rgba(46, 127, 193, 0.18), transparent 32%),
-    linear-gradient(135deg, #05162a, #071428 120%);
+    linear-gradient(135deg, #05162a, #071428 120%); */
+  background-color: #07335c;
   isolation: isolate;
 }
 

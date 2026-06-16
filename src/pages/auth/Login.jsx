@@ -7,7 +7,7 @@ import "../../App.css";
 
 function Login() {
   const navigate = useNavigate();
-  const { login, user: contextUser } = useAuth(); // Gather live state context variables safely
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -58,15 +58,13 @@ function Login() {
     setError("");
 
     try {
-      // 1. Submit form payload details to backend context pipeline
+      // 1. Authenticate with backend and wait for profile payload data
       const loggedInUser = await login(formData);
 
-      // 2. Identify active target account configurations (Fallback back-check logic)
-      // Checks the directly returned user object first, then checks the global auth context
-      const targetUser = loggedInUser || contextUser;
-      const targetRole = targetUser?.role || loggedInUser?.user?.role;
+      // 2. Safely extract role parsing fallback branches
+      const targetRole = loggedInUser?.role || loggedInUser?.user?.role;
 
-      // 3. Routing matrix configuration
+      // 3. Absolute Routing Matrix Execution
       if (targetRole === "student") {
         navigate("/student");
       } else if (targetRole === "instructor") {
@@ -74,8 +72,8 @@ function Login() {
       } else if (targetRole === "admin") {
         navigate("/admin");
       } else {
-        // Fallback option if user state data exists but role is missing
-        console.warn("User authenticated, but no role configuration was identified:", targetUser);
+        // Safe generic recovery path to root dashboard routing evaluation if parsing drops through
+        console.warn("Authentication passed, but role property path could not be resolved:", loggedInUser);
         navigate("/");
       }
 

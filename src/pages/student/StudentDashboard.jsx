@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -19,6 +18,7 @@ import {
   FiStar,
   FiTarget,
   FiUsers,
+  FiAlertCircle
 } from "react-icons/fi";
 
 import API from "../../services/api";
@@ -30,23 +30,6 @@ const badgeCatalog = [
   { label: "Team Lead", icon: <FiUsers /> },
   { label: "UI Architect", icon: <FiLayers /> },
   { label: "Data Wizard", icon: <FiLock /> },
-];
-
-const liveSessions = [
-  {
-    date: "Today at 14:00",
-    title: "System Architecture Q&A",
-    mentor: "Sarah Drasner",
-    action: "Join Session",
-    soon: true,
-  },
-  {
-    date: "Tomorrow at 10:00",
-    title: "Career Coaching: Portfolio Review",
-    mentor: "James Clear",
-    action: "Set Reminder",
-    soon: false,
-  },
 ];
 
 const monthNames = [
@@ -100,7 +83,6 @@ const buildConsistencyGraph = (learningSummary) => {
   });
 
   const startOfYear = new Date(Date.UTC(year, 0, 1));
-
   const cells = [];
   const monthMarkers = monthList.map((month) => ({
     label: month.name.slice(0, 3),
@@ -170,20 +152,32 @@ const formatTimeAgo = (value) => {
 
 function StudentDashboard() {
   const [dashboard, setDashboard] = useState(null);
+  const [liveClasses, setLiveClasses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchDashboard = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const res = await API.get("/dashboard/student");
+        const [dashboardRes, liveClassesRes] = await Promise.all([
+          API.get("/dashboard/student"),
+          API.get("/live-classes/student")
+        ]);
 
         if (isMounted) {
-          setDashboard(res.data);
+          setDashboard(dashboardRes.data);
+          
+          // Defend against nested data payloads (e.g., res.data.classes or res.data.data)
+          const extractedClasses = 
+            Array.isArray(liveClassesRes.data) ? liveClassesRes.data : 
+            Array.isArray(liveClassesRes.data?.classes) ? liveClassesRes.data.classes :
+            Array.isArray(liveClassesRes.data?.data) ? liveClassesRes.data.data : [];
+            
+          setLiveClasses(extractedClasses);
         }
       } catch (error) {
-        console.log(error);
+        console.error("Dashboard multi-node telemetry connection failure:", error);
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -191,12 +185,25 @@ function StudentDashboard() {
       }
     };
 
-    fetchDashboard();
+    fetchDashboardData();
 
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const handleJoinClass = async (liveClass) => {
+    try {
+      const res = await API.post(`/live-classes/join/${liveClass._id}`);
+      const meetingLink = res.data?.meetingLink || liveClass.meetingLink;
+
+      if (meetingLink) {
+        window.open(meetingLink, "_blank", "noopener,noreferrer");
+      }
+    } catch (error) {
+      console.error("Live streaming room connection engine failure inside dashboard:", error);
+    }
+  };
 
   const viewModel = useMemo(() => {
     const studentName = dashboard?.profile?.fullName || "Kwame Mensah";
@@ -215,8 +222,8 @@ function StudentDashboard() {
 
     const badgeNames = Array.isArray(dashboard?.badges)
       ? dashboard.badges.map((badge) =>
-        typeof badge === "string" ? badge : badge?.name || badge?.title || "Badge"
-      )
+          typeof badge === "string" ? badge : badge?.name || badge?.title || "Badge"
+        )
       : [];
 
     const consistencyMonths =
@@ -229,28 +236,33 @@ function StudentDashboard() {
     const courses =
       dashboard?.enrolledCourses?.length > 0
         ? dashboard.enrolledCourses.slice(0, 2).map((course, index) => ({
-          title: course.title,
-          description: course.description,
-          progress: index === 0 ? 45 : 78,
-          lessons: index === 0 ? "12/24 Lessons" : "18/23 Lessons",
-          status: "In Progress",
-        }))
+            title: course.title,
+            description: course.description,
+            progress: index === 0 ? 45 : 78,
+            lessons: index === 0 ? "12/24 Lessons" : "18/23 Lessons",
+            status: "In Progress",
+          }))
         : [
-          {
-            title: "Advanced React Patterns",
-            description: "Master design patterns and performance optimization.",
-            progress: 45,
-            lessons: "12/24 Lessons",
-            status: "In Progress",
-          },
-          {
-            title: "Visual Design Systems",
-            description: "Scaling design for enterprise platforms.",
-            progress: 78,
-            lessons: "18/23 Lessons",
-            status: "In Progress",
-          },
-        ];
+            {
+              title: "Advanced React Patterns",
+              description: "Master design patterns and performance optimization.",
+              progress: 45,
+              lessons: "12/24 Lessons",
+              status: "In Progress",
+            },
+            {
+              title: "Visual Design Systems",
+              description: "Scaling design for enterprise platforms.",
+              progress: 78,
+              lessons: "18/23 Lessons",
+              status: "In Progress",
+            },
+          ];
+
+    // Take the 2 absolute closest upcoming sessions
+    const recentLiveSessions = [...liveClasses]
+      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+      .slice(0, 2);
 
     return {
       firstName,
@@ -264,9 +276,10 @@ function StudentDashboard() {
       consistencyMonths,
       consistencyGraph,
       courses,
+      recentLiveSessions,
       recentActivities: dashboard?.recentActivities || [],
     };
-  }, [dashboard]);
+  }, [dashboard, liveClasses]);
 
   const previewActivities = viewModel.recentActivities.slice(0, 4);
 
@@ -470,24 +483,50 @@ function StudentDashboard() {
           >
             <div className="student-side-head">
               <h3>Upcoming Live</h3>
-              <span className="student-live-pill">LIVE SOON</span>
+              <Link className="student-see-more-link" to="/student/live-classes">
+                See more <FiArrowRight />
+              </Link>
             </div>
 
             <div className="student-live-list">
-              {liveSessions.map((session) => (
-                <article key={session.title} className="student-live-card">
-                  <div className="student-live-meta">
-                    <FiCalendar />
-                    <span>{session.date}</span>
-                  </div>
-                  <h4>{session.title}</h4>
-                  <p>Mentor: {session.mentor}</p>
+              {viewModel.recentLiveSessions.length > 0 ? (
+                viewModel.recentLiveSessions.map((session) => {
+                  const classDate = new Date(session.startTime);
+                  const isLiveNow = classDate <= new Date();
 
-                  <button type="button" className="student-live-button" disabled={!session.soon}>
-                    {session.action}
-                  </button>
-                </article>
-              ))}
+                  return (
+                    <article key={session._id} className="student-live-card">
+                      <div className="student-live-meta">
+                        <FiCalendar />
+                        <span>
+                          {classDate.toLocaleDateString([], { month: 'short', day: 'numeric' })} at {classDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {isLiveNow && <span className="student-live-pill" style={{ marginLeft: "auto", fontSize: "0.7rem" }}>LIVE NOW</span>}
+                      </div>
+                      <h4>{session.title}</h4>
+                      <p>Mentor: {session.instructor?.fullName || "Unassigned Faculty"}</p>
+
+                      <button 
+                        type="button" 
+                        className="student-live-button"
+                        onClick={() => handleJoinClass(session)}
+                      >
+                        Initialize Live Stream Bridge
+                      </button>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className="student-activity-item student-activity-empty" style={{ padding: "1rem 0" }}>
+                  <span className="student-activity-icon" aria-hidden="true">
+                    <FiAlertCircle />
+                  </span>
+                  <div>
+                    <strong>No live streams available</strong>
+                    <p style={{ fontSize: "0.75rem" }}>Check back later for active sessions.</p>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.section>
 
