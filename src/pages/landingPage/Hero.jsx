@@ -27,7 +27,7 @@ function Hero() {
           transition={{ duration: 0.5 }}
         >
           <span className="bx-hero-badge-icon">⚡</span>
-          <span>AI-Powered Platform Engine</span>
+          <span>Next-Gen LMS Architecture</span>
         </motion.div>
 
         {/* MAIN TYPOGRAPHY HEADER STACK */}
@@ -37,8 +37,8 @@ function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          Your Institutional Portal, <br />
-          <span className="bx-hero-title-accent">now with intelligence</span>
+          Premium Digital Learning, <br />
+          <span className="bx-hero-title-accent">Driven by Intelligence.</span>
         </motion.h1>
 
         {/* CALL TO ACTION BUTTON CLUSTERS */}
