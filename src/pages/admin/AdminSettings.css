@@ -1,4 +1,4 @@
-/* AdminSettings.css */
+/* AdminSettings.css EXTENSIONS */
 
 .bx-st-workspace {
   background-color: #f8fafc;
@@ -87,7 +87,7 @@
   border: 1px solid #e2e8f0;
   background: #ffffff;
   font-size: 0.88rem;
-  color: #0f172a !important; /* FIXED HIGH CONTRAST INPUT TEXT */
+  color: #0f172a !important;
   font-weight: 500;
   outline: none;
   transition: all 0.2s ease;
@@ -96,6 +96,51 @@
 .bx-st-input-wrapper input:focus {
   border-color: #07335c;
   box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+/* NEW: SELECT WRAPPER STYLING ENGINE FOR ROLES DROPDOWN */
+.bx-st-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.bx-st-select-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.bx-st-dropdown {
+  width: 100%;
+  padding: 12px 14px 12px 44px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 0.88rem;
+  color: #0f172a;
+  font-weight: 500;
+  outline: none;
+  appearance: none; /* Strip standard legacy operational browser select styling vectors */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 14px) center;
+  background-size: 16px;
+}
+
+.bx-st-dropdown:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 3px rgba(7, 51, 92, 0.05);
+}
+
+/* HIGHLIGHT COLOR SCHEME COMPONENT MATCH */
+.text-primary-theme {
+  color: #07335c;
 }
 
 /* PREMIUM INTERACTIVE TOGGLE SLIDERS */
@@ -144,7 +189,7 @@
 }
 
 input:checked + .bx-st-slider {
-  background-color: #ef4444; /* Alert color representation for maintenance overrides */
+  background-color: #ef4444;
 }
 
 input:focus + .bx-st-slider {
@@ -190,6 +235,12 @@ input:checked + .bx-st-slider:before {
 .bx-st-submit-btn:disabled {
   background-color: #94a3b8;
   cursor: not-allowed;
+}
+
+/* ALERTS FEEDBACK ELEMENT OVERRIDES */
+.alert {
+  border-radius: 10px;
+  font-weight: 500;
 }
 
 /* NOTIFICATION OVERLAYS TOASTS */

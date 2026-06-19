@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+.bx-maint-viewport {
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f8fafc;
+}
+
+.bx-maint-container {
+  max-width: 550px;
+  width: 100%;
+}
+
+/* Illustration Engine Component Positioning Hooks */
+.bx-maint-illustration {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bx-maint-gear-primary {
+  color: #07335c;
+  display: inline-block;
+}
+
+.bx-maint-gear-secondary {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  color: #38bdf8;
+  background-color: #ffffff;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base Content Variables Typography Layouts */
+.bx-maint-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: #ffe4e6;
+  color: #e11d48;
+  padding: 6px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.bx-maint-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.bx-maint-description {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 35px;
+  font-weight: 400;
+}
+
+/* Metrics Dashboard Cards Subgrid Grid System */
+.bx-maint-metrics-grid {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.bx-maint-status-card {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 24px;
+  box-shadow: 0 4px 10px -2px rgba(7, 51, 92, 0.03);
+  text-align: left;
+}
+
+.bx-maint-card-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.bx-maint-card-value {
+  font-size: 0.85rem;
+  margin-top: 6px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bx-maint-card-value.text-success {
+  color: #16a34a;
+}
+
+.bx-maint-card-value.text-muted {
+  color: #64748b;
+}
+
+/* Responsiveness Adaptations Hooks */
+@media (max-width: 576px) {
+  .bx-maint-title {
+    font-size: 1.85rem;
+  }
+  
+  .bx-maint-metrics-grid {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

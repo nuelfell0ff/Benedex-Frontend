@@ -2,20 +2,20 @@ import {
   Routes,
   Route,
   Navigate
-}
-  from "react-router-dom";
-
+} from "react-router-dom";
+import { motion } from "framer-motion"; 
+import { FiSliders, FiClock, FiCheckCircle } from "react-icons/fi";
 import {
   AuthProvider,
   useAuth
-}
-  from "./context/AuthContext";
+} from "./context/AuthContext";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import LandingPage from "./pages/landingPage/Landing";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Maintenance from "./pages/Maintainance";
 
 import StudentLayout from "./layouts/StudentLayout";
 import InstructorLayout from "./layouts/InstructorLayout";
@@ -29,9 +29,6 @@ import Notifications from "./pages/student/Notifications";
 import LiveClasses from "./pages/student/LiveClasses";
 import Messages from "./pages/student/Messages";
 import StudentQuiz from "./pages/student/StudentQuiz";
-
-
-
 
 import InstructorDashboard from "./pages/instructor/InstructorDashboard";
 import InstructorCourses from "./pages/instructor/InstructorCourses";
@@ -47,10 +44,6 @@ import InstructorCourseDetails from "./pages/instructor/InstructorCourseDetails"
 import InstructorLessons from "./pages/instructor/InstructorLessons";
 import InstructorQuizBuilder from "./pages/instructor/InstructorQuizBuilder";
 
-
-
-
-
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -59,65 +52,36 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import AdminCourses from "./pages/admin/AdminCourses";
 import PaymentCallback from "./pages/payments/PaymentCallback";
 
-
-
-
-
 function HomeRedirect() {
-
   const { user } = useAuth();
 
-
   if (!user) {
-
     return <Navigate to="/login" />;
-
   }
-
 
   if (user.role === "student") {
-
     return <Navigate to="/student" />;
-
   }
-
 
   if (user.role === "instructor") {
-
     return <Navigate to="/instructor" />;
-
   }
-
 
   if (user.role === "admin") {
-
     return <Navigate to="/admin" />;
-
   }
 
-
   return <Navigate to="/login" />;
-
 }
 
-
-
-
-
 function App() {
-
   return (
-
     <AuthProvider>
-
       <Routes>
-
         <Route
           path="/"
           element={<LandingPage />}
         />
-
-
 
         <Route
           path="/login"
@@ -131,28 +95,22 @@ function App() {
           element={<Register />}
         />
 
-
-
-
+        {/* NEW: Explicit Global Maintenance Route */}
+        <Route 
+          path="/maintenance" 
+          element={<Maintenance />} 
+        />
 
         <Route
-
           path="/student"
-
           element={
-
             <ProtectedRoute
               roles={["student"]}
             >
-
               <StudentLayout />
-
             </ProtectedRoute>
-
           }
-
         >
-
           <Route
             index
             element={<StudentDashboard />}
@@ -183,16 +141,10 @@ function App() {
             element={<Messages />}
           />
 
-          {/* <Route
-            path="courses/:courseId"
-            element={<StudentCourseDetails />}
-          /> */}
-
           <Route
             path="/student/quiz/:quizId"
             element={<StudentQuiz />}
           />
-
         </Route>
 
         <Route
@@ -200,30 +152,16 @@ function App() {
           element={<CourseDetails />}
         />
 
-
-
-
-
-
-
         <Route
-
           path="/instructor"
-
           element={
-
             <ProtectedRoute
               roles={["instructor"]}
             >
-
               <InstructorLayout />
-
             </ProtectedRoute>
-
           }
-
         >
-
           <Route
             index
             element={<InstructorDashboard />}
@@ -293,31 +231,18 @@ function App() {
             path="quiz-builder/:moduleId"
             element={<InstructorQuizBuilder />}
           />
-
         </Route>
 
-
-
-
-
         <Route
-
           path="/admin"
-
           element={
-
             <ProtectedRoute
               roles={["admin"]}
             >
-
               <AdminLayout />
-
             </ProtectedRoute>
-
           }
-
         >
-
           <Route
             index
             element={<AdminDashboard />}
@@ -347,19 +272,10 @@ function App() {
             path="courses"
             element={<AdminCourses />}
           />
-
         </Route>
-
-
-
-
-
       </Routes>
-
     </AuthProvider>
-
   );
-
 }
 
 export default App;
