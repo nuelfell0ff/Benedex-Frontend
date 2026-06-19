@@ -5,9 +5,19 @@
 .bx-notify-container {
   padding: 40px 24px;
   max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #1e293b;
+  overflow-x: hidden; /* Prevent master container canvas leakage */
+}
+
+/* Ensure structural parameters explicitly handle scaling constraints universally */
+.bx-notify-container *,
+.bx-notify-container *::before,
+.bx-notify-container *::after {
+  box-sizing: border-box;
 }
 
 /* FULL FRAME IDENTITY BLOCK LOADERS */
@@ -18,6 +28,7 @@
   justify-content: center;
   min-height: 50vh;
   gap: 16px;
+  width: 100%;
 }
 
 .bx-notify-spinner {
@@ -33,6 +44,8 @@
   font-size: 0.95rem;
   color: #64748b;
   font-weight: 500;
+  margin: 0;
+  text-align: center;
 }
 
 /* MODULE TITLES BANNER */
@@ -40,6 +53,7 @@
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 24px;
   margin-bottom: 36px;
+  width: 100%;
 }
 
 .bx-notify-title-zone h1 {
@@ -48,6 +62,7 @@
   color: #07335c;
   letter-spacing: -0.025em;
   margin: 0 0 6px 0;
+  word-wrap: break-word;
 }
 
 .bx-notify-title-zone p {
@@ -60,9 +75,16 @@
 /* SPLIT VIEWPORT WRAPPER MATRIX */
 .bx-notify-layout-split {
   display: grid;
-  grid-template-columns: 460px 1fr;
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr); /* Safe scaling logic to protect columns from overflowing */
   align-items: start;
   gap: 40px;
+  width: 100%;
+}
+
+.bx-notify-form-panel,
+.bx-notify-feed-column {
+  min-width: 0; /* Unlocks deep structural nesting calculations on flex/grid setups */
+  width: 100%;
 }
 
 /* SECTION CARD TITLE SUBHEADERS */
@@ -85,12 +107,14 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
 }
 
 .bx-form-cell {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .bx-form-cell label {
@@ -110,6 +134,7 @@
   color: #0f172a;
   background-color: #ffffff;
   font-family: inherit;
+  width: 100%; /* Enforces fluid restriction on small screen options */
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -140,6 +165,7 @@
   justify-content: center;
   gap: 8px;
   margin-top: 4px;
+  width: 100%;
   transition: background-color 0.15s ease;
 }
 
@@ -167,6 +193,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  gap: 12px;
+  width: 100%;
 }
 
 .bx-feed-header-row h2 {
@@ -181,12 +209,14 @@
   color: #475569;
   padding: 4px 10px;
   border-radius: 20px;
+  white-space: nowrap;
 }
 
 .bx-feed-scroll-container {
   max-height: 600px;
   overflow-y: auto;
   padding-right: 6px;
+  width: 100%;
 }
 
 /* CUSTOM STREAM CARDS */
@@ -194,6 +224,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .bx-notify-feed-card {
@@ -202,6 +233,9 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 6px rgba(7, 51, 92, 0.01);
+  width: 100%;
+  word-wrap: break-word; /* Prevents overflow from un-broken textual string metrics */
+  word-break: break-word;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -215,6 +249,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  gap: 12px;
+  flex-wrap: wrap; /* Allows alignment tags to break safely into standard mobile rows */
 }
 
 .bx-feed-badge {
@@ -227,6 +263,7 @@
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 /* METRIC BADGE CATEGORY MAPS */
@@ -242,6 +279,7 @@
   font-size: 0.78rem;
   color: #94a3b8;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .bx-notify-feed-card h3 {
@@ -249,6 +287,7 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0 0 6px 0;
+  word-wrap: break-word;
 }
 
 .bx-notify-feed-card p {
@@ -265,6 +304,7 @@
   background-color: #f8fafc;
   border: 1px dashed #cbd5e1;
   border-radius: 12px;
+  width: 100%;
 }
 
 .bx-notify-empty-icon {
@@ -284,9 +324,9 @@
   font-size: 0.88rem;
   color: #64748b;
   line-height: 1.5;
-  margin: 0;
-  max-width: 340px;
   margin: 0 auto;
+  max-width: 340px;
+  width: 100%;
 }
 
 /* SCROLLBAR ENGINE DECORATIONS */
@@ -308,8 +348,30 @@
 
 /* DEVICE BREAKPOINT MEDIA RESPONSES */
 @media (max-width: 992px) {
+  .bx-notify-container {
+    padding: 24px 16px; /* Enhanced viewport breathing bounds */
+  }
   .bx-notify-layout-split {
     grid-template-columns: 1fr;
     gap: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bx-premium-form {
+    padding: 16px; /* Tighter layout bounds for small compact cards */
+  }
+  .bx-feed-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .bx-feed-badge {
+    width: 100%;
+    justify-content: center;
+  }
+  .bx-feed-timestamp {
+    width: 100%;
+    justify-content: flex-start;
   }
 }

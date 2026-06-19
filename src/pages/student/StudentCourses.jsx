@@ -24,7 +24,7 @@ function StudentCourses() {
   const [loading, setLoading] = useState(true);
   const [selectedTrack, setSelectedTrack] = useState("All programs");
   const [sortBy, setSortBy] = useState("popular");
-  const [visibleCount, setVisibleCount] = useState(4);
+  const [visibleCount, setVisibleCount] = useState(3);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -148,8 +148,8 @@ function StudentCourses() {
 
   if (loading) {
     return (
-      <div className={styles.loadingPane}>
-        <div className={styles.spinner}></div>
+      <div className="st-maint-loader-frame">
+        <div className="st-maint-spinner" />
         <p>Preparing your course catalog...</p>
       </div>
     );

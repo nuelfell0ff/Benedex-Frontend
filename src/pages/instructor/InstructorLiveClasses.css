@@ -5,9 +5,19 @@
 .bx-live-workspace-container {
   padding: 40px 24px;
   max-width: 1200px;
+  width: 100%; /* Explicit fluid restriction bounds */
+  box-sizing: border-box;
   margin: 0 auto;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #1e293b;
+  overflow-x: hidden; /* Prevent master container canvas leakage */
+}
+
+/* Ensure structural parameters explicitly handle scaling constraints universally */
+.bx-live-workspace-container *,
+.bx-live-workspace-container *::before,
+.bx-live-workspace-container *::after {
+  box-sizing: border-box;
 }
 
 /* SYSTEM MAIN LOADER SPINNERS */
@@ -18,6 +28,7 @@
   justify-content: center;
   min-height: 50vh;
   gap: 16px;
+  width: 100%;
 }
 
 .bx-live-spinner {
@@ -33,6 +44,8 @@
   font-size: 0.95rem;
   color: #64748b;
   font-weight: 500;
+  margin: 0;
+  text-align: center;
 }
 
 /* MODULE MASTER HEADER TIERS */
@@ -44,6 +57,11 @@
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 28px;
   margin-bottom: 36px;
+  width: 100%;
+}
+
+.bx-live-title-block {
+  max-width: 100%;
 }
 
 .bx-live-title-block h1 {
@@ -52,6 +70,7 @@
   color: #07335c;
   letter-spacing: -0.025em;
   margin: 0 0 6px 0;
+  word-wrap: break-word;
 }
 
 .bx-live-title-block p {
@@ -125,9 +144,16 @@
 /* WORKSPACE LAYOUT GRID CONTROLS */
 .bx-live-split-matrix {
   display: grid;
-  grid-template-columns: 480px 1fr;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr); /* Clean scaling logic to protect columns from overflowing viewports */
   align-items: start;
   gap: 40px;
+  width: 100%;
+}
+
+.bx-live-form-column,
+.bx-live-feed-column {
+  min-width: 0; /* Unlocks deep structural nesting calculations on flex/grid setups */
+  width: 100%;
 }
 
 .bx-live-form-column h2,
@@ -149,12 +175,14 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
 }
 
 .bx-live-field-row {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .bx-live-field-row label {
@@ -174,6 +202,7 @@
   color: #0f172a;
   background-color: #ffffff;
   font-family: inherit;
+  width: 100%; /* Enforces absolute 100% containment on mobile form components */
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -193,6 +222,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
 }
 
 /* ACTION EXECUTE DISPATCH SUBMIT TERMINAL BUTTON */
@@ -210,6 +240,7 @@
   justify-content: center;
   gap: 8px;
   margin-top: 4px;
+  width: 100%;
   transition: background-color 0.15s ease;
 }
 
@@ -237,6 +268,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  gap: 12px;
+  width: 100%;
 }
 
 .bx-feed-meta-row h2 {
@@ -251,12 +284,14 @@
   color: #475569;
   padding: 4px 10px;
   border-radius: 20px;
+  white-space: nowrap;
 }
 
 .bx-live-scroll-frame {
   max-height: 640px;
   overflow-y: auto;
   padding-right: 6px;
+  width: 100%;
 }
 
 .bx-inner-feed-loader {
@@ -265,6 +300,7 @@
   justify-content: center;
   gap: 10px;
   padding: 40px 0;
+  width: 100%;
 }
 
 .bx-live-spinner-small {
@@ -287,6 +323,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .bx-live-class-card {
@@ -295,6 +332,9 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 6px rgba(7, 51, 92, 0.005);
+  width: 100%;
+  word-wrap: break-word; /* Safeguards titles and parameters from breaking canvas boundaries */
+  word-break: break-word;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -308,6 +348,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+  gap: 12px;
+  flex-wrap: wrap; /* Allows duration badges to drop gracefully on midsize devices */
 }
 
 .bx-platform-badge {
@@ -355,6 +397,7 @@
   color: #0f172a;
   margin: 0 0 6px 0;
   letter-spacing: -0.01em;
+  word-wrap: break-word;
 }
 
 .bx-class-card-desc {
@@ -370,6 +413,8 @@
   justify-content: space-between;
   border-top: 1px dashed #e2e8f0;
   padding-top: 14px;
+  gap: 12px;
+  flex-wrap: wrap; /* Wraps timestamps and button parameters seamlessly on tiny screens */
 }
 
 .bx-footer-date-stamp {
@@ -403,6 +448,7 @@
   background-color: #f8fafc;
   border: 1px dashed #cbd5e1;
   border-radius: 12px;
+  width: 100%;
 }
 
 .bx-live-empty-icon-box {
@@ -424,6 +470,7 @@
   line-height: 1.5;
   margin: 0 auto;
   max-width: 360px;
+  width: 100%;
 }
 
 /* SYSTEM CUSTOM CHROME SCROLLBARS */
@@ -445,6 +492,9 @@
 
 /* RESPONSIVE LAYOUT MATRIX SWITCHES */
 @media (max-width: 992px) {
+  .bx-live-workspace-container {
+    padding: 24px 16px; /* Optimized screen padding bounds for small viewports */
+  }
   .bx-live-header-panel {
     flex-direction: column;
     align-items: flex-start;
@@ -464,13 +514,33 @@
     grid-template-columns: 1fr;
     gap: 20px;
   }
+  .bx-live-premium-form {
+    padding: 16px; /* Tighter item gutters for small screens */
+  }
   .bx-class-card-top {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
+  .bx-platform-badge {
+    width: 100%;
+    justify-content: center;
+  }
   .bx-class-duration-badge {
     width: 100%;
     justify-content: center;
+  }
+  .bx-class-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .bx-join-stream-action {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: #f8fafc;
   }
 }
