@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { 
-  FiActivity, 
-  FiCheckCircle, 
-  FiXCircle, 
-  FiLoader, 
-  FiArrowRight, 
-  FiRefreshCw, 
-  FiHelpCircle 
+import {
+  FiActivity,
+  FiCheckCircle,
+  FiXCircle,
+  FiLoader,
+  FiArrowRight,
+  FiRefreshCw,
+  FiHelpCircle
 } from "react-icons/fi";
 import API from "../../services/api";
 import "./PaymentCallback.css"; // Styling layout provided below
@@ -60,22 +60,18 @@ function PaymentCallback() {
       {/* BRANDING TOPBAR FOR PREMIUM CONSISTENCY */}
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
-          <div className="student-sidebar-brand">
-            <span className="student-sidebar-mark" aria-hidden="true">
-              <FiActivity />
-            </span>
-            <div className="student-sidebar-brand-copy">
-              <strong>Benedex Digital</strong>
-              <span>Premium Learning Hub</span>
+          <Link to="/" className="bx-nav-brand-group">
+            <div className="bx-nav-logo-box">
             </div>
-          </div>
+            <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
+          </Link>
         </div>
       </header>
 
       {/* CORE CARTRIDGE AREA */}
       <main className="callback-main-canvas">
         <div className="callback-glass-card">
-          
+
           {/* VERIFYING STATE */}
           {status === "verifying" && (
             <div className="callback-state-content state-verifying">
@@ -117,7 +113,7 @@ function PaymentCallback() {
               </div>
               <h2>Transaction Exception</h2>
               <p className="callback-error-message">{message}</p>
-              
+
               <div className="callback-error-notice-box">
                 <FiHelpCircle className="notice-box-icon" />
                 <p>

@@ -36,8 +36,8 @@
 }
 
 .bx-nav-logo-box {
-  width: 32px;
-  height: 32px;
+  width: 32px !important;
+  height: 32px !important;
   background-color: #194066;
   border-radius: 8px; /* Smooth professional rounded block edge */
   display: flex;

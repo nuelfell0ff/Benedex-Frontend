@@ -90,14 +90,11 @@ function Login() {
   return (
     <main className="login-shell">
       <section className="login-visual-panel">
-        <div className="login-brand-row">
-          <div className="login-brand-mark" aria-hidden="true">
-            <span />
-            <span />
-            <span />
+        <Link to="/" className="bx-nav-brand-group">
+          <div className="bx-nav-logo-box bg-white">
           </div>
-          <span className="login-brand-name">Benedex Digital Hub</span>
-        </div>
+          <span className="bx-nav-brand-text student-sidebar-brand-copy text-white">Benedex</span>
+        </Link>
 
         <div className="login-visual-content">
           <span className="login-kicker">Digital Excellence</span>

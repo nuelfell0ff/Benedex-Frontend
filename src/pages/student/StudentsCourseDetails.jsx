@@ -44,8 +44,8 @@ const StudentsCourseDetails = () => {
   const [selectedLessonIndex, setSelectedLessonIndex] = useState(null);
 
   const [progress, setProgress] = useState([]);
-  const [quizProgress, setQuizProgress] = useState([]); 
-  const [allModulesQuizzes, setAllModulesQuizzes] = useState({}); 
+  const [quizProgress, setQuizProgress] = useState([]);
+  const [allModulesQuizzes, setAllModulesQuizzes] = useState({});
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -64,7 +64,7 @@ const StudentsCourseDetails = () => {
 
         const rawModules = modulesRes.data || [];
         const completedLessons = progressRes.data || [];
-        
+
         setCourse(courseRes.data);
         setModules(rawModules);
         setQuizProgress(quizProgressRes.data || []);
@@ -101,12 +101,12 @@ const StudentsCourseDetails = () => {
               try {
                 const lessonRes = await API.get(`/lessons/module/${rawModules[m]._id}`);
                 const modLessons = lessonRes.data || [];
-                
+
                 for (let l = 0; l < modLessons.length; l++) {
                   const isLessonDone = completedLessons.some(
                     (p) => String(p.lesson?._id || p.lesson) === String(modLessons[l]._id)
                   );
-                  
+
                   // Set bookmark location at the first incomplete lesson found
                   if (!isLessonDone) {
                     bookmarkedModuleIdx = m;
@@ -164,49 +164,72 @@ const StudentsCourseDetails = () => {
     .toUpperCase();
 
   /* ---------------- DYNAMIC LESSONS + QUIZ FETCHING ---------------- */
+  /* ---------------- LESSONS + QUIZ FETCHING ---------------- */
   useEffect(() => {
+    let isMounted = true;
+
     const fetchModuleData = async () => {
-      if (!modules.length || selectedModuleIndex === null) return;
+      if (!modules || modules.length === 0 || selectedModuleIndex === null) return;
+      
       // If student hasn't paid, don't execute structural internal lookups
       if (!isEnrolled) {
         setLoading(false);
         return;
       }
+      
       setLoading(true);
 
       try {
         const moduleId = modules[selectedModuleIndex]?._id;
         if (!moduleId) return;
 
+        // Fetch data for the active selected module safely
         const [lessonRes, quizRes] = await Promise.all([
-          API.get(`/lessons/module/${moduleId}`),
+          API.get(`/lessons/module/${moduleId}`).catch(() => ({ data: [] })),
           API.get(`/quizzes/module/${moduleId}`).catch(() => null),
         ]);
 
-        setLessons(lessonRes.data || []);
+        if (!isMounted) return;
+
+        const fetchedLessons = lessonRes.data || [];
+        setLessons(fetchedLessons);
         setQuiz(quizRes?.data || null);
 
-        if (selectedLessonIndex === null || selectedLessonIndex >= (lessonRes.data || []).length) {
+        // Safely bounds-check the selected lesson index layout
+        if (selectedLessonIndex === null || selectedLessonIndex >= fetchedLessons.length) {
           setSelectedLessonIndex(0);
         }
 
-        const lessonRequests = modules.map((module) =>
-          API.get(`/lessons/module/${module._id}`)
-        );
-        const lessonResponses = await Promise.all(lessonRequests);
-        const total = lessonResponses.reduce(
-          (sum, response) => sum + (response.data?.length || 0),
-          0
-        );
-        setTotalLessons(total);
+        // Only calculate total lesson matrix structures across all modules if not calculated yet
+        if (totalLessons === 0) {
+          const lessonRequests = modules.map((mod) =>
+            API.get(`/lessons/module/${mod._id}`).catch(() => ({ data: [] }))
+          );
+          const lessonResponses = await Promise.all(lessonRequests);
+          
+          if (isMounted) {
+            const total = lessonResponses.reduce(
+              (sum, response) => sum + (response.data?.length || 0),
+              0
+            );
+            setTotalLessons(total);
+          }
+        }
       } catch (err) {
-        console.log(err);
+        console.error("Error loading nested workflow metrics:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
+
     fetchModuleData();
-  }, [selectedModuleIndex, modules, isEnrolled]); 
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedModuleIndex, modules.length, isEnrolled, totalLessons]);
 
   const currentLesson = lessons[selectedLessonIndex];
 
@@ -290,7 +313,7 @@ const StudentsCourseDetails = () => {
     } else if (selectedModuleIndex > 0) {
       if (!isModuleLocked(selectedModuleIndex - 1)) {
         setSelectedModuleIndex((prev) => prev - 1);
-        setSelectedLessonIndex(0); 
+        setSelectedLessonIndex(0);
       }
     }
   };
@@ -369,15 +392,11 @@ const StudentsCourseDetails = () => {
       {/* 1. TOPBAR WITH BRANDING */}
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
-          <div className="student-sidebar-brand">
-            <span className="student-sidebar-mark" aria-hidden="true">
-              <FiActivity />
-            </span>
-            <div className="student-sidebar-brand-copy">
-              <strong>Benedex Digital</strong>
-              <span>Premium Learning</span>
+          <Link to="/" className="bx-nav-brand-group">
+            <div className="bx-nav-logo-box">
             </div>
-          </div>
+            <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
+          </Link>
         </div>
 
         <label className="student-search" htmlFor="student-search-input">
@@ -432,13 +451,13 @@ const StudentsCourseDetails = () => {
                     <div className="document-meta-details">
                       <h4>Premium Course Content Locked</h4>
                       <p>Unlock all modules, lessons, downloadable handbook resources, and certifications immediately upon finalizing your enrollment order payment.</p>
-                      <button 
-                        className="btn-primary-action-buy" 
-                        style={{ marginTop: "1rem", width: "auto", padding: "0.75rem 2rem" }} 
+                      <button
+                        className="btn-primary-action-buy"
+                        style={{ marginTop: "1rem", width: "auto", padding: "0.75rem 2rem" }}
                         onClick={handleEnroll}
                         disabled={isProcessingPayment}
                       >
-                        <FiCreditCard style={{ marginRight: "8px" }} /> 
+                        <FiCreditCard style={{ marginRight: "8px" }} />
                         {isProcessingPayment ? "Opening Gateway..." : "Pay & Unlock Track"}
                       </button>
                     </div>
@@ -653,7 +672,7 @@ const StudentsCourseDetails = () => {
                                       <p>
                                         {hasTakenQuiz(quiz._id) ? (
                                           <span style={{ fontWeight: "600", color: hasPassedQuiz(quiz._id) ? "#10b981" : "#ef4444" }}>
-                                            {hasPassedQuiz(quiz._id) ? "✅ Passed" : "❌ Attempted (Failed)"} 
+                                            {hasPassedQuiz(quiz._id) ? "✅ Passed" : "❌ Attempted (Failed)"}
                                             {getQuizRecord(quiz._id)?.score !== undefined && ` • Your Score: ${getQuizRecord(quiz._id).score}%`}
                                           </span>
                                         ) : (
@@ -708,8 +727,8 @@ const StudentsCourseDetails = () => {
                     Your account holds lifetime academic clearance for this course track.
                   </div>
                 ) : (
-                  <button 
-                    className="btn-primary-action-buy" 
+                  <button
+                    className="btn-primary-action-buy"
                     onClick={handleEnroll}
                     disabled={isProcessingPayment}
                   >
