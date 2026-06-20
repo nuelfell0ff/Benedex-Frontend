@@ -52,38 +52,45 @@ const StudentsCourseDetails = () => {
 
   /* ---------------- BASELINE DATA INITIALIZATION + BOOKMARKING ---------------- */
   useEffect(() => {
+    let isMounted = true;
+
     const fetchInitialData = async () => {
       try {
+        // 1. Individually catch errors on all requests so ONE failure doesn't crash the page
         const [courseRes, modulesRes, dashboardRes, quizProgressRes, progressRes] = await Promise.all([
-          API.get(`/courses/${courseId}`),
-          API.get(`/modules/${courseId}`),
-          API.get("/dashboard/student"),
+          API.get(`/courses/${courseId}`).catch((err) => { console.error("Course fetch fail:", err); return { data: null }; }),
+          API.get(`/modules/${courseId}`).catch((err) => { console.error("Modules fetch fail:", err); return { data: [] }; }),
+          API.get("/dashboard/student").catch((err) => { console.error("Dashboard fetch fail:", err); return { data: {} }; }),
           API.get(`/quizzes/progress`).catch(() => ({ data: [] })),
           API.get(`/lessons/progress`).catch(() => ({ data: [] }))
         ]);
 
+        if (!isMounted) return;
+
         const rawModules = modulesRes.data || [];
         const completedLessons = progressRes.data || [];
 
-        setCourse(courseRes.data);
+        if (courseRes?.data) setCourse(courseRes.data);
         setModules(rawModules);
-        setQuizProgress(quizProgressRes.data || []);
+        if (quizProgressRes?.data) setQuizProgress(quizProgressRes.data);
         setProgress(completedLessons);
 
+        // 2. Validate dynamic enrollment mapping securely
         const enrolledIds = new Set(
-          (dashboardRes.data?.enrolledCourses || []).map((c) => c._id)
+          (dashboardRes.data?.enrolledCourses || []).map((c) => c._id || c)
         );
         const userHasPaid = enrolledIds.has(courseId);
         setIsEnrolled(userHasPaid);
 
-        // Prefetch quizzes across all modules to calculate module locks
         if (rawModules.length > 0) {
+          // 3. Prefetch quizzes across modules cleanly in parallel
           const quizPromises = rawModules.map(mod =>
             API.get(`/quizzes/module/${mod._id}`)
               .then(res => ({ moduleId: mod._id, quiz: res.data }))
               .catch(() => ({ moduleId: mod._id, quiz: null }))
           );
           const resolvedQuizzes = await Promise.all(quizPromises);
+          
           const quizMapping = {};
           resolvedQuizzes.forEach(item => {
             if (item.quiz) quizMapping[item.moduleId] = item.quiz;
@@ -93,21 +100,29 @@ const StudentsCourseDetails = () => {
           /* --- SYSTEM TRACKING: AUTO-BOOKMARK TO PROGRESS LOCATION --- */
           let bookmarkedModuleIdx = 0;
           let bookmarkedLessonIdx = 0;
-          let foundBookmark = false;
 
-          // Only compute auto-bookmarks if the student has paid and access is permitted
+          // 4. Fire lesson requests in parallel to prevent live server lag
           if (userHasPaid) {
-            for (let m = 0; m < rawModules.length; m++) {
-              try {
-                const lessonRes = await API.get(`/lessons/module/${rawModules[m]._id}`);
-                const modLessons = lessonRes.data || [];
+            try {
+              const lessonPromises = rawModules.map(mod => 
+                API.get(`/lessons/module/${mod._id}`)
+                  .then(res => ({ moduleId: mod._id, lessons: res.data || [] }))
+                  .catch(() => ({ moduleId: mod._id, lessons: [] }))
+              );
+              
+              const allModulesLessons = await Promise.all(lessonPromises);
+              let foundBookmark = false;
+
+              // Map back sequentially via memory evaluation to find the bookmark location instantly
+              for (let m = 0; m < rawModules.length; m++) {
+                const targetData = allModulesLessons.find(item => item.moduleId === rawModules[m]._id);
+                const modLessons = targetData ? targetData.lessons : [];
 
                 for (let l = 0; l < modLessons.length; l++) {
                   const isLessonDone = completedLessons.some(
                     (p) => String(p.lesson?._id || p.lesson) === String(modLessons[l]._id)
                   );
 
-                  // Set bookmark location at the first incomplete lesson found
                   if (!isLessonDone) {
                     bookmarkedModuleIdx = m;
                     bookmarkedLessonIdx = l;
@@ -115,22 +130,33 @@ const StudentsCourseDetails = () => {
                     break;
                   }
                 }
-              } catch (e) {
-                console.log("Error calculating lesson index bookmark metrics:", e);
+                if (foundBookmark) break;
               }
-              if (foundBookmark) break;
+            } catch (bookmarkErr) {
+              console.error("Error setting up automatic bookmark tracking points:", bookmarkErr);
             }
           }
 
-          setSelectedModuleIndex(bookmarkedModuleIdx);
-          setSelectedLessonIndex(bookmarkedLessonIdx);
+          if (isMounted) {
+            setSelectedModuleIndex(bookmarkedModuleIdx);
+            setSelectedLessonIndex(bookmarkedLessonIdx);
+          }
         }
 
       } catch (err) {
-        console.log("Error loading baseline structural database info:", err);
+        console.error("Error loading baseline structural database info:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false); // Shuts off loading screen safely in all scenarios
+        }
       }
     };
+
     fetchInitialData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [courseId]);
 
   /* ---------------- TOPBAR NOTIFICATIONS LOGIC ---------------- */
@@ -163,15 +189,18 @@ const StudentsCourseDetails = () => {
     .join("")
     .toUpperCase();
 
-  /* ---------------- DYNAMIC LESSONS + QUIZ FETCHING ---------------- */
   /* ---------------- LESSONS + QUIZ FETCHING ---------------- */
   useEffect(() => {
     let isMounted = true;
 
     const fetchModuleData = async () => {
-      if (!modules || modules.length === 0 || selectedModuleIndex === null) return;
+      if (!modules || modules.length === 0 || selectedModuleIndex === null) {
+        // If there's nothing to fetch, turn off the spinner
+        setLoading(false);
+        return;
+      }
       
-      // If student hasn't paid, don't execute structural internal lookups
+      // If student hasn't paid, don't stall the UI, just stop loading and let them see the screen
       if (!isEnrolled) {
         setLoading(false);
         return;
@@ -181,7 +210,10 @@ const StudentsCourseDetails = () => {
 
       try {
         const moduleId = modules[selectedModuleIndex]?._id;
-        if (!moduleId) return;
+        if (!moduleId) {
+          if (isMounted) setLoading(false);
+          return;
+        }
 
         // Fetch data for the active selected module safely
         const [lessonRes, quizRes] = await Promise.all([

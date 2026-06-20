@@ -93,7 +93,7 @@ function Login() {
         <Link to="/" className="bx-nav-brand-group">
           <div className="bx-nav-logo-box bg-white">
           </div>
-          <span className="bx-nav-brand-text student-sidebar-brand-copy text-white">Benedex</span>
+          <span className="bx-nav-brand-text text-white">Benedex</span>
         </Link>
 
         <div className="login-visual-content">
