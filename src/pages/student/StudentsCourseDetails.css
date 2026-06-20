@@ -1065,6 +1065,79 @@ body {
   cursor: pointer;
 }
 
+/* Premium Certificate Sidebar Claim Styles */
+.certificate-sidebar-claim-zone {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: white;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  animation: pulseGoldBorder 2s infinite alternate;
+}
+
+.certificate-sidebar-claim-zone h5 {
+  color: #1e293b;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-certificate-action {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-certificate-action.checkout-btn {
+  background: #0d5aa0;
+  color: white;
+}
+
+.btn-certificate-action.checkout-btn:hover {
+  background: #0d5aa0;
+  transform: translateY(-2px);
+}
+
+.btn-certificate-action.view-btn {
+  background: #0a4fa6;
+  color: #ffffff;
+}
+
+.btn-certificate-action.view-btn:hover {
+  background: #0a4fa6;
+  transform: translateY(-2px);
+}
+
+.btn-certificate-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+@keyframes pulseGoldBorder {
+  0% {
+    background-color: white;
+  }
+
+  100% {
+    background-color: white;
+  }
+}
+
 /* RESPONSIVE DISPLAY VIEWPORTS */
 @media (max-width: 1200px) {
   .benedex-grid {

@@ -3,7 +3,7 @@ import {
   Route,
   Navigate
 } from "react-router-dom";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 import { FiSliders, FiClock, FiCheckCircle } from "react-icons/fi";
 import {
   AuthProvider,
@@ -29,6 +29,8 @@ import Notifications from "./pages/student/Notifications";
 import LiveClasses from "./pages/student/LiveClasses";
 import Messages from "./pages/student/Messages";
 import StudentQuiz from "./pages/student/StudentQuiz";
+// import PaymentCallback from "./pages/payments/PaymentCallback";
+import CertificateView from "./pages/student/CertificateView";
 
 import InstructorDashboard from "./pages/instructor/InstructorDashboard";
 import InstructorCourses from "./pages/instructor/InstructorCourses";
@@ -96,9 +98,9 @@ function App() {
         />
 
         {/* NEW: Explicit Global Maintenance Route */}
-        <Route 
-          path="/maintenance" 
-          element={<Maintenance />} 
+        <Route
+          path="/maintenance"
+          element={<Maintenance />}
         />
 
         <Route
@@ -144,6 +146,16 @@ function App() {
           <Route
             path="/student/quiz/:quizId"
             element={<StudentQuiz />}
+          />
+
+          <Route
+            path="/student/certificate/view/:courseId"
+            element={<CertificateView />}
+          />
+
+          <Route
+            path="/student/certificate-callback"
+            element={<PaymentCallback />}
           />
         </Route>
 

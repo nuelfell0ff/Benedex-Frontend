@@ -22,6 +22,7 @@ import {
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./StudentsCourseDetails.css";
+import { FaGraduationCap, FaSchool } from "react-icons/fa";
 
 const StudentsCourseDetails = () => {
   const { courseId } = useParams();
@@ -49,6 +50,14 @@ const StudentsCourseDetails = () => {
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  /* Certificate Specific States */
+  const [certStatus, setCertStatus] = useState({
+    isEligible: false,
+    isPaid: false,
+    certificateId: null
+  });
+  const [loadingCert, setLoadingCert] = useState(false);
 
   /* ---------------- BASELINE DATA INITIALIZATION + BOOKMARKING ---------------- */
   useEffect(() => {
@@ -180,6 +189,26 @@ const StudentsCourseDetails = () => {
       window.removeEventListener("student-activities-updated", handleActivitiesUpdated);
     };
   }, [location.pathname]);
+
+  /* ---------------- CERTIFICATE REALTIME EXTRACTION ---------------- */
+  useEffect(() => {
+    const checkCertificateStatus = async () => {
+      try {
+        const res = await API.get(`/certificates/course/${courseId}`);
+        setCertStatus({
+          isEligible: res.data.isEligible,
+          isPaid: res.data.isPaid,
+          certificateId: res.data.certificateId
+        });
+      } catch (err) {
+        console.error("Error evaluating certificate backend metrics:", err);
+      }
+    };
+
+    if (courseId && isEnrolled) {
+      checkCertificateStatus();
+    }
+  }, [courseId, isEnrolled, progress.length]);
 
   const initials = (user?.fullName || "Student")
     .split(" ")
@@ -381,7 +410,7 @@ const StudentsCourseDetails = () => {
     .join("")
     .toUpperCase();
 
-  /* LIVE PAYSTACK INITIALIZATION GATEWAY FLOW */
+  /* LIVE PAYSTACK INITIALIZATION GATEWAY FLOW FOR ENROLLMENT */
   const handleEnroll = async () => {
     if (isEnrolled || isProcessingPayment) return;
     setIsProcessingPayment(true);
@@ -394,7 +423,7 @@ const StudentsCourseDetails = () => {
 
       const authorizationUrl = res?.data?.authorization_url;
       if (authorizationUrl) {
-        window.location.href = authorizationUrl; // Redirect to secure Paystack page
+        window.location.href = authorizationUrl; 
       } else {
         console.error("Initialization failed: Missing authorization endpoint.");
         alert("Unable to set up premium gateway checkout. Please check console metrics.");
@@ -404,6 +433,23 @@ const StudentsCourseDetails = () => {
       console.error("Payment flow failure initialized via course details window:", err);
       alert(err?.response?.data?.message || "Gateway request dropped. Check connection network.");
       setIsProcessingPayment(false);
+    }
+  };
+
+  /* INITIALIZE GATEWAY REDIRECT TO PAY FOR CERTIFICATE */
+  const handlePurchaseCertificate = async () => {
+    setLoadingCert(true);
+    try {
+      const res = await API.post("/certificates/initialize-payment", { courseId });
+      if (res.data?.authorization_url) {
+        window.location.href = res.data.authorization_url;
+      } else {
+        alert("Could not process your certificate gateway initialization.");
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to initialize payment gateway request.");
+    } finally {
+      setLoadingCert(false);
     }
   };
 
@@ -423,8 +469,7 @@ const StudentsCourseDetails = () => {
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
           <Link to="/" className="bx-nav-brand-group">
-            <div className="bx-nav-logo-box">
-            </div>
+            <div className="bx-nav-logo-box"></div>
             <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
           </Link>
         </div>
@@ -774,9 +819,33 @@ const StudentsCourseDetails = () => {
                 <ul>
                   <li><FiVideo /> 12 hours on-demand video streaming</li>
                   <li><FiFileText /> {totalLessons} dynamic class assets</li>
-                  <li><FiCheckCircle /> Progress Tracking (Completed: {progress.length})</li>
+                  <li><FiCheckCircle /> Progress Tracking (Completed: {progress.length} / {totalLessons})</li>
                   <li><FiAward /> Digital certificate of completion</li>
                 </ul>
+
+                {/* DYNAMIC PREMIUM CERTIFICATE CLAIM BOX */}
+                {certStatus.isEligible && (
+                  <div className="certificate-sidebar-claim-zone">
+                    <h5> <FaGraduationCap /> Course Completed!</h5>
+                    {certStatus.isPaid ? (
+                      <Link 
+                        to={`/student/certificate/view/${courseId}`} 
+                        className="btn-certificate-action view-btn"
+                      >
+                        <FiAward /> View Your Certificate
+                      </Link>
+                    ) : (
+                      <button 
+                        className="btn-certificate-action checkout-btn" 
+                        onClick={handlePurchaseCertificate}
+                        disabled={loadingCert}
+                      >
+                        <FiCreditCard /> 
+                        {loadingCert ? "Processing..." : "Pay for Certificate (₦5,000)"}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

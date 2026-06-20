@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import {
-  FiActivity,
   FiCheckCircle,
   FiXCircle,
   FiLoader,
@@ -10,7 +9,7 @@ import {
   FiHelpCircle
 } from "react-icons/fi";
 import API from "../../services/api";
-import "./PaymentCallback.css"; // Styling layout provided below
+import "./PaymentCallback.css"; 
 
 function PaymentCallback() {
   const [searchParams] = useSearchParams();
@@ -20,6 +19,8 @@ function PaymentCallback() {
 
   useEffect(() => {
     const reference = searchParams.get("reference") || searchParams.get("trxref");
+    // Look at the query parameter we appended in Step 1
+    const paymentType = searchParams.get("type"); 
 
     if (!reference) {
       setStatus("error");
@@ -29,26 +30,46 @@ function PaymentCallback() {
 
     const verify = async () => {
       try {
-        // backend exposes GET /api/payments/verify/:reference
-        const res = await API.get(`/payments/verify/${encodeURIComponent(reference)}`);
+        let res;
+        
+        // Explicit routing choice based completely on the URL parameters
+        if (paymentType === "certificate") {
+          res = await API.get(`/certificates/verify-payment/${encodeURIComponent(reference)}`);
+        } else {
+          res = await API.get(`/payments/verify/${encodeURIComponent(reference)}`);
+        }
 
-        if (res?.data?.success) {
+        if (res?.data?.success || res?.status === 200) {
           setStatus("success");
-          setMessage(res.data.message || "Payment verified successfully — enrollment clearance active.");
+          setMessage(res.data.message || "Payment verified successfully.");
 
-          const courseId = res.data.courseId;
+          const courseId = res.data.courseId || res.data.certificate?.course;
+
           setTimeout(() => {
-            if (courseId) navigate(`/student/courses/${courseId}`);
-            else navigate("/student");
-          }, 2500); // Slightly prolonged to let the student appreciate the luxury success state
+            if (paymentType === "certificate" && courseId) {
+              navigate(`/student/certificate/view/${courseId}`);
+            } else if (courseId) {
+              navigate(`/student/courses/${courseId}`);
+            } else {
+              navigate("/student");
+            }
+          }, 2500); 
         } else {
           setStatus("error");
           setMessage(res.data?.message || "Payment verification failed or was declined by the network.");
         }
       } catch (err) {
         console.error(err);
+        
+        if (err?.response?.data?.message?.includes("already issued") || err?.response?.status === 400) {
+          setStatus("success");
+          setMessage("Payment record verified. Access token confirmation established.");
+          setTimeout(() => navigate("/student"), 2500);
+          return;
+        }
+
         setStatus("error");
-        setMessage(err?.response?.data?.message || "Verification request timed out. Connection drop detected.");
+        setMessage(err?.response?.data?.message || "Verification request timed out or returned a 404.");
       }
     };
 
@@ -57,25 +78,17 @@ function PaymentCallback() {
 
   return (
     <div className="benedex-lms-theme callback-page-wrapper">
-      {/* BRANDING TOPBAR FOR PREMIUM CONSISTENCY */}
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
-          <Link
-            to="/"
-            className="bx-nav-brand-group me-auto"
-            style={{ marginLeft: 0, marginRight: "auto" }}
-          >
+          <Link to="/" className="bx-nav-brand-group me-auto" style={{ marginLeft: 0, marginRight: "auto" }}>
             <div className="bx-nav-logo-box"></div>
             <span className="bx-nav-brand-text">Benedex</span>
           </Link>
         </div>
       </header>
 
-      {/* CORE CARTRIDGE AREA */}
       <main className="callback-main-canvas">
         <div className="callback-glass-card">
-
-          {/* VERIFYING STATE */}
           {status === "verifying" && (
             <div className="callback-state-content state-verifying">
               <div className="callback-icon-wrapper spinner-animated">
@@ -89,7 +102,6 @@ function PaymentCallback() {
             </div>
           )}
 
-          {/* SUCCESS STATE */}
           {status === "success" && (
             <div className="callback-state-content state-success">
               <div className="callback-icon-wrapper success-accent-color">
@@ -97,9 +109,7 @@ function PaymentCallback() {
               </div>
               <h2>Clearance Granted</h2>
               <p className="callback-success-message">{message}</p>
-              <p className="callback-meta-subtitle">
-                Configuring classroom tokens. Redirecting you to your course track dashboard...
-              </p>
+              <p className="callback-meta-subtitle">Configuring ecosystem tokens. Updating account dashboard clearances...</p>
               <div className="callback-action-footer">
                 <Link to="/student" className="callback-primary-action-btn">
                   Go to Dashboard <FiArrowRight style={{ marginLeft: 8 }} />
@@ -108,7 +118,6 @@ function PaymentCallback() {
             </div>
           )}
 
-          {/* ERROR STATE */}
           {status === "error" && (
             <div className="callback-state-content state-error">
               <div className="callback-icon-wrapper error-accent-color">
@@ -116,29 +125,21 @@ function PaymentCallback() {
               </div>
               <h2>Transaction Exception</h2>
               <p className="callback-error-message">{message}</p>
-
               <div className="callback-error-notice-box">
                 <FiHelpCircle className="notice-box-icon" />
-                <p>
-                  If funds were debited from your account but authorization timed out, please hold. Your track profile updates inside the student dashboard within 5 minutes automatically.
-                </p>
+                <p>If funds were debited from your account but authorization timed out, please hold. Your profile automatically updates within 5 minutes.</p>
               </div>
-
               <div className="callback-action-buttons-group">
                 <button onClick={() => window.location.reload()} className="callback-secondary-btn">
                   <FiRefreshCw style={{ marginRight: 8 }} /> Retry Verification
                 </button>
-                <Link to="/student" className="callback-primary-action-btn">
-                  View Student Dashboard
-                </Link>
+                <Link to="/student" className="callback-primary-action-btn">View Student Dashboard</Link>
               </div>
             </div>
           )}
-
         </div>
       </main>
 
-      {/* MINIMAL FOOTER FOR BALANCED LAYOUT CONTENT */}
       <footer className="callback-footer-minimal">
         <p>© 2026 Benedex Digital Hub. Built for African Excellence.</p>
       </footer>
