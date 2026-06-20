@@ -1,21 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function Sidebar({ links }) {
   const { logout } = useAuth();
 
   return (
     <aside className="student-sidebar">
-      <div className="student-sidebar-brand">
-        <span className="student-sidebar-mark" aria-hidden="true">
-          {links[0]?.icon ?? null}
-        </span>
-        <div className="student-sidebar-brand-copy">
-          <strong>Benedex Digital</strong>
-          <span>Premium Learning</span>
+      <Link to="/" className="bx-nav-brand-group">
+        <div className="bx-nav-logo-box">
         </div>
-      </div>
+        <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
+      </Link>
 
       <nav className="student-sidebar-nav" aria-label="Student navigation">
         {links.map((link) => (
