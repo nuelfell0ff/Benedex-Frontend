@@ -60,10 +60,13 @@ function PaymentCallback() {
       {/* BRANDING TOPBAR FOR PREMIUM CONSISTENCY */}
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
-          <Link to="/" className="bx-nav-brand-group">
-            <div className="bx-nav-logo-box">
-            </div>
-            <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
+          <Link
+            to="/"
+            className="bx-nav-brand-group me-auto"
+            style={{ marginLeft: 0, marginRight: "auto" }}
+          >
+            <div className="bx-nav-logo-box"></div>
+            <span className="bx-nav-brand-text">Benedex</span>
           </Link>
         </div>
       </header>

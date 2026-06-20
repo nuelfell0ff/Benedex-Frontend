@@ -36,12 +36,12 @@ const StudentsCourseDetails = () => {
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
   const [lessons, setLessons] = useState([]);
-  const [quiz, setQuiz] = useState(null); // Fixed: Added missing quiz state
+  const [quiz, setQuiz] = useState(null); 
   const [totalLessons, setTotalLessons] = useState(0);
 
-  // Initialized to null to properly sequence bookmark logic on mount
-  const [selectedModuleIndex, setSelectedModuleIndex] = useState(null);
-  const [selectedLessonIndex, setSelectedLessonIndex] = useState(null);
+  // Initialized to 0 to prevent loading-lifecycle traps due to production network latency
+  const [selectedModuleIndex, setSelectedModuleIndex] = useState(0);
+  const [selectedLessonIndex, setSelectedLessonIndex] = useState(0);
 
   const [progress, setProgress] = useState([]);
   const [quizProgress, setQuizProgress] = useState([]);
@@ -153,7 +153,6 @@ const StudentsCourseDetails = () => {
     };
 
     fetchInitialData();
-
     return () => {
       isMounted = false;
     };
@@ -195,18 +194,16 @@ const StudentsCourseDetails = () => {
 
     const fetchModuleData = async () => {
       if (!modules || modules.length === 0 || selectedModuleIndex === null) {
-        // If there's nothing to fetch, turn off the spinner
-        setLoading(false);
         return;
       }
       
-      // If student hasn't paid, don't stall the UI, just stop loading and let them see the screen
+      // If student hasn't paid, don't stall the UI, just stop loading and let them see the preview paywall
       if (!isEnrolled) {
-        setLoading(false);
+        if (isMounted) setLoading(false);
         return;
       }
       
-      setLoading(true);
+      if (isMounted) setLoading(true);
 
       try {
         const moduleId = modules[selectedModuleIndex]?._id;
@@ -410,7 +407,8 @@ const StudentsCourseDetails = () => {
     }
   };
 
-  if (!course || selectedModuleIndex === null) {
+  // Safe checks against course state values to keep view elements structurally alive
+  if (!course) {
     return (
       <div className="scd-loader-container">
         <div className="scd-spinner" />
@@ -451,7 +449,7 @@ const StudentsCourseDetails = () => {
             ) : null}
           </Link>
 
-          <div className="student-user-chip">
+          <div className="student-top-actions">
             <span className="student-user-avatar" aria-hidden="true">
               {initials}
             </span>
@@ -562,7 +560,6 @@ const StudentsCourseDetails = () => {
                 <FiArrowLeft /> Previous
               </button>
 
-              {/* Fixed Classname Template String Syntax below */}
               <button
                 className={`nav-control-button center-complete ${currentLesson && isCompleted(currentLesson._id) ? "is-finished" : ""}`}
                 onClick={markComplete}
