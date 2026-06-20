@@ -167,13 +167,12 @@ function StudentDashboard() {
 
         if (isMounted) {
           setDashboard(dashboardRes.data);
-          
-          // Defend against nested data payloads (e.g., res.data.classes or res.data.data)
-          const extractedClasses = 
-            Array.isArray(liveClassesRes.data) ? liveClassesRes.data : 
-            Array.isArray(liveClassesRes.data?.classes) ? liveClassesRes.data.classes :
-            Array.isArray(liveClassesRes.data?.data) ? liveClassesRes.data.data : [];
-            
+
+          const extractedClasses =
+            Array.isArray(liveClassesRes.data) ? liveClassesRes.data :
+              Array.isArray(liveClassesRes.data?.classes) ? liveClassesRes.data.classes :
+                Array.isArray(liveClassesRes.data?.data) ? liveClassesRes.data.data : [];
+
           setLiveClasses(extractedClasses);
         }
       } catch (error) {
@@ -222,8 +221,8 @@ function StudentDashboard() {
 
     const badgeNames = Array.isArray(dashboard?.badges)
       ? dashboard.badges.map((badge) =>
-          typeof badge === "string" ? badge : badge?.name || badge?.title || "Badge"
-        )
+        typeof badge === "string" ? badge : badge?.name || badge?.title || "Badge"
+      )
       : [];
 
     const consistencyMonths =
@@ -233,33 +232,18 @@ function StudentDashboard() {
 
     const consistencyGraph = buildConsistencyGraph(learningSummary);
 
+    // Dynamic extraction: returns empty list if backend response has no enrolled courses
     const courses =
       dashboard?.enrolledCourses?.length > 0
         ? dashboard.enrolledCourses.slice(0, 2).map((course, index) => ({
-            title: course.title,
-            description: course.description,
-            progress: index === 0 ? 45 : 78,
-            lessons: index === 0 ? "12/24 Lessons" : "18/23 Lessons",
-            status: "In Progress",
-          }))
-        : [
-            {
-              title: "Advanced React Patterns",
-              description: "Master design patterns and performance optimization.",
-              progress: 45,
-              lessons: "12/24 Lessons",
-              status: "In Progress",
-            },
-            {
-              title: "Visual Design Systems",
-              description: "Scaling design for enterprise platforms.",
-              progress: 78,
-              lessons: "18/23 Lessons",
-              status: "In Progress",
-            },
-          ];
+          title: course.title,
+          description: course.description,
+          progress: course.progress || 0,
+          lessons: course.lessons || "0 Lessons",
+          status: "In Progress",
+        }))
+        : [];
 
-    // Take the 2 absolute closest upcoming sessions
     const recentLiveSessions = [...liveClasses]
       .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
       .slice(0, 2);
@@ -435,38 +419,69 @@ function StudentDashboard() {
             </div>
 
             <div className="student-course-grid">
-              {viewModel.courses.map((course, index) => (
-                <motion.article
-                  key={course.title}
-                  className="student-course-card"
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
+              {viewModel.courses.length > 0 ? (
+                viewModel.courses.map((course, index) => (
+                  <motion.article
+                    key={course.title}
+                    className="student-course-card"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                  >
+                    <div className="student-course-preview">
+                      <span>{course.status}</span>
+                      <FiPlayCircle />
+                    </div>
+
+                    <div className="student-course-body">
+                      <h4>{course.title}</h4>
+                      <p>{course.description}</p>
+
+                      <div className="student-course-meta">
+                        <span>{course.progress}% Complete</span>
+                        <span>{course.lessons}</span>
+                      </div>
+
+                      <div className="student-course-bar" aria-hidden="true">
+                        <span style={{ width: `${course.progress}%` }} />
+                      </div>
+
+                      <button type="button" className="student-course-button">
+                        Continue Learning <FiArrowRight />
+                      </button>
+                    </div>
+                  </motion.article>
+                ))
+              ) : (
+                <div
+                  className="student-activity-item student-activity-empty w-100"
+                  style={{
+                    padding: "2.5rem 1.5rem",
+                    background: "rgba(255,255,255,0.03)",
+                    borderRadius: "12px",
+                    border: "1px dashed rgba(255,255,255,0.1)",
+                    display: "flex",
+                    gap: "1rem",
+                    alignItems: "center"
+                  }}
                 >
-                  <div className="student-course-preview">
-                    <span>{course.status}</span>
-                    <FiPlayCircle />
+                  <span
+                    className="student-activity-icon"
+                    style={{ fontSize: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    aria-hidden="true"
+                  >
+                    <FiAlertCircle />
+                  </span>
+                  <div>
+                    <strong style={{ display: "block", fontSize: "1rem", color: "grey" }}>
+                      No course registered yet
+                    </strong>
+                    <p style={{ fontSize: "0.85rem", color: "grey", margin: "4px 0 0 0" }}>
+                      Explore the hub catalog to enroll in a program and kickstart your learning path.
+                    </p>
                   </div>
-
-                  <div className="student-course-body">
-                    <h4>{course.title}</h4>
-                    <p>{course.description}</p>
-
-                    <div className="student-course-meta">
-                      <span>{course.progress}% Complete</span>
-                      <span>{course.lessons}</span>
-                    </div>
-
-                    <div className="student-course-bar" aria-hidden="true">
-                      <span style={{ width: `${course.progress}%` }} />
-                    </div>
-
-                    <button type="button" className="student-course-button">
-                      Continue Learning <FiArrowRight />
-                    </button>
-                  </div>
-                </motion.article>
-              ))}
+                </div>
+              )}
             </div>
           </section>
         </div>
@@ -503,8 +518,8 @@ function StudentDashboard() {
                       <h4>{session.title}</h4>
                       <p>Mentor: {session.instructor?.fullName || "Unassigned Faculty"}</p>
 
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="student-live-button"
                         onClick={() => handleJoinClass(session)}
                       >

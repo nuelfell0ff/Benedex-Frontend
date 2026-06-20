@@ -150,7 +150,7 @@ function StudentCourses() {
     return (
       <div className="st-maint-loader-frame">
         <div className="st-maint-spinner" />
-        <p>Preparing your course catalog...</p>
+        <p className="fw-normal">Preparing your course catalog...</p>
       </div>
     );
   }
