@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiLoader, FiAward, FiShield, FiDownload, FiImage } from "react-icons/fi";
+import { FiArrowLeft, FiLoader, FiDownload, FiImage } from "react-icons/fi";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import API from "../../services/api";
@@ -14,8 +14,6 @@ const CertificateView = () => {
   const [cert, setCert] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
-  
-  // Attach a reference node handle straight to the targeted certificate container canvas
   const certificateRef = useRef(null);
 
   useEffect(() => {
@@ -39,47 +37,40 @@ const CertificateView = () => {
     fetchCertificate();
   }, [courseId, navigate]);
 
-  // Method 1: Export purely as a perfectly sized landscape A4 PDF Document
   const downloadAsPDF = async () => {
     if (!certificateRef.current) return;
     try {
       setDownloading(true);
       
-      // Render HTML canvas element with clear high-definition scaling parameters
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 3, // Multiplies resolution scale pixel density so the text stays crisp on high-res displays
-        useCORS: true, // Prevents image security tracking blocks if external images are used
+        scale: 3, 
+        useCORS: true, 
         logging: false,
         backgroundColor: "#ffffff"
       });
       
       const imgData = canvas.toDataURL("image/png");
-      
-      // Create landscape A4 size pdf document instance
       const pdf = new jsPDF({
         orientation: "landscape",
         unit: "mm",
         format: "a4"
       });
       
-      const pdfWidth = pdf.internal.pageSize.getWidth(); // ~297mm
-      const pdfHeight = pdf.internal.pageSize.getHeight(); // ~210mm
+      const pdfWidth = pdf.internal.pageSize.getWidth(); 
+      const pdfHeight = pdf.internal.pageSize.getHeight(); 
       
-      // Paint the snapshot perfectly edge-to-edge on the document
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       
-      // Format file name safely
       const safeName = (cert?.courseTitle || "Course").replace(/[^a-z0-9]/gi, '_').toLowerCase();
       pdf.save(`benedex_certificate_${safeName}.pdf`);
     } catch (error) {
       console.error("PDF generation engine exception:", error);
-      alert("Something went wrong compiling the PDF document track.");
+      alert("Something went wrong compiling your PDF document.");
     } finally {
       setDownloading(false);
     }
   };
 
-  // Method 2: Export purely as a high-quality PNG image file 
   const downloadAsImage = async () => {
     if (!certificateRef.current) return;
     try {
@@ -93,8 +84,6 @@ const CertificateView = () => {
       });
       
       const imgUri = canvas.toDataURL("image/png");
-      
-      // Trigger instant programmatically native file downloader interface download anchor link injection
       const link = document.createElement("a");
       const safeName = (cert?.courseTitle || "Course").replace(/[^a-z0-9]/gi, '_').toLowerCase();
       link.download = `benedex_certificate_${safeName}.png`;
@@ -104,7 +93,7 @@ const CertificateView = () => {
       document.body.removeChild(link);
     } catch (error) {
       console.error("Image capture engine exception:", error);
-      alert("Something went wrong formatting your certificate graphic image.");
+      alert("Something went wrong formatting your certificate image.");
     } finally {
       setDownloading(false);
     }
@@ -119,10 +108,14 @@ const CertificateView = () => {
     );
   }
 
+  const issueDate = cert?.issuedAt 
+    ? new Date(cert.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }) 
+    : new Date().toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
+
   return (
     <div className="cert-page-wrapper">
       
-      {/* ACTION BAR: Completely updated with elegant isolated action workflows */}
+      {/* TOOLBAR CONTROLS */}
       <div className="cert-action-bar">
         <button 
           onClick={() => navigate(`/student/courses/${courseId}`)} 
@@ -133,90 +126,98 @@ const CertificateView = () => {
         </button>
 
         <div className="cert-download-actions-group">
-          <button 
-            onClick={downloadAsImage} 
-            className="cert-secondary-action-btn"
-            disabled={downloading}
-          >
+          <button onClick={downloadAsImage} className="cert-secondary-action-btn" disabled={downloading}>
             {downloading ? <FiLoader className="cert-spinner" /> : <FiImage size={16} />} 
             Save as PNG Image
           </button>
           
-          <button 
-            onClick={downloadAsPDF} 
-            className="cert-print-btn"
-            disabled={downloading}
-          >
+          <button onClick={downloadAsPDF} className="cert-print-btn" disabled={downloading}>
             {downloading ? <FiLoader className="cert-spinner" /> : <FiDownload size={16} />} 
-            {downloading ? "Compiling Document..." : "Download Official PDF"}
+            {downloading ? "Compiling..." : "Download Official PDF"}
           </button>
         </div>
       </div>
 
-      {/* SECURE CERTIFICATE CANVAS CONTAINER */}
-      <div className="certificate-print-canvas" ref={certificateRef}>
+      {/* FIXED LANDSCAPE SCALING WRAPPER FOR RESPONSIVENESS */}
+      <div className="cert-scale-container">
         
-        {/* Decorative Geometric Design Corner Brackets */}
-        <div className="cert-corner-bracket top-left"></div>
-        <div className="cert-corner-bracket top-right"></div>
-        <div className="cert-corner-bracket bottom-left"></div>
-        <div className="cert-corner-bracket bottom-right"></div>
-
-        {/* BRANDING CREST HEADER BLOCK */}
-        <div className="cert-header-section">
-          <div className="cert-logo-group">
-            <FiAward size={36} className="cert-brand-icon" />
-            <h2>Benedex Digital</h2>
-          </div>
-          <p className="cert-brand-subtitle">Hub for Digital Excellence</p>
-          <div className="cert-header-divider"></div>
-        </div>
-
-        {/* CORE ATTESTATION CONTENT LOCK */}
-        <div className="cert-body-section">
-          <h4>Certificate of Completion</h4>
-          <p className="cert-conferred-text">This official dynamic credential token is proudly conferred upon</p>
-          <h1 className="cert-student-name">
-            {user?.fullName || "Valued Student Member"}
-          </h1>
-          <p className="cert-fulfillment-text">
-            for successfully completing and fulfilling all assessment criteria, testing metrics, module exercises, and specialized development track profiles mapped for
-          </p>
-          <h3 className="cert-course-title">
-            {cert?.courseTitle}
-          </h3>
-        </div>
-
-        {/* VERIFICATION AND METRIC DATA FOOTER LAYOUT */}
-        <div className="cert-footer-section">
+        {/* SECURE CERTIFICATE CANVAS (1000px X 700px Native Proportion) */}
+        <div className="certificate-print-canvas" ref={certificateRef}>
           
-          {/* ISSUE DATE METRIC */}
-          <div className="cert-footer-block text-left">
-            <p className="cert-footer-label">Issued On:</p>
-            <strong className="cert-footer-value">
-              {cert?.issuedAt 
-                ? new Date(cert.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) 
-                : new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
-            </strong>
-          </div>
-          
-          {/* METRIC SECURITY EMBLEM STAMP */}
-          <div className="cert-seal-wrapper">
-            <div className="cert-seal-inner">
-              <FiShield size={24} />
-              <span>VERIFIED</span>
+          {/* Subtle Guilloche/Rosette watermark circle layer */}
+          <div className="cert-watermark-rosette"></div>
+
+          {/* Thin Classic Double Border Frame */}
+          <div className="cert-inner-border"></div>
+
+          {/* LEFT CONTENT CONTAINER COLUMN */}
+          <div className="cert-left-column">
+            
+            {/* BRAND LOGO */}
+            <div className="cert-brand-logo-area">
+              <span className="brand-logo-blue">benedex</span>
+              <span className="brand-logo-dark">digital</span>
+            </div>
+
+            {/* ISSUE TIMESTAMPS */}
+            <div className="cert-date-stamp">
+              {issueDate}
+            </div>
+
+            {/* STUDENT NAME BLOCK */}
+            <div className="cert-recipient-block">
+              <h1 className="cert-student-name">
+                {user?.fullName || "Valued Student Member"}
+              </h1>
+            </div>
+
+            {/* ATTESTATION DETAILS LOCK */}
+            <div className="cert-attestation-details">
+              <p className="conferred-lead-text">has successfully completed</p>
+              <h2 className="cert-course-title">{cert?.courseTitle || "Advanced Technical Mastery Track"}</h2>
+              <p className="cert-course-description">
+                an online non-credit course authorized by Benedex Digital Hub and offered through its learning portal.
+              </p>
+            </div>
+
+            {/* SIGNATURE SECTION */}
+            <div className="cert-signature-section">
+              <div className="signature-wrapper">
+                {/* Decorative Signature Script Line */}
+                <div className="signature-graphic-mock">John Doe</div>
+                <div className="signature-line"></div>
+                <p className="signatory-name">John Doe</p>
+                <p className="signatory-title">Director, Benedex Digital Hub</p>
+              </div>
             </div>
           </div>
 
-          {/* VERIFICATION SECURE HASH */}
-          <div className="cert-footer-block text-right">
-            <p className="cert-footer-label">Credential ID:</p>
-            <strong className="cert-footer-value hash-code">
-              {cert?.certificateId || "BX-PENDING-TOKEN"}
-            </strong>
-          </div>
-        </div>
+          {/* RIGHT BADGE / RIBBON FEATURE COLUMN */}
+          <div className="cert-right-column">
+            <div className="cert-vertical-ribbon">
+              <div className="ribbon-text-group">
+                <span className="ribbon-title">COURSE</span>
+                <span className="ribbon-subtitle">CERTIFICATE</span>
+              </div>
+              
+              {/* Embossed Round Stamp Seal Design */}
+              <div className="ribbon-seal-circle">
+                <div className="seal-inner-dotted">
+                  <div className="seal-center-core">
+                    <span className="seal-core-brand">benedex</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            {/* LOWER VALIDATION AND CREDENTIAL IDENTIFIERS */}
+            <div className="cert-validation-footer">
+              <p>{cert?.certificateId || "BX-PENDING-TOKEN"}</p>
+              <p>Benedex has confirmed the identity of this individual and their participation in the course.</p>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
