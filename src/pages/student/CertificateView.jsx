@@ -41,26 +41,26 @@ const CertificateView = () => {
     if (!certificateRef.current) return;
     try {
       setDownloading(true);
-      
+
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 3, 
-        useCORS: true, 
+        scale: 3,
+        useCORS: true,
         logging: false,
         backgroundColor: "#ffffff"
       });
-      
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "landscape",
         unit: "mm",
         format: "a4"
       });
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth(); 
-      const pdfHeight = pdf.internal.pageSize.getHeight(); 
-      
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      
+
       const safeName = (cert?.courseTitle || "Course").replace(/[^a-z0-9]/gi, '_').toLowerCase();
       pdf.save(`benedex_certificate_${safeName}.pdf`);
     } catch (error) {
@@ -75,14 +75,14 @@ const CertificateView = () => {
     if (!certificateRef.current) return;
     try {
       setDownloading(true);
-      
+
       const canvas = await html2canvas(certificateRef.current, {
         scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff"
       });
-      
+
       const imgUri = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       const safeName = (cert?.courseTitle || "Course").replace(/[^a-z0-9]/gi, '_').toLowerCase();
@@ -101,24 +101,24 @@ const CertificateView = () => {
 
   if (loading) {
     return (
-      <div className="cert-loading-screen">
-        <FiLoader size={44} className="cert-spinner" />
-        <p>RETRIEVING SECURE CREDENTIALS...</p>
+      <div className="scd-loader-container">
+        <div className="scd-spinner" />
+        <p>Retrieving secure credentials...</p>
       </div>
     );
   }
 
-  const issueDate = cert?.issuedAt 
-    ? new Date(cert.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }) 
+  const issueDate = cert?.issuedAt
+    ? new Date(cert.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' })
     : new Date().toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
 
   return (
     <div className="cert-page-wrapper">
-      
+
       {/* TOOLBAR CONTROLS */}
       <div className="cert-action-bar">
-        <button 
-          onClick={() => navigate(`/student/courses/${courseId}`)} 
+        <button
+          onClick={() => navigate(`/student/courses/${courseId}`)}
           className="cert-back-btn"
           disabled={downloading}
         >
@@ -127,12 +127,12 @@ const CertificateView = () => {
 
         <div className="cert-download-actions-group">
           <button onClick={downloadAsImage} className="cert-secondary-action-btn" disabled={downloading}>
-            {downloading ? <FiLoader className="cert-spinner" /> : <FiImage size={16} />} 
+            {downloading ? <FiLoader className="cert-spinner" /> : <FiImage size={16} />}
             Save as PNG Image
           </button>
-          
+
           <button onClick={downloadAsPDF} className="cert-print-btn" disabled={downloading}>
-            {downloading ? <FiLoader className="cert-spinner" /> : <FiDownload size={16} />} 
+            {downloading ? <FiLoader className="cert-spinner" /> : <FiDownload size={16} />}
             {downloading ? "Compiling..." : "Download Official PDF"}
           </button>
         </div>
@@ -140,10 +140,10 @@ const CertificateView = () => {
 
       {/* FIXED LANDSCAPE SCALING WRAPPER FOR RESPONSIVENESS */}
       <div className="cert-scale-container">
-        
+
         {/* SECURE CERTIFICATE CANVAS (1000px X 700px Native Proportion) */}
         <div className="certificate-print-canvas" ref={certificateRef}>
-          
+
           {/* Subtle Guilloche/Rosette watermark circle layer */}
           <div className="cert-watermark-rosette"></div>
 
@@ -152,7 +152,7 @@ const CertificateView = () => {
 
           {/* LEFT CONTENT CONTAINER COLUMN */}
           <div className="cert-left-column">
-            
+
             {/* BRAND LOGO */}
             <div className="cert-brand-logo-area">
               <span className="brand-logo-blue">benedex</span>
@@ -199,7 +199,7 @@ const CertificateView = () => {
                 <span className="ribbon-title">COURSE</span>
                 <span className="ribbon-subtitle">CERTIFICATE</span>
               </div>
-              
+
               {/* Embossed Round Stamp Seal Design */}
               <div className="ribbon-seal-circle">
                 <div className="seal-inner-dotted">
