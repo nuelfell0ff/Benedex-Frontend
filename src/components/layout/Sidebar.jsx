@@ -35,7 +35,7 @@ function Sidebar({ links }) {
       <div className="student-sidebar-footer">
         <button
           type="button"
-          className="student-sidebar-logout"
+          className="student-sidebar-logout" 
           onClick={logout}
           aria-label="Sign out"
         >

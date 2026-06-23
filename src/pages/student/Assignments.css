@@ -7,7 +7,8 @@
 .assignment-layout-root *,
 .assignment-layout-root *::before,
 .assignment-layout-root *::after {
-  box-sizing: border-box; /* Ensures padding doesn't widen elements beyond 100% */
+  box-sizing: border-box;
+  /* Ensures padding doesn't widen elements beyond 100% */
 }
 
 .assignment-layout-root {
@@ -15,7 +16,8 @@
   background-color: var(--bg-main, #f8fafc);
   padding-bottom: 3rem;
   width: 100%;
-  overflow-x: hidden; /* Hard viewport boundary armor */
+  overflow-x: hidden;
+  /* Hard viewport boundary armor */
 }
 
 /* 1. HERO BRAND BANNER */
@@ -195,7 +197,7 @@
 .assignments-masonry-grid {
   display: grid;
   /* CRITICAL MOBILE FIX: Force exactly ONE card per row on small screens */
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
   gap: 1.5rem;
   width: 100%;
 }
@@ -216,7 +218,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  
+
   /* FLUID CELL STABILIZATION ARRESTORS */
   max-width: 100% !important;
   width: 100%;
@@ -341,7 +343,8 @@
   gap: 12px;
   cursor: pointer;
   background-color: #f8fafc;
-  overflow: hidden; /* Clips wild filename text layouts */
+  overflow: hidden;
+  /* Clips wild filename text layouts */
   transition: all 0.2s ease;
 }
 
@@ -361,7 +364,8 @@
   color: #475569;
   font-weight: 500;
   flex: 1;
-  min-width: 0; /* Forces text layout container compression inside flex elements */
+  min-width: 0;
+  /* Forces text layout container compression inside flex elements */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
