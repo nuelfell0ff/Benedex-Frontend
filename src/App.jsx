@@ -53,6 +53,7 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminCourses from "./pages/admin/AdminCourses";
 import PaymentCallback from "./pages/payments/PaymentCallback";
+import AdminAiTickets from "./pages/admin/AdminAiTickets";
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -283,6 +284,11 @@ function App() {
           <Route
             path="courses"
             element={<AdminCourses />}
+          />
+
+          <Route
+            path="tickets"
+            element={<AdminAiTickets />}
           />
         </Route>
       </Routes>

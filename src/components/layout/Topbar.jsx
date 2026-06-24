@@ -5,7 +5,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
-// Master list of all layout link targets across all profiles
 const ALL_DASHBOARD_PAGES = [
   // Student Scope
   { label: "Dashboard Home", path: "/student", role: "student" },
@@ -14,7 +13,7 @@ const ALL_DASHBOARD_PAGES = [
   { label: "Live Classes", path: "/student/live-classes", role: "student" },
   { label: "Messages", path: "/student/messages", role: "student" },
   { label: "Notifications", path: "/student/notifications", role: "student" },
-  
+
   // Instructor Scope
   { label: "Dashboard Home", path: "/instructor", role: "instructor" },
   { label: "Courses", path: "/instructor/courses", role: "instructor" },
@@ -46,33 +45,38 @@ function Topbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Normalize active user role securely
   const currentRole = user?.role?.toLowerCase() || "student";
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchNotifications = async () => {
       try {
-        // Dynamic endpoint path adjustment based on active route spaces
-        const endpoint = currentRole === "student" ? "/dashboard/student" : `/dashboard/${currentRole}`;
-        const res = await API.get(endpoint);
-        const count = res.data?.unreadActivityCount || 0;
+        let count = 0;
+
+        if (currentRole === "student") {
+          // 🛠️ Fetch from the main notifications broadcast list to calculate unread bulletins
+          const res = await API.get("/notifications");
+          const broadcasts = res.data || [];
+          count = broadcasts.filter((item) => !item.isRead).length;
+        } else if (currentRole === "admin") {
+          // Fetch admin pending tasks overview counter
+          const res = await API.get("/admin/analytics");
+          count = res.data?.overview?.pendingSubmissions || 0;
+        } else {
+          // Instructors / default route matching fallback
+          const res = await API.get(`/dashboard/${currentRole}`);
+          count = res.data?.unreadActivityCount || 0;
+        }
 
         if (isMounted) setNotificationCount(count);
       } catch (error) {
-        console.log("Notification load bypass:", error);
+        console.log("Topbar metric sync failed:", error);
       }
     };
 
     fetchNotifications();
-
-    const handleActivitiesUpdated = () => { fetchNotifications(); };
-    window.addEventListener(`${currentRole}-activities-updated`, handleActivitiesUpdated);
-
-    return () => {
-      isMounted = false;
-      window.removeEventListener(`${currentRole}-activities-updated`, handleActivitiesUpdated);
-    };
+    return () => { isMounted = false; };
   }, [location.pathname, currentRole]);
 
   useEffect(() => {
@@ -85,16 +89,13 @@ function Topbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Sync Search queries & filter parameters natively
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
       return;
     }
 
-    // 1. STAGE ROLE VALIDATION: Filter navigation routes matching ONLY the active profile
     const allowedPages = ALL_DASHBOARD_PAGES.filter(page => page.role === currentRole);
-    
     const filteredPages = allowedPages
       .filter(page => page.label.toLowerCase().includes(query.toLowerCase()))
       .map(page => ({
@@ -111,10 +112,7 @@ function Topbar() {
     setIsLoading(true);
     const delayDebounce = setTimeout(async () => {
       try {
-        // 2. Query dynamic backend records
         const response = await API.get(`/search?q=${query}`);
-        
-        // Combine matched navigation sub-links with backend collection data
         setResults([...filteredPages, ...response.data]);
       } catch (error) {
         console.error("Omnibox tracking sync error:", error);
@@ -126,10 +124,24 @@ function Topbar() {
     return () => clearTimeout(delayDebounce);
   }, [query, currentRole]);
 
-  const handleSelectResult = (path) => {
+  const handleSelectResult = (item) => {
     setQuery("");
     setIsOpen(false);
-    navigate(path);
+
+    // 🚨 CODES DIRECT REDIRECT ROUTING INTERCEPTOR TO DM
+    if (item.isStudentRedirect && currentRole === "instructor") {
+      navigate("/instructor/messages", {
+        state: {
+          redirectedFromRoster: true,
+          targetStudentData: item.studentData
+        }
+      });
+      return;
+    }
+
+    if (item.path) {
+      navigate(item.path);
+    }
   };
 
   const initials = (user?.fullName || "User")
@@ -162,7 +174,7 @@ function Topbar() {
               <div
                 key={index}
                 className="search-result-item"
-                onClick={() => handleSelectResult(item.path)}
+                onClick={() => handleSelectResult(item)}
               >
                 <div className="search-item-info">
                   <span className="search-item-title">{item.title}</span>
@@ -175,12 +187,10 @@ function Topbar() {
       </div>
 
       <div className="student-top-actions">
-        <Link className="student-icon-button student-notification-button" to={`/${currentRole}/notifications`} aria-label="Notifications">
+        <Link className="student-icon-button student-notification-button" to={`/${currentRole}/notifications`}>
           <FiBell />
           {notificationCount > 0 ? (
-            <span className="student-notification-badge">
-              {notificationCount > 9 ? "9+" : notificationCount}
-            </span>
+            <span className="student-notification-badge">{notificationCount}</span>
           ) : null}
         </Link>
 

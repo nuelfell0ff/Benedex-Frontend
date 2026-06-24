@@ -1,0 +1,250 @@
+.ai-widget-root {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  /* Float on top of everything else */
+  font-family: inherit;
+}
+
+/* Floating round execution button */
+.ai-widget-trigger {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  /* Removed green (#1e844f) and updated with your brand blues */
+  background: linear-gradient(135deg, #0d5aa0 0%, #194066 100%);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.ai-widget-trigger:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ai-trigger-pulse {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  /* Changed notification dot to brand blue accent */
+  background-color: #0d5aa0;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+/* Messenger Style Drawer Box popup window */
+.ai-chat-drawer {
+  width: 360px;
+  height: 480px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  animation: scaleInDrawer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleInDrawer {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ai-drawer-header {
+  padding: 14px 16px;
+  background: #194066;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-avatar-badge {
+  font-size: 20px;
+  background-color: rgba(255, 255, 255, 0.15);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-header-profile h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ai-header-profile span {
+  font-size: 11px;
+  opacity: 0.8;
+  display: block;
+}
+
+.ai-close-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ai-close-btn:hover {
+  opacity: 1;
+}
+
+/* Chat dialogue area styles */
+.ai-drawer-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-empty-state {
+  text-align: center;
+  margin: auto;
+  color: #64748b;
+  padding: 0 10px;
+}
+
+.ai-empty-state p {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.ai-empty-state span {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.ai-msg-row {
+  display: flex;
+  width: 100%;
+}
+
+.ai-row-user {
+  justify-content: flex-end;
+}
+
+.ai-row-model {
+  justify-content: flex-start;
+}
+
+.ai-msg-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.ai-row-user .ai-msg-bubble {
+  /* Swapped green style out for your primary blue theme background */
+  background-color: #0d5aa0;
+  color: #ffffff;
+  border-bottom-right-radius: 2px;
+}
+
+.ai-row-model .ai-msg-bubble {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border-bottom-left-radius: 2px;
+}
+
+.ai-loading-bubble {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-style: italic;
+}
+
+.ai-spin-icon {
+  animation: aiSpinner 1s linear infinite;
+}
+
+@keyframes aiSpinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Chat Input Bar panel box footer styles */
+.ai-drawer-footer {
+  padding: 12px;
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 8px;
+}
+
+.ai-drawer-footer input {
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ai-drawer-footer input:focus {
+  border-color: #0d5aa0;
+}
+
+.ai-drawer-footer button {
+  background-color: #0d5aa0;
+  color: #ffffff;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ai-drawer-footer button:hover {
+  background-color: #194066;
+}
+
+.ai-drawer-footer button:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+}

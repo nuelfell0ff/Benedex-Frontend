@@ -1,7 +1,5 @@
 import { useMemo } from "react";
-
 import { Outlet } from "react-router-dom";
-
 import {
   FiBell,
   FiBookOpen,
@@ -13,9 +11,9 @@ import {
 
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
+import AiSupportWidget from "../components/layout/AiSupportWidget"; // <-- Imported Support Widget
 
 function StudentLayout() {
-
   const links = useMemo(
     () => [
       {
@@ -63,10 +61,11 @@ function StudentLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Floating AI widget sitting over the layout shell structure natively */}
+      <AiSupportWidget />
     </div>
-
   );
-
 }
 
 export default StudentLayout;

@@ -10,6 +10,7 @@ import {
   FiPlayCircle,
   FiClipboard,
   FiUsers,
+  FiAlertCircle,
 } from "react-icons/fi";
 
 import Sidebar from "../components/layout/Sidebar";
@@ -57,6 +58,12 @@ function AdminLayout() {
         label: "Settings",
         path: "/admin/settings",
         icon: <CiSettings />
+      },
+
+      {
+        label: "Support Tickets",
+        path: "/admin/tickets",
+        icon: <FiAlertCircle />, // or any icon of your choosing
       }
 
     ]
