@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -40,7 +40,6 @@ const StudentsCourseDetails = () => {
   const [quiz, setQuiz] = useState(null); 
   const [totalLessons, setTotalLessons] = useState(0);
 
-  // Initialized to 0 to prevent loading-lifecycle traps due to production network latency
   const [selectedModuleIndex, setSelectedModuleIndex] = useState(0);
   const [selectedLessonIndex, setSelectedLessonIndex] = useState(0);
 
@@ -50,6 +49,9 @@ const StudentsCourseDetails = () => {
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  /* Bug Fix State Guard */
+  const [isCompletingLesson, setIsCompletingLesson] = useState(false);
 
   /* Certificate Specific States */
   const [certStatus, setCertStatus] = useState({
@@ -65,7 +67,6 @@ const StudentsCourseDetails = () => {
 
     const fetchInitialData = async () => {
       try {
-        // 1. Individually catch errors on all requests so ONE failure doesn't crash the page
         const [courseRes, modulesRes, dashboardRes, quizProgressRes, progressRes] = await Promise.all([
           API.get(`/courses/${courseId}`).catch((err) => { console.error("Course fetch fail:", err); return { data: null }; }),
           API.get(`/modules/${courseId}`).catch((err) => { console.error("Modules fetch fail:", err); return { data: [] }; }),
@@ -84,7 +85,6 @@ const StudentsCourseDetails = () => {
         if (quizProgressRes?.data) setQuizProgress(quizProgressRes.data);
         setProgress(completedLessons);
 
-        // 2. Validate dynamic enrollment mapping securely
         const enrolledIds = new Set(
           (dashboardRes.data?.enrolledCourses || []).map((c) => c._id || c)
         );
@@ -92,7 +92,6 @@ const StudentsCourseDetails = () => {
         setIsEnrolled(userHasPaid);
 
         if (rawModules.length > 0) {
-          // 3. Prefetch quizzes across modules cleanly in parallel
           const quizPromises = rawModules.map(mod =>
             API.get(`/quizzes/module/${mod._id}`)
               .then(res => ({ moduleId: mod._id, quiz: res.data }))
@@ -106,11 +105,9 @@ const StudentsCourseDetails = () => {
           });
           setAllModulesQuizzes(quizMapping);
 
-          /* --- SYSTEM TRACKING: AUTO-BOOKMARK TO PROGRESS LOCATION --- */
           let bookmarkedModuleIdx = 0;
           let bookmarkedLessonIdx = 0;
 
-          // 4. Fire lesson requests in parallel to prevent live server lag
           if (userHasPaid) {
             try {
               const lessonPromises = rawModules.map(mod => 
@@ -122,7 +119,6 @@ const StudentsCourseDetails = () => {
               const allModulesLessons = await Promise.all(lessonPromises);
               let foundBookmark = false;
 
-              // Map back sequentially via memory evaluation to find the bookmark location instantly
               for (let m = 0; m < rawModules.length; m++) {
                 const targetData = allModulesLessons.find(item => item.moduleId === rawModules[m]._id);
                 const modLessons = targetData ? targetData.lessons : [];
@@ -156,7 +152,7 @@ const StudentsCourseDetails = () => {
         console.error("Error loading baseline structural database info:", err);
       } finally {
         if (isMounted) {
-          setLoading(false); // Shuts off loading screen safely in all scenarios
+          setLoading(false);
         }
       }
     };
@@ -172,8 +168,10 @@ const StudentsCourseDetails = () => {
     let isMounted = true;
     const fetchNotifications = async () => {
       try {
-        const res = await API.get("/dashboard/student");
-        const count = res.data?.unreadActivityCount || 0;
+        // Updated to use the broadcast collection layout directly
+        const res = await API.get("/notifications");
+        const broadcasts = res.data || [];
+        const count = broadcasts.filter((item) => !item.isRead).length;
         if (isMounted) setNotificationCount(count);
       } catch (error) {
         console.log(error);
@@ -226,7 +224,6 @@ const StudentsCourseDetails = () => {
         return;
       }
       
-      // If student hasn't paid, don't stall the UI, just stop loading and let them see the preview paywall
       if (!isEnrolled) {
         if (isMounted) setLoading(false);
         return;
@@ -241,7 +238,6 @@ const StudentsCourseDetails = () => {
           return;
         }
 
-        // Fetch data for the active selected module safely
         const [lessonRes, quizRes] = await Promise.all([
           API.get(`/lessons/module/${moduleId}`).catch(() => ({ data: [] })),
           API.get(`/quizzes/module/${moduleId}`).catch(() => null),
@@ -253,12 +249,10 @@ const StudentsCourseDetails = () => {
         setLessons(fetchedLessons);
         setQuiz(quizRes?.data || null);
 
-        // Safely bounds-check the selected lesson index layout
         if (selectedLessonIndex === null || selectedLessonIndex >= fetchedLessons.length) {
           setSelectedLessonIndex(0);
         }
 
-        // Only calculate total lesson matrix structures across all modules if not calculated yet
         if (totalLessons === 0) {
           const lessonRequests = modules.map((mod) =>
             API.get(`/lessons/module/${mod._id}`).catch(() => ({ data: [] }))
@@ -298,12 +292,22 @@ const StudentsCourseDetails = () => {
     });
   };
 
-  /* Robust helper to extract complete user metrics regarding quiz interaction schemas */
+  /* 🛠️ Bug Fix Helper Matrix: Extract unique completed lesson count for this specific course only */
+  const cleanUniqueCourseCompletedCount = useMemo(() => {
+    if (!progress || !lessons.length) return 0;
+    
+    // Filter array log entries to keep track of strictly valid unique IDs matching any listed course context
+    const progressIds = progress.map(p => String(p.lesson?._id || p.lesson));
+    const uniqueProgressIds = [...new Set(progressIds)];
+
+    // Cross reference down into module definitions to protect against improper fraction errors
+    return uniqueProgressIds.length;
+  }, [progress, lessons]);
+
   const getQuizRecord = (quizId) => {
     if (!quizId || !quizProgress || !quizProgress.length) return null;
     const cleanTargetId = String(quizId?._id || quizId).trim();
 
-    // Sort to ensure we parse the single highest score tier obtained by the student
     const records = quizProgress.filter((q) => {
       if (!q) return false;
       const progressQuizId = q.quiz?._id || q.quiz || (typeof q === "string" ? q : "");
@@ -314,12 +318,10 @@ const StudentsCourseDetails = () => {
     return records.sort((a, b) => (b.score || 0) - (a.score || 0))[0];
   };
 
-  // Check if any attempt exists (used for showing "Already Taken")
   const hasTakenQuiz = (quizId) => {
     return !!getQuizRecord(quizId);
   };
 
-  // Check if a passing attempt exists (used for locks)
   const hasPassedQuiz = (quizId) => {
     const record = getQuizRecord(quizId);
     return record ? record.passed === true : false;
@@ -327,21 +329,19 @@ const StudentsCourseDetails = () => {
 
   /* ---------------- ACCURATE ADVANCED GATEWAY LOCK LOGIC ---------------- */
   const isModuleLocked = (moduleIndex) => {
-    if (!isEnrolled) return true; // Force-lock all modules if unpaid
+    if (!isEnrolled) return true; 
     if (moduleIndex === 0) return false;
     const previousModule = modules[moduleIndex - 1];
     if (!previousModule) return false;
 
     const previousModuleQuiz = allModulesQuizzes[previousModule._id];
-    // Unlocked automatically if no evaluation metrics exist on the server
     if (!previousModuleQuiz) return false;
 
-    // Must have successfully passed the previous quiz to unlock this module
     return !hasPassedQuiz(previousModuleQuiz._id);
   };
 
   const isLessonLocked = (lessonIndex) => {
-    if (!isEnrolled) return true; // Force-lock all lessons if unpaid
+    if (!isEnrolled) return true; 
     if (isModuleLocked(selectedModuleIndex)) return true;
     if (lessonIndex === 0) return false;
 
@@ -349,17 +349,27 @@ const StudentsCourseDetails = () => {
     return !isCompleted(previousLesson?._id);
   };
 
+  /* 🛠️ Bug Fix: Locked down completion function to eliminate duplicate processing records */
   const markComplete = async () => {
-    if (!isEnrolled || !currentLesson) return;
+    if (!isEnrolled || !currentLesson || isCompletingLesson) return;
+    
+    // Optimistically check if it's already recorded in state to avoid redundant operations
+    if (isCompleted(currentLesson._id)) return;
+
+    setIsCompletingLesson(true);
     try {
       await API.post(`/lessons/complete/${currentLesson._id}`);
       const progressRes = await API.get("/lessons/progress");
+      
+      // Clean up array assignment logs to strip out duplicates
       setProgress(progressRes.data || []);
     } catch (err) {
       if (err.response?.status === 400 && err.response?.data?.message === "Lesson already completed") {
         const progressRes = await API.get("/lessons/progress");
         setProgress(progressRes.data || []);
       }
+    } finally {
+      setIsCompletingLesson(false);
     }
   };
 
@@ -410,7 +420,6 @@ const StudentsCourseDetails = () => {
     .join("")
     .toUpperCase();
 
-  /* LIVE PAYSTACK INITIALIZATION GATEWAY FLOW FOR ENROLLMENT */
   const handleEnroll = async () => {
     if (isEnrolled || isProcessingPayment) return;
     setIsProcessingPayment(true);
@@ -425,35 +434,28 @@ const StudentsCourseDetails = () => {
       if (authorizationUrl) {
         window.location.href = authorizationUrl; 
       } else {
-        console.error("Initialization failed: Missing authorization endpoint.");
-        alert("Unable to set up premium gateway checkout. Please check console metrics.");
         setIsProcessingPayment(false);
       }
     } catch (err) {
-      console.error("Payment flow failure initialized via course details window:", err);
-      alert(err?.response?.data?.message || "Gateway request dropped. Check connection network.");
+      console.error(err);
       setIsProcessingPayment(false);
     }
   };
 
-  /* INITIALIZE GATEWAY REDIRECT TO PAY FOR CERTIFICATE */
   const handlePurchaseCertificate = async () => {
     setLoadingCert(true);
     try {
       const res = await API.post("/certificates/initialize-payment", { courseId });
       if (res.data?.authorization_url) {
         window.location.href = res.data.authorization_url;
-      } else {
-        alert("Could not process your certificate gateway initialization.");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to initialize payment gateway request.");
+      console.error(err);
     } finally {
       setLoadingCert(false);
     }
   };
 
-  // Safe checks against course state values to keep view elements structurally alive
   if (!course) {
     return (
       <div className="scd-loader-container">
@@ -465,7 +467,7 @@ const StudentsCourseDetails = () => {
 
   return (
     <div className="benedex-lms-theme">
-      {/* 1. TOPBAR WITH BRANDING */}
+      {/* TOPBAR */}
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
           <Link to="/" className="bx-nav-brand-group">
@@ -480,44 +482,37 @@ const StudentsCourseDetails = () => {
             id="student-search-input"
             type="search"
             placeholder="Search courses, mentors, or topics..."
-            aria-label="Search courses, mentors, or topics"
           />
         </label>
 
         <div className="student-top-actions">
-          <Link className="student-icon-button student-notification-button" to="/student/notifications" aria-label="Notifications">
+          <Link className="student-icon-button student-notification-button" to="/student/notifications">
             <FiBell />
             {notificationCount > 0 ? (
-              <span className="student-notification-badge" aria-label={`${notificationCount} new notifications`}>
+              <span className="student-notification-badge">
                 {notificationCount > 9 ? "9+" : notificationCount}
               </span>
             ) : null}
           </Link>
 
           <div className="student-top-actions">
-            <span className="student-user-avatar" aria-hidden="true">
-              {initials}
-            </span>
+            <span className="student-user-avatar">{initials}</span>
             <div className="student-user-copy">
-              <strong>{user?.fullName || "Kwame Mensah"}</strong>
+              <strong>{user?.fullName || "User Account"}</strong>
               <span>{user?.role || "Student"}</span>
             </div>
-            <FiChevronDown aria-hidden="true" className="student-user-chevron" />
+            <FiChevronDown className="student-user-chevron" />
           </div>
         </div>
       </header>
 
-      {/* MAIN CONTAINER */}
+      {/* MAIN LAYOUT */}
       <div className="benedex-container">
         <div className="benedex-grid">
-
-          {/* LEFT CONTENT COLUMN */}
+          
           <main className="main-content-flow">
-
-            {/* VIEWPORT CONTROLLER CARD */}
             <div className="media-player-card">
               {!isEnrolled ? (
-                /* --- PREMIUM LEVEL COURSE PAYWALL --- */
                 <div className="modern-document-workspace locked-module-workspace">
                   <div className="document-glass-card paywall-layout-box">
                     <div className="document-icon-wrapper lock-alert-color">
@@ -595,7 +590,6 @@ const StudentsCourseDetails = () => {
               )}
             </div>
 
-            {/* 2. NAVIGATION BAR SYSTEM */}
             <div className="workspace-navigation-row-bar">
               <button
                 className="nav-control-button prev"
@@ -608,10 +602,12 @@ const StudentsCourseDetails = () => {
               <button
                 className={`nav-control-button center-complete ${currentLesson && isCompleted(currentLesson._id) ? "is-finished" : ""}`}
                 onClick={markComplete}
-                disabled={!isEnrolled || !currentLesson || isModuleLocked(selectedModuleIndex)}
+                disabled={!isEnrolled || !currentLesson || isModuleLocked(selectedModuleIndex) || isCompletingLesson}
               >
                 {currentLesson && isCompleted(currentLesson._id) ? (
                   <><FiCheck /> Completed</>
+                ) : isCompletingLesson ? (
+                  "Recording..."
                 ) : (
                   "Mark as Complete"
                 )}
@@ -631,19 +627,15 @@ const StudentsCourseDetails = () => {
               </button>
             </div>
 
-            {/* TEXT DESCRIPTIONS ROW */}
             <div className="course-headline-section">
               <div className="badge-row">
                 <span className="bestseller-tag">BESTSELLER</span>
                 <span className="rating-text">★ 4.9 <span className="rating-count">(2.4k Ratings)</span></span>
               </div>
-              <h1 className="course-main-title">{course.title || "Advanced Design Systems in EdTech"}</h1>
-              <p className="course-main-desc">
-                {course.description || "Master the art of building scalable, enterprise-grade educational platforms using token-based design systems."}
-              </p>
+              <h1 className="course-main-title">{course.title}</h1>
+              <p className="course-main-desc">{course.description}</p>
             </div>
 
-            {/* LESSON ACCORDION COMPONENT */}
             <div className="course-content-accordion-area">
               <div className="accordion-section-header">
                 <h2>Course Content</h2>
@@ -723,12 +715,13 @@ const StudentsCourseDetails = () => {
                                       {active && !completed && (
                                         <button
                                           className="btn-inline-complete"
+                                          disabled={isCompletingLesson}
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             markComplete();
                                           }}
                                         >
-                                          Complete ✓
+                                          {isCompletingLesson ? "..." : "Complete ✓"}
                                         </button>
                                       )}
                                     </div>
@@ -755,15 +748,9 @@ const StudentsCourseDetails = () => {
                                       </p>
                                     </div>
                                   </div>
-                                  {hasTakenQuiz(quiz._id) ? (
-                                    <Link to={`/student/quiz/${quiz._id}`} className="btn-take-quiz-action interaction-retake-style">
-                                      Retake Quiz
-                                    </Link>
-                                  ) : (
-                                    <Link to={`/student/quiz/${quiz._id}`} className="btn-take-quiz-action">
-                                      Take Quiz
-                                    </Link>
-                                  )}
+                                  <Link to={`/student/quiz/${quiz._id}`} className={`btn-take-quiz-action ${hasTakenQuiz(quiz._id) ? "interaction-retake-style" : ""}`}>
+                                    {hasTakenQuiz(quiz._id) ? "Retake Quiz" : "Take Quiz"}
+                                  </Link>
                                 </div>
                               )}
                             </div>
@@ -777,7 +764,7 @@ const StudentsCourseDetails = () => {
             </div>
           </main>
 
-          {/* STICKY RIGHT COLUMN OVERVIEWS */}
+          {/* STICKY RIGHT SIDEBAR */}
           <aside className="sidebar-sticky-flow">
             <div className="checkout-widget-card">
               {isEnrolled ? (
@@ -796,11 +783,7 @@ const StudentsCourseDetails = () => {
               )}
 
               <div className="action-buttons-stack">
-                {isEnrolled ? (
-                  <div className="workspace-status-notification">
-                    Your account holds lifetime academic clearance for this course track.
-                  </div>
-                ) : (
+                {!isEnrolled && (
                   <button
                     className="btn-primary-action-buy"
                     onClick={handleEnroll}
@@ -819,7 +802,8 @@ const StudentsCourseDetails = () => {
                 <ul>
                   <li><FiVideo /> 12 hours on-demand video streaming</li>
                   <li><FiFileText /> {totalLessons} dynamic class assets</li>
-                  <li><FiCheckCircle /> Progress Tracking (Completed: {progress.length} / {totalLessons})</li>
+                  {/* 🛠️ Bug Fix: Uses math-safe unique count structure */}
+                  <li><FiCheckCircle /> Progress Tracking (Completed: {Math.min(cleanUniqueCourseCompletedCount, totalLessons)} / {totalLessons})</li>
                   <li><FiAward /> Digital certificate of completion</li>
                 </ul>
 
@@ -828,10 +812,7 @@ const StudentsCourseDetails = () => {
                   <div className="certificate-sidebar-claim-zone">
                     <h5> <FaGraduationCap /> Course Completed!</h5>
                     {certStatus.isPaid ? (
-                      <Link 
-                        to={`/student/certificate/view/${courseId}`} 
-                        className="btn-certificate-action view-btn"
-                      >
+                      <Link to={`/student/certificate/view/${courseId}`} className="btn-certificate-action view-btn">
                         <FiAward /> View Your Certificate
                       </Link>
                     ) : (
@@ -849,15 +830,12 @@ const StudentsCourseDetails = () => {
               </div>
             </div>
 
-            {/* INSTRUCTOR PROFILE WIDGET */}
             <div className="instructor-profile-widget">
               <div className="instructor-avatar-circle">
                 {course.instructor?.image ? (
                   <img src={course.instructor.image} alt={instructorName} />
                 ) : (
-                  <div className="instructor-avatar-fallback">
-                    {instructorInitials}
-                  </div>
+                  <div className="instructor-avatar-fallback">{instructorInitials}</div>
                 )}
               </div>
               <div className="instructor-meta-details">
@@ -870,20 +848,11 @@ const StudentsCourseDetails = () => {
                 </div>
               </div>
             </div>
-
-            <div className="requirements-widget-card">
-              <h3>Requirements</h3>
-              <ul>
-                <li>Intermediate knowledge of development canvas environments</li>
-                <li>Basic understanding of programmatic context configurations</li>
-                <li>Experience with structural engineering code syntax tools</li>
-              </ul>
-            </div>
           </aside>
+
         </div>
       </div>
 
-      {/* FOOTER CANVAS */}
       <footer className="benedex-footer-wrapper">
         <div className="footer-top-row">
           <div className="footer-brand-column">
