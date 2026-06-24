@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import Logo from "../../assets/20260623_190852.png";
+import Logo2 from "../../assets/20260623_191023.png"
 
 function Sidebar({ links }) {
   const { logout } = useAuth();
@@ -9,9 +11,9 @@ function Sidebar({ links }) {
   return (
     <aside className="student-sidebar">
       <Link to="/" className="bx-nav-brand-group">
-        <div className="bx-nav-logo-box">
-        </div>
-        <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
+        <img src={Logo} alt="" className="bx-nav-logo d-lg-flex d-none" />
+        <img src={Logo2} alt="" className="bx-nav-logo d-lg-none d-sm-flex" />
+        {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
       </Link>
 
       <nav className="student-sidebar-nav" aria-label="Student navigation">
@@ -35,7 +37,7 @@ function Sidebar({ links }) {
       <div className="student-sidebar-footer">
         <button
           type="button"
-          className="student-sidebar-logout" 
+          className="student-sidebar-logout"
           onClick={logout}
           aria-label="Sign out"
         >

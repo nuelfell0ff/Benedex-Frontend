@@ -2250,12 +2250,12 @@ input {
   animation: loginSpin 0.8s linear infinite;
 }
 
+.bx-nav-logo {
+  width: 130px;
+  margin: 0 !important;
+}
+
 .bx-nav-logo-box {
-  width: 40px !important;
-  height: 40px !important;
-  background-color: #0d5aa0;
-  border-radius: 8px;
-  /* Smooth professional rounded block edge */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2368,6 +2368,11 @@ input {
 
   .student-badge-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bx-nav-logo {
+    width: 40px;
+    margin: 0 !important;
   }
 
   .bx-nav-logo-box {
