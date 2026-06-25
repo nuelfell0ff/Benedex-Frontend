@@ -22,3 +22,5 @@ Security:
 Notes:
 - I added `PaymentCallback.jsx` and a route at `/payments/callback`.
  - The frontend redirects the current tab to Paystack so Paystack will redirect back to `/payments/callback?reference=...` on completion. The callback then calls `GET /payments/verify/:reference`.
+
+hello everyone! i get exam tomorrow 😭😭
