@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { FiGlobe, FiUsers } from "react-icons/fi";
+import { Link } from 'react-router-dom';
 import "./Footer.css";
+import Logo from "../../assets/20260623_190852.png";
+import Logo2 from "../../assets/20260623_191023.png"
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -44,11 +47,11 @@ function Footer() {
 
           {/* BRAND COLUMN / MATCHES NAVBAR IDENTITY STYLE */}
           <div className="bx-footer-brand-col">
-            <a href="/" className="bx-footer-logo-link d-flex gap-2">
-              <div className="bx-nav-logo-box">
-              </div>
-              <h2 className="bx-footer-brand-logo">Benedex</h2>
-            </a>
+            <Link to="/" className="bx-nav-brand-group">
+              <img src={Logo} alt="" className="bx-nav-logo2 d-lg-flex d-none" />
+              <img src={Logo} alt="" className="bx-nav-logo2 d-lg-none d-sm-flex" />
+              {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
+            </Link>
             <p className="bx-footer-brand-desc">
               The intelligence layer for modern educational institutions. Professional, secure, and infinitely scalable.
             </p>

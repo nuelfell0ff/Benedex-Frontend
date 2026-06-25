@@ -18,8 +18,8 @@ function Navbar() {
 
         {/* LOGO NODE WITH RECTANGLE ICON HOLDER */}
         <Link to="/" className="bx-nav-brand-group">
-          <img src={Logo} alt="" className="bx-nav-logo d-lg-flex d-none" />
-          <img src={Logo2} alt="" className="bx-nav-logo d-lg-none d-sm-flex" />
+          <img src={Logo} alt="" className="bx-nav-logo2 d-lg-flex d-none" />
+          <img src={Logo} alt="" className="bx-nav-logo2 d-lg-none d-sm-flex" />
           {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
         </Link>
 
@@ -48,12 +48,10 @@ function Navbar() {
         {/* MOBILE RIGHT SLIDING SIDEBAR DRAWER PANEL */}
         <div className={`bx-nav-sidebar-drawer ${isOpen ? "is-active" : ""}`}>
           <div className="bx-nav-drawer-header">
-            <div className="bx-nav-brand-group">
-              <div className="bx-nav-logo-box">
-                <span className="bx-nav-logo-dot" />
-              </div>
-              <span className="bx-nav-brand-text">Benedex</span>
-            </div>
+            <Link to="/" className="bx-nav-brand-group">
+              <img src={Logo2} alt="" className="bx-nav-logo d-flex" />
+              {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
+            </Link>
             <button className="bx-nav-close-btn" onClick={toggleMenu} aria-label="Close drawer menu">
               <FiX size={20} />
             </button>

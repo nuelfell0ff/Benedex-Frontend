@@ -4,6 +4,7 @@ import { FiArrowRight, FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import "../../App.css";
+import Logo from "../../assets/20260623_190807.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -91,9 +92,8 @@ function Login() {
     <main className="login-shell">
       <section className="login-visual-panel">
         <Link to="/" className="bx-nav-brand-group">
-          <div className="bx-nav-logo-box bg-white">
-          </div>
-          <span className="bx-nav-brand-text text-white">Benedex</span>
+          <img src={Logo} alt="" className="bx-nav-logo2 d-flex" />
+          {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
         </Link>
 
         <div className="login-visual-content">

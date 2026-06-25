@@ -2250,8 +2250,9 @@ input {
   animation: loginSpin 0.8s linear infinite;
 }
 
-.bx-nav-logo {
-  width: 130px;
+.bx-nav-logo,
+.bx-nav-logo2 {
+  width: 110px;
   margin: 0 !important;
 }
 
@@ -2371,8 +2372,11 @@ input {
   }
 
   .bx-nav-logo {
-    width: 40px;
-    margin: 0 !important;
+    width: 30px;
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+    /* margin: 0 !important; */
   }
 
   .bx-nav-logo-box {

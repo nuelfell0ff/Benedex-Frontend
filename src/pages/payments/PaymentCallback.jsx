@@ -9,7 +9,9 @@ import {
   FiHelpCircle
 } from "react-icons/fi";
 import API from "../../services/api";
-import "./PaymentCallback.css"; 
+import "./PaymentCallback.css";
+import Logo from "../../assets/20260623_190852.png";
+import Logo2 from "../../assets/20260623_191023.png"
 
 function PaymentCallback() {
   const [searchParams] = useSearchParams();
@@ -20,7 +22,7 @@ function PaymentCallback() {
   useEffect(() => {
     const reference = searchParams.get("reference") || searchParams.get("trxref");
     // Look at the query parameter we appended in Step 1
-    const paymentType = searchParams.get("type"); 
+    const paymentType = searchParams.get("type");
 
     if (!reference) {
       setStatus("error");
@@ -31,7 +33,7 @@ function PaymentCallback() {
     const verify = async () => {
       try {
         let res;
-        
+
         // Explicit routing choice based completely on the URL parameters
         if (paymentType === "certificate") {
           res = await API.get(`/certificates/verify-payment/${encodeURIComponent(reference)}`);
@@ -53,14 +55,14 @@ function PaymentCallback() {
             } else {
               navigate("/student");
             }
-          }, 2500); 
+          }, 2500);
         } else {
           setStatus("error");
           setMessage(res.data?.message || "Payment verification failed or was declined by the network.");
         }
       } catch (err) {
         console.error(err);
-        
+
         if (err?.response?.data?.message?.includes("already issued") || err?.response?.status === 400) {
           setStatus("success");
           setMessage("Payment record verified. Access token confirmation established.");
@@ -80,9 +82,10 @@ function PaymentCallback() {
     <div className="benedex-lms-theme callback-page-wrapper">
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
-          <Link to="/" className="bx-nav-brand-group me-auto" style={{ marginLeft: 0, marginRight: "auto" }}>
-            <div className="bx-nav-logo-box"></div>
-            <span className="bx-nav-brand-text">Benedex</span>
+          <Link to="/" className="bx-nav-brand-group">
+            <img src={Logo} alt="" className="bx-nav-logo2 d-lg-flex d-none" />
+            <img src={Logo} alt="" className="bx-nav-logo2 d-lg-none d-sm-flex" />
+            {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
           </Link>
         </div>
       </header>

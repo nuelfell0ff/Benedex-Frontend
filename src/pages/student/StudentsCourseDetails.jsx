@@ -23,6 +23,8 @@ import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./StudentsCourseDetails.css";
 import { FaGraduationCap, FaSchool } from "react-icons/fa";
+import Logo from "../../assets/20260623_190852.png";
+import Logo2 from "../../assets/20260623_191023.png"
 
 const StudentsCourseDetails = () => {
   const { courseId } = useParams();
@@ -37,7 +39,7 @@ const StudentsCourseDetails = () => {
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
   const [lessons, setLessons] = useState([]);
-  const [quiz, setQuiz] = useState(null); 
+  const [quiz, setQuiz] = useState(null);
   const [totalLessons, setTotalLessons] = useState(0);
 
   const [selectedModuleIndex, setSelectedModuleIndex] = useState(0);
@@ -98,7 +100,7 @@ const StudentsCourseDetails = () => {
               .catch(() => ({ moduleId: mod._id, quiz: null }))
           );
           const resolvedQuizzes = await Promise.all(quizPromises);
-          
+
           const quizMapping = {};
           resolvedQuizzes.forEach(item => {
             if (item.quiz) quizMapping[item.moduleId] = item.quiz;
@@ -110,12 +112,12 @@ const StudentsCourseDetails = () => {
 
           if (userHasPaid) {
             try {
-              const lessonPromises = rawModules.map(mod => 
+              const lessonPromises = rawModules.map(mod =>
                 API.get(`/lessons/module/${mod._id}`)
                   .then(res => ({ moduleId: mod._id, lessons: res.data || [] }))
                   .catch(() => ({ moduleId: mod._id, lessons: [] }))
               );
-              
+
               const allModulesLessons = await Promise.all(lessonPromises);
               let foundBookmark = false;
 
@@ -223,12 +225,12 @@ const StudentsCourseDetails = () => {
       if (!modules || modules.length === 0 || selectedModuleIndex === null) {
         return;
       }
-      
+
       if (!isEnrolled) {
         if (isMounted) setLoading(false);
         return;
       }
-      
+
       if (isMounted) setLoading(true);
 
       try {
@@ -258,7 +260,7 @@ const StudentsCourseDetails = () => {
             API.get(`/lessons/module/${mod._id}`).catch(() => ({ data: [] }))
           );
           const lessonResponses = await Promise.all(lessonRequests);
-          
+
           if (isMounted) {
             const total = lessonResponses.reduce(
               (sum, response) => sum + (response.data?.length || 0),
@@ -295,7 +297,7 @@ const StudentsCourseDetails = () => {
   /* 🛠️ Bug Fix Helper Matrix: Extract unique completed lesson count for this specific course only */
   const cleanUniqueCourseCompletedCount = useMemo(() => {
     if (!progress || !lessons.length) return 0;
-    
+
     // Filter array log entries to keep track of strictly valid unique IDs matching any listed course context
     const progressIds = progress.map(p => String(p.lesson?._id || p.lesson));
     const uniqueProgressIds = [...new Set(progressIds)];
@@ -329,7 +331,7 @@ const StudentsCourseDetails = () => {
 
   /* ---------------- ACCURATE ADVANCED GATEWAY LOCK LOGIC ---------------- */
   const isModuleLocked = (moduleIndex) => {
-    if (!isEnrolled) return true; 
+    if (!isEnrolled) return true;
     if (moduleIndex === 0) return false;
     const previousModule = modules[moduleIndex - 1];
     if (!previousModule) return false;
@@ -341,7 +343,7 @@ const StudentsCourseDetails = () => {
   };
 
   const isLessonLocked = (lessonIndex) => {
-    if (!isEnrolled) return true; 
+    if (!isEnrolled) return true;
     if (isModuleLocked(selectedModuleIndex)) return true;
     if (lessonIndex === 0) return false;
 
@@ -352,7 +354,7 @@ const StudentsCourseDetails = () => {
   /* 🛠️ Bug Fix: Locked down completion function to eliminate duplicate processing records */
   const markComplete = async () => {
     if (!isEnrolled || !currentLesson || isCompletingLesson) return;
-    
+
     // Optimistically check if it's already recorded in state to avoid redundant operations
     if (isCompleted(currentLesson._id)) return;
 
@@ -360,7 +362,7 @@ const StudentsCourseDetails = () => {
     try {
       await API.post(`/lessons/complete/${currentLesson._id}`);
       const progressRes = await API.get("/lessons/progress");
-      
+
       // Clean up array assignment logs to strip out duplicates
       setProgress(progressRes.data || []);
     } catch (err) {
@@ -432,7 +434,7 @@ const StudentsCourseDetails = () => {
 
       const authorizationUrl = res?.data?.authorization_url;
       if (authorizationUrl) {
-        window.location.href = authorizationUrl; 
+        window.location.href = authorizationUrl;
       } else {
         setIsProcessingPayment(false);
       }
@@ -471,12 +473,13 @@ const StudentsCourseDetails = () => {
       <header className="student-topbar">
         <div className="student-topbar-brand-container">
           <Link to="/" className="bx-nav-brand-group">
-            <div className="bx-nav-logo-box"></div>
-            <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span>
+            <img src={Logo} alt="" className="bx-nav-logo d-lg-flex d-none" />
+            <img src={Logo2} alt="" className="bx-nav-logo d-lg-none d-sm-flex" />
+            {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
           </Link>
         </div>
 
-        <label className="student-search" htmlFor="student-search-input">
+        <label className="student-search2" htmlFor="student-search-input">
           <FiSearch aria-hidden="true" />
           <input
             id="student-search-input"
@@ -486,7 +489,7 @@ const StudentsCourseDetails = () => {
         </label>
 
         <div className="student-top-actions">
-          <Link className="student-icon-button student-notification-button" to="/student/notifications">
+          <Link className="student-icon-button student-notification-button " to="/student/notifications">
             <FiBell />
             {notificationCount > 0 ? (
               <span className="student-notification-badge">
@@ -509,7 +512,7 @@ const StudentsCourseDetails = () => {
       {/* MAIN LAYOUT */}
       <div className="benedex-container">
         <div className="benedex-grid">
-          
+
           <main className="main-content-flow">
             <div className="media-player-card">
               {!isEnrolled ? (
@@ -816,12 +819,12 @@ const StudentsCourseDetails = () => {
                         <FiAward /> View Your Certificate
                       </Link>
                     ) : (
-                      <button 
-                        className="btn-certificate-action checkout-btn" 
+                      <button
+                        className="btn-certificate-action checkout-btn"
                         onClick={handlePurchaseCertificate}
                         disabled={loadingCert}
                       >
-                        <FiCreditCard /> 
+                        <FiCreditCard />
                         {loadingCert ? "Processing..." : "Pay for Certificate (₦5,000)"}
                       </button>
                     )}
