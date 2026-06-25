@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import "./Navbar.css";
+import Logo from "../../assets/20260623_190852.png";
+import Logo2 from "../../assets/20260623_191023.png"
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,10 +18,9 @@ function Navbar() {
 
         {/* LOGO NODE WITH RECTANGLE ICON HOLDER */}
         <Link to="/" className="bx-nav-brand-group">
-          <div className="bx-nav-logo-box">
-            {/* <span className="bx-nav-logo-dot" /> */}
-          </div>
-          <span className="bx-nav-brand-text">Benedex</span>
+          <img src={Logo} alt="" className="bx-nav-logo d-lg-flex d-none" />
+          <img src={Logo2} alt="" className="bx-nav-logo d-lg-none d-sm-flex" />
+          {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
         </Link>
 
         {/* DESKTOP CENTER LINKS */}
