@@ -84,10 +84,6 @@ const buildConsistencyGraph = (learningSummary) => {
 
   const startOfYear = new Date(Date.UTC(year, 0, 1));
   const cells = [];
-  const monthMarkers = monthList.map((month) => ({
-    label: month.name.slice(0, 3),
-    monthIndex: month.monthIndex ?? 0,
-  }));
 
   for (let index = 0; index < daysToRender; index += 1) {
     const date = new Date(startOfYear);
@@ -108,6 +104,10 @@ const buildConsistencyGraph = (learningSummary) => {
   }
 
   const renderedWeeks = Math.ceil(cells.length / 7);
+  const monthMarkers = monthList.map((month) => ({
+    label: month.name.slice(0, 3),
+    monthIndex: month.monthIndex ?? 0,
+  }));
 
   return {
     year,
@@ -153,6 +153,8 @@ const formatTimeAgo = (value) => {
 function StudentDashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [liveClasses, setLiveClasses] = useState([]);
+  const [lessonProgress, setLessonProgress] = useState([]);
+  const [courseLessonsMap, setCourseLessonsMap] = useState({}); // Dynamic storage for course lesson structures
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -160,23 +162,61 @@ function StudentDashboard() {
 
     const fetchDashboardData = async () => {
       try {
-        const [dashboardRes, liveClassesRes] = await Promise.all([
+        const [dashboardRes, liveClassesRes, progressRes] = await Promise.all([
           API.get("/dashboard/student"),
-          API.get("/live-classes/student")
+          API.get("/live-classes/student"),
+          API.get("/lessons/progress").catch(() => ({ data: [] }))
         ]);
 
+        if (!isMounted) return;
+
+        setDashboard(dashboardRes.data);
+        setLessonProgress(progressRes.data || []);
+
+        const extractedClasses =
+          Array.isArray(liveClassesRes.data) ? liveClassesRes.data :
+            Array.isArray(liveClassesRes.data?.classes) ? liveClassesRes.data.classes :
+              Array.isArray(liveClassesRes.data?.data) ? liveClassesRes.data.data : [];
+
+        setLiveClasses(extractedClasses);
+
+        // Dynamic deep-fetch loop matching your structure layout
+        const enrolled = dashboardRes.data?.enrolledCourses || [];
+        const lessonsMap = {};
+
+        await Promise.all(
+          enrolled.map(async (item) => {
+            const cId = item._id || item.courseId || item;
+            if (!cId || typeof cId !== "string") return;
+
+            try {
+              // 1. Fetch modules for this course
+              const modulesRes = await API.get(`/modules/${cId}`);
+              const rawModules = modulesRes.data || [];
+
+              // 2. Fetch lessons for all modules parallelly
+              const lessonPromises = rawModules.map(mod =>
+                API.get(`/lessons/module/${mod._id}`)
+                  .then(res => res.data || [])
+                  .catch(() => [])
+              );
+
+              const resolvedLessonsArrays = await Promise.all(lessonPromises);
+              const allLessons = resolvedLessonsArrays.flat();
+
+              lessonsMap[cId] = allLessons;
+            } catch (err) {
+              console.error(`Could not resolve lessons for course ${cId}:`, err);
+            }
+          })
+        );
+
         if (isMounted) {
-          setDashboard(dashboardRes.data);
-
-          const extractedClasses =
-            Array.isArray(liveClassesRes.data) ? liveClassesRes.data :
-              Array.isArray(liveClassesRes.data?.classes) ? liveClassesRes.data.classes :
-                Array.isArray(liveClassesRes.data?.data) ? liveClassesRes.data.data : [];
-
-          setLiveClasses(extractedClasses);
+          setCourseLessonsMap(lessonsMap);
         }
+
       } catch (error) {
-        console.error("Dashboard multi-node telemetry connection failure:", error);
+        console.error("Dashboard database synchronization failure:", error);
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -200,18 +240,18 @@ function StudentDashboard() {
         window.open(meetingLink, "_blank", "noopener,noreferrer");
       }
     } catch (error) {
-      console.error("Live streaming room connection engine failure inside dashboard:", error);
+      console.error("Live streaming connection failure:", error);
     }
   };
 
   const viewModel = useMemo(() => {
-    const studentName = dashboard?.profile?.fullName || "Kwame Mensah";
-    const firstName = studentName.split(" ")[0] || "Kwame";
-    const xp = dashboard?.xp ?? 1240;
+    const studentName = dashboard?.profile?.fullName || "Student Account";
+    const firstName = studentName.split(" ")[0] || "Student";
+    const xp = dashboard?.xp ?? 0;
     const level = dashboard?.level ?? Math.max(1, Math.floor(xp / 100));
-    const xpTarget = dashboard?.xpTarget ?? 2000;
+    const xpTarget = dashboard?.xpTarget ?? 1000;
     const xpProgress = dashboard?.xpProgress ?? Math.min(100, Math.round((xp / xpTarget) * 100));
-    const currentStreak = dashboard?.learningSummary?.currentStreak ?? 14;
+    const currentStreak = dashboard?.learningSummary?.currentStreak ?? 0;
     const learningSummary = dashboard?.learningSummary || {
       activeDays: 0,
       totalDays: 365,
@@ -225,28 +265,67 @@ function StudentDashboard() {
       )
       : [];
 
-    const consistencyMonths =
-      learningSummary.months?.length > 0
-        ? learningSummary.months
-        : buildFallbackConsistency(learningSummary.year || new Date().getUTCFullYear());
-
     const consistencyGraph = buildConsistencyGraph(learningSummary);
 
-    // Dynamic extraction: returns empty list if backend response has no enrolled courses
+    // Extract unique completed lesson IDs matching StudentsCourseDetails
+    const completedLessonIds = new Set(
+      lessonProgress.map((p) => String(p.lesson?._id || p.lesson))
+    );
+
     const courses =
       dashboard?.enrolledCourses?.length > 0
-        ? dashboard.enrolledCourses.slice(0, 2).map((course, index) => ({
-          title: course.title,
-          description: course.description,
-          progress: course.progress || 0,
-          lessons: course.lessons || "0 Lessons",
-          status: "In Progress",
-        }))
-        : [];
+        ? dashboard.enrolledCourses.slice(0, 2).map((enrollment) => {
+          const actualCourse = enrollment.courseId || enrollment.course || enrollment;
+          const courseIdStr = String(actualCourse._id || actualCourse);
 
-    const recentLiveSessions = [...liveClasses]
-      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
-      .slice(0, 2);
+          let completedCount = 0;
+          let totalCount = 0;
+
+          // Cross reference with the dynamically fetched actual lessons map
+          const courseLessonsList = courseLessonsMap[courseIdStr] || [];
+
+          if (courseLessonsList.length > 0) {
+            totalCount = courseLessonsList.length;
+            courseLessonsList.forEach((les) => {
+              const lessonId = les._id || les;
+              if (completedLessonIds.has(String(lessonId))) {
+                completedCount++;
+              }
+            });
+          } else {
+            // Static fallbacks if backend fields ever populate later
+            completedCount =
+              enrollment.completedLessonsCount ??
+              enrollment.progress?.completedLessonsCount ??
+              0;
+
+            totalCount =
+              enrollment.totalLessonsCount ??
+              enrollment.progress?.totalLessonsCount ??
+              actualCourse.totalLessonsCount ??
+              0;
+          }
+
+          let calculatedProgress = 0;
+          if (totalCount > 0) {
+            calculatedProgress = Math.round((completedCount / totalCount) * 100);
+          } else if (typeof enrollment.progress === 'number') {
+            calculatedProgress = enrollment.progress;
+          }
+
+          calculatedProgress = Math.max(0, Math.min(100, calculatedProgress));
+
+          return {
+            id: courseIdStr,
+            title: actualCourse.title || "Untitled Program",
+            description: actualCourse.description || "No overview provided.",
+            progress: calculatedProgress,
+            lessons: `Completed: ${completedCount} / ${totalCount}`,
+            subLessonsLabel: `${calculatedProgress}% Complete • ${totalCount} Lessons`,
+            status: calculatedProgress >= 100 ? "Completed" : "In Progress",
+          };
+        })
+        : [];
 
     return {
       firstName,
@@ -257,13 +336,12 @@ function StudentDashboard() {
       currentStreak,
       learningSummary,
       badgeNames,
-      consistencyMonths,
       consistencyGraph,
       courses,
-      recentLiveSessions,
+      recentLiveSessions: [...liveClasses].sort((a, b) => new Date(a.startTime) - new Date(b.startTime)).slice(0, 2),
       recentActivities: dashboard?.recentActivities || [],
     };
-  }, [dashboard, liveClasses]);
+  }, [dashboard, liveClasses, lessonProgress, courseLessonsMap]);
 
   const previewActivities = viewModel.recentActivities.slice(0, 4);
 
@@ -372,7 +450,6 @@ function StudentDashboard() {
                     ))}
                   </div>
                 </div>
-
               </div>
             </motion.article>
           </div>
@@ -409,11 +486,13 @@ function StudentDashboard() {
             <div className="student-section-head student-section-head-inline">
               <h3>Continue Learning</h3>
               <div className="student-carousel-actions" aria-hidden="true">
-                <button type="button">
+                {/* <button type="button">
                   <FiArrowRight className="student-rotate-left" />
-                </button>
-                <button type="button">
+                </button> */}
+                <button>
+                  <Link to="/student/courses" type="button">
                   <FiArrowRight />
+                </Link>
                 </button>
               </div>
             </div>
@@ -422,7 +501,7 @@ function StudentDashboard() {
               {viewModel.courses.length > 0 ? (
                 viewModel.courses.map((course, index) => (
                   <motion.article
-                    key={course.title}
+                    key={course.id || index}
                     className="student-course-card"
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -438,17 +517,21 @@ function StudentDashboard() {
                       <p>{course.description}</p>
 
                       <div className="student-course-meta">
-                        <span>{course.progress}% Complete</span>
                         <span>{course.lessons}</span>
+                        <span>{course.subLessonsLabel}</span>
                       </div>
 
                       <div className="student-course-bar" aria-hidden="true">
                         <span style={{ width: `${course.progress}%` }} />
                       </div>
 
-                      <button type="button" className="student-course-button">
-                        Continue Learning <FiArrowRight />
-                      </button>
+                      <Link
+                        to={`/student/courses/${course.id}`}
+                        className="student-course-button"
+                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}
+                      >
+                        Continue Learning <FiArrowRight style={{ marginLeft: "8px" }} />
+                      </Link>
                     </div>
                   </motion.article>
                 ))
@@ -534,7 +617,7 @@ function StudentDashboard() {
                     <FiAlertCircle />
                   </span>
                   <div>
-                    <strong>No live streams available</strong>
+                    <strong style={{ display: "block", fontSize: "0.75rem" }}>No live streams available</strong>
                     <p style={{ fontSize: "0.75rem" }}>Check back later for active sessions.</p>
                   </div>
                 </div>
@@ -597,7 +680,7 @@ function StudentDashboard() {
         <div>
           <span>Privacy Policy</span>
           <span>Terms of Service</span>
-          <span>Currency: USD/NGN</span>
+          <span>Currency: NGN</span>
           <span>Contact Support</span>
         </div>
       </footer>
