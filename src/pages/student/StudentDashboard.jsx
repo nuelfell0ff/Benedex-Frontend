@@ -285,7 +285,7 @@ function StudentDashboard() {
     >
       <section className="student-hero">
         <div>
-          <p className="student-hero-kicker">Good Morning, {viewModel.firstName}</p>
+          <p className="student-hero-kicker">Hello, {viewModel.firstName}</p>
           <h1>
             You&apos;re on a {viewModel.currentStreak}-day learning streak. Keep the momentum going!
           </h1>
