@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { initPushNotifications } from "../../utils/registerPush";
 
 import {
   FiArrowRight,
@@ -156,6 +157,15 @@ function StudentDashboard() {
   const [lessonProgress, setLessonProgress] = useState([]);
   const [courseLessonsMap, setCourseLessonsMap] = useState({}); // Dynamic storage for course lesson structures
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Grab the logged-in user's token from localStorage or your state manager
+    const token = localStorage.getItem("token"); 
+    
+    if (token) {
+      initPushNotifications(token);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -491,8 +501,8 @@ function StudentDashboard() {
                 </button> */}
                 <button>
                   <Link to="/student/courses" type="button">
-                  <FiArrowRight />
-                </Link>
+                    <FiArrowRight />
+                  </Link>
                 </button>
               </div>
             </div>

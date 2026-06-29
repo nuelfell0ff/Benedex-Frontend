@@ -73,3 +73,53 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+// ==========================================
+// BENEDEX WEB PUSH NOTIFICATION SYSTEM
+// ==========================================
+
+// Listen for push events sent from your Node backend
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+
+  try {
+    const payload = event.data.json();
+
+    const options = {
+      body: payload.body || "New update waiting in your portal.",
+      icon: payload.icon || "/logo192.png", 
+      image: payload.image || null,         // Displays your Cloudinary Admin Upload banner!
+      badge: "/logo192.png",                
+      data: {
+        url: payload.data?.url || "/student/dashboard" 
+      }
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(payload.title, options)
+    );
+  } catch (err) {
+    console.error("Error parsing push notification layout:", err);
+  }
+});
+
+// Handle clicking on the notification banner
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close(); 
+  const targetUrl = event.notification.data?.url || "/";
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      // If a tab is already open, focus it and redirect
+      for (let client of windowClients) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          return client.focus().then(() => client.navigate(targetUrl));
+        }
+      }
+      // Otherwise, open a fresh window tab
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
