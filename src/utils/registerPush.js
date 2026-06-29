@@ -30,7 +30,7 @@ export const initPushNotifications = async (userToken) => {
     };
 
     // 4. Fetch the Public VAPID Key from your backend
-    const res = await axios.get("http://localhost:5000/api/notifications/vapid-key", config);
+    const res = await axios.get("https://benedex-backend.onrender.com/api/notifications/vapid-key", config);
     const publicKey = res.data.publicKey;
 
     if (!publicKey) return;
@@ -49,7 +49,7 @@ export const initPushNotifications = async (userToken) => {
     });
 
     // 7. Send the device endpoint token to MongoDB
-    await axios.post("http://localhost:5000/api/notifications/subscribe", subscription, config);
+    await axios.post("https://benedex-backend.onrender.com/api/notifications/subscribe", subscription, config);
     console.log("Device synchronized with push notifications endpoint!");
 
   } catch (error) {
