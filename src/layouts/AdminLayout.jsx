@@ -55,15 +55,21 @@ function AdminLayout() {
       },
 
       {
-        label: "Settings",
-        path: "/admin/settings",
-        icon: <CiSettings />
-      },
-
-      {
         label: "Support Tickets",
         path: "/admin/tickets",
         icon: <FiAlertCircle />, // or any icon of your choosing
+      },
+
+      {
+        label: "Notifications",
+        path: "/admin/notifications",
+        icon: <FiBell />,
+      },
+
+      {
+        label: "Settings",
+        path: "/admin/settings",
+        icon: <CiSettings />
       }
 
     ]
