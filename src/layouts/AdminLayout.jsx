@@ -11,6 +11,7 @@ import {
   FiClipboard,
   FiUsers,
   FiAlertCircle,
+  FiActivity,
 } from "react-icons/fi";
 
 import Sidebar from "../components/layout/Sidebar";
@@ -64,6 +65,12 @@ function AdminLayout() {
         label: "Notifications",
         path: "/admin/notifications",
         icon: <FiBell />,
+      },
+
+      {
+        label: "Activity",
+        path: "/admin/activity-logs",
+        icon: <FiActivity />
       },
 
       {

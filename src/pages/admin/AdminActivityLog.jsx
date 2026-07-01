@@ -1,0 +1,153 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { 
+  LuShieldAlert, 
+  LuRefreshCw, 
+  LuCalendar, 
+  LuUser, 
+  LuLayers, 
+  LuActivity, 
+  LuFileText 
+} from "react-icons/lu";
+import "./AdminActivityLog.css";
+
+function AdminActivityLog() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "https://benedex-backend.onrender.com/api/notifications/admin-logs",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        setLogs(response.data.logs);
+      }
+    } catch (err) {
+      console.error("System operations audit pipeline sync crash:", err);
+      setError("Failed to stream administrative action metrics from secure data pipelines.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const formatTimestamp = (dateString) => {
+    return new Date(dateString).toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const cleanModuleName = (moduleString) => {
+    if (!moduleString) return "SYSTEM";
+    return moduleString.replace("_", " ");
+  };
+
+  return (
+    <div className="logs-page-container">
+      <div className="logs-page-header">
+        <div className="header-left-side">
+          <h2 className="logs-page-title">
+            <LuShieldAlert className="title-icon-svg" /> Security Operations Audit Trail
+          </h2>
+          <p className="logs-page-subtitle">
+            Unalterable chronological snapshot ledger of administrative ecosystem interactions.
+          </p>
+        </div>
+        <motion.button 
+          className="refresh-logs-btn" 
+          onClick={fetchLogs} 
+          disabled={loading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <LuRefreshCw className={`refresh-icon ${loading ? "spinning" : ""}`} />
+          {loading ? "Syncing Grid..." : "Refresh Log Stream"}
+        </motion.button>
+      </div>
+
+      <div className="logs-table-card">
+        {loading ? (
+          <div className="logs-loading-container">
+            <LuRefreshCw className="loading-spinner spinning" />
+            <p>Streaming secure administrative interaction log matrix...</p>
+          </div>
+        ) : error ? (
+          <div className="logs-empty-container operational-error-state">
+            <p>{error}</p>
+            <motion.button 
+              className="refresh-logs-btn error-retry-btn" 
+              onClick={fetchLogs}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Retry Stream
+            </motion.button>
+          </div>
+        ) : logs.length === 0 ? (
+          <div className="logs-empty-container">
+            <p>No logged system manipulations or views registered across environment nodes yet.</p>
+          </div>
+        ) : (
+          <div className="logs-table-wrapper">
+            <table className="audit-matrix-table">
+              <thead>
+                <tr>
+                  <th><div className="th-cell"><LuCalendar /> Date & Time</div></th>
+                  <th><div className="th-cell"><LuUser /> Administrator</div></th>
+                  <th><div className="th-cell"><LuLayers /> Target Module</div></th>
+                  <th><div className="th-cell"><LuActivity /> Action Type</div></th>
+                  <th><div className="th-cell"><LuFileText /> Operation Details</div></th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map((log) => (
+                  <tr key={log._id}>
+                    <td className="log-timestamp">
+                      {formatTimestamp(log.createdAt)}
+                    </td>
+                    <td className="log-admin-identity">
+                      {log.adminName}
+                    </td>
+                    <td>
+                      <span className="badge-module">
+                        {cleanModuleName(log.module)}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge-action ${log.actionType}`}>
+                        {log.actionType}
+                      </span>
+                    </td>
+                    <td className={`log-details-text ${log.actionType === 'DELETE' ? 'delete-alert-text' : ''}`}>
+                      {log.details}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default AdminActivityLog;

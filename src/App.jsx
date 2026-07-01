@@ -55,6 +55,7 @@ import AdminCourses from "./pages/admin/AdminCourses";
 import PaymentCallback from "./pages/payments/PaymentCallback";
 import AdminAiTickets from "./pages/admin/AdminAiTickets";
 import AdminNotifications from "./pages/admin/AdminNotificationForm";
+import AdminActivityLog from "./pages/admin/AdminActivityLog";
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -295,6 +296,11 @@ function App() {
           <Route
             path="notifications"
             element={<AdminNotifications />}
+          />
+          
+          <Route 
+          path="/admin/activity-logs" 
+          element={<AdminActivityLog />} 
           />
         </Route>
       </Routes>

@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.logs-page-container {
+  font-family: 'Poppins', sans-serif;
+  max-width: 1250px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.logs-page-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid rgba(7, 51, 92, 0.05);
+  padding-bottom: 20px;
+}
+
+.logs-page-title {
+  color: #07335c;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logs-page-subtitle {
+  color: #666666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Table Architecture & Cards Wrapper */
+.logs-table-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(7, 51, 92, 0.04);
+  border: 1px solid rgba(7, 51, 92, 0.08);
+  overflow: hidden;
+}
+
+.logs-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.audit-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+  min-width: 900px; /* Forces smooth scroll instead of column squishing on mobile */
+}
+
+.audit-matrix-table th {
+  background-color: rgba(7, 51, 92, 0.02);
+  color: #07335c;
+  font-weight: 600;
+  padding: 18px 20px;
+  border-bottom: 1.5px solid rgba(7, 51, 92, 0.08);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.audit-matrix-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(7, 51, 92, 0.04);
+  color: #333333;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.audit-matrix-table tr:last-child td {
+  border-bottom: none;
+}
+
+.audit-matrix-table tr:hover {
+  background-color: rgba(7, 51, 92, 0.01);
+}
+
+/* Typography Overrides */
+.log-timestamp {
+  white-space: nowrap;
+  color: #666666;
+  font-weight: 500;
+}
+
+.log-admin-identity {
+  color: #07335c;
+  font-weight: 600;
+}
+
+/* Feature Target Categorization Module Badges */
+.badge-module {
+  background-color: rgba(7, 51, 92, 0.06);
+  color: #07335c;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  display: inline-block;
+}
+
+/* Action Execution Urgency Badges */
+.badge-action {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-block;
+  letter-spacing: 0.5px;
+  text-align: center;
+  min-width: 65px;
+}
+
+.badge-action.CREATE { background-color: #e6f4ea; color: #137333; border: 1px solid rgba(19, 115, 51, 0.15); }
+.badge-action.UPDATE { background-color: #fef7e0; color: #b06000; border: 1px solid rgba(176, 96, 0, 0.15); }
+.badge-action.DELETE { background-color: #fce8e6; color: #c5221f; border: 1px solid rgba(197, 34, 31, 0.15); font-weight: 800; }
+.badge-action.VIEW { background-color: #f1f3f4; color: #5f6368; border: 1px solid rgba(95, 99, 104, 0.15); }
+
+/* Details text highlights */
+.log-details-text {
+  max-width: 450px;
+  word-wrap: break-word;
+}
+
+.delete-alert-text {
+  color: #c5221f;
+  font-weight: 500;
+}
+
+/* States Configurations UI */
+.logs-loading-container,
+.logs-empty-container {
+  padding: 60px;
+  text-align: center;
+  color: #07335c;
+  font-weight: 500;
+}
+
+.logs-empty-container {
+  color: #888888;
+}
+
+.refresh-logs-btn {
+  background: #07335c;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.1);
+}
+
+.refresh-logs-btn:hover {
+  background: #052340;
+  transform: translateY(-1px);
+}
+
+/* Layout Alignment Fixes for React Icons */
+.header-left-side {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title-icon-svg {
+  color: #07335c;
+  font-size: 28px;
+  vertical-align: middle;
+}
+
+.refresh-logs-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.refresh-icon, .loading-spinner {
+  font-size: 16px;
+}
+
+.loading-spinner {
+  font-size: 32px;
+  color: #07335c;
+  margin-bottom: 15px;
+}
+
+/* Keyframe Spinning Rule for Loading State Controls */
+.spinning {
+  animation: logSpin 1.2s linear infinite;
+}
+
+@keyframes logSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Table Header Alignment Grid Matrix */
+.th-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.th-cell svg {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Error UI Layout State Styles overrides */
+.operational-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.error-retry-btn {
+  background-color: #c5221f !important;
+  box-shadow: 0 4px 12px rgba(197, 34, 31, 0.15) !important;
+}
+.error-retry-btn:hover {
+  background-color: #a81d1a !important;
+}
