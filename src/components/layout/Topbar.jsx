@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { FiBell, FiChevronDown, FiSearch } from "react-icons/fi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LuUser } from "react-icons/lu";
 
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -194,14 +195,15 @@ function Topbar() {
           ) : null}
         </Link>
 
-        <div className="student-user-chip">
+        <Link to="/profile" className="student-user-chip navbar-profile-icon-btn">
+          <LuUser style={{ color: "#07335c", fontSize: "20px" }} />
           <span className="student-user-avatar">{initials}</span>
           <div className="student-user-copy">
             <strong>{user?.fullName || "User Account"}</strong>
             <span style={{ textTransform: "capitalize" }}>{currentRole}</span>
           </div>
           <FiChevronDown className="student-user-chevron" />
-        </div>
+        </Link>
       </div>
     </header>
   );

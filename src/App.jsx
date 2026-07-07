@@ -15,6 +15,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import LandingPage from "./pages/landingPage/Landing";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Profile from "./pages/Profile";
 import Maintenance from "./pages/Maintainance";
 
 import StudentLayout from "./layouts/StudentLayout";
@@ -98,6 +99,11 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        <Route 
+        path="/profile" 
+        element={<Profile />} 
         />
 
         {/* NEW: Explicit Global Maintenance Route */}
