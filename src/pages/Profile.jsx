@@ -3,13 +3,36 @@ import { useAuth } from "../context/AuthContext";
 import API from "../services/api";
 import {
   FiUser, FiMail, FiShield, FiKey, FiCamera,
-  FiCheckCircle, FiAlertCircle, FiLogOut
+  FiCheckCircle, FiAlertCircle, FiLogOut, FiGrid
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 
 function Profile() {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  // Dynamic back-to-dashboard vector matching student, admin, or instructor paths
+  const handleBackToDashboard = () => {
+    const targetRole = user?.role || user?.user?.role;
+
+    if (targetRole === "student") {
+      navigate("/student");
+    } else if (targetRole === "instructor") {
+      navigate("/instructor");
+    } else if (targetRole === "admin") {
+      navigate("/admin");
+    } else {
+      console.warn("Could not match dashboard role, defaulting to entry root:", user);
+      navigate("/");
+    }
+  };
+
+  const handleSignOut = () => {
+    logout();          // Clears token and user profiles from state/localStorage
+    navigate("/login"); // Dispatches user back to login entry vector
+  };
 
   const [activeTab, setActiveTab] = useState("general"); // Options: general, security
   const [passwordData, setPasswordData] = useState({
@@ -38,7 +61,7 @@ function Profile() {
 
     try {
       // Points directly to your secure profile update routing engine
-      await API.put("/auth/update-password", {
+      await API.put("/auth/forget-password", {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
@@ -90,7 +113,7 @@ function Profile() {
         </div>
 
         <div className="profile-identity-block">
-          <h2>{user?.fullName || "Benedex Member"}</h2>
+          <h2 className="text-white">{user?.fullName || "Benedex Member"}</h2>
           <span className="profile-role-badge">{user?.role || "Student"}</span>
         </div>
       </header>
@@ -98,6 +121,13 @@ function Profile() {
       {/* Main Control Panel Structure */}
       <main className="profile-content-frame">
         <aside className="profile-navigation-sidebar">
+          {/* Dynamic Return Navigation Trigger Node */}
+          <button className="profile-nav-tab" onClick={handleBackToDashboard}>
+            <FiGrid /> Go to Dashboard
+          </button>
+          
+          <hr className="profile-sidebar-divider" />
+
           <button
             className={`profile-nav-tab ${activeTab === "general" ? "active" : ""}`}
             onClick={() => setActiveTab("general")}
@@ -110,8 +140,10 @@ function Profile() {
           >
             <FiShield /> Security & Password
           </button>
+          
           <hr className="profile-sidebar-divider" />
-          <button className="profile-nav-tab logout-vector-btn" onClick={logout}>
+          
+          <button className="profile-nav-tab logout-vector-btn" onClick={handleSignOut}>
             <FiLogOut /> Sign Out Account
           </button>
         </aside>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiArrowRight, FiEye, FiEyeOff, FiLock, FiMail, FiUser, FiGithub } from "react-icons/fi";
+import { FaGoogle } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import "../../App.css";
@@ -276,7 +277,7 @@ function Register() {
               {googleLoading ? (
                 <span className="login-spinner" />
               ) : (
-                <span className="google-emoji-wrapper"><FiGithub /></span>
+                <span className="google-emoji-wrapper"><FaGoogle /></span>
               )}
               {googleLoading ? "Verifying..." : "Continue with Google"}
             </button>
