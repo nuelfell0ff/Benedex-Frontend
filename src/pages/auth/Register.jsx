@@ -8,7 +8,7 @@ import Logo from "../../assets/20260623_190807.png";
 
 function Register() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth(); // Extracted loginWithGoogle from your AuthContext
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -18,6 +18,7 @@ function Register() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [messageIndex, setMessageIndex] = useState(0);
 
@@ -47,6 +48,42 @@ function Register() {
     return () => window.clearInterval(timer);
   }, [messages.length]);
 
+  // Initializing Google Sign-In script cleanly
+  useEffect(() => {
+    /* global google */
+    if (window.google && !window.google.accounts.id.initialized) {
+      google.accounts.id.initialize({
+        client_id: "1091918268463-724o0piphionbjucki0dfgt06glpj63g.apps.googleusercontent.com",
+        callback: handleGoogleCredentialResponse,
+      });
+      // Flag it as initialized so it doesn't double-fire
+      window.google.accounts.id.initialized = true;
+    }
+  }, []);
+
+  const handleGoogleCredentialResponse = async (response) => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      // Sends the idToken (credential) payload securely straight down to our new backend router endpoint
+      await loginWithGoogle(response.credential);
+      navigate("/dashboard"); // Redirect directly to workspace dashboard on social login success
+    } catch (googleError) {
+      setError("Google authentication failed. Please try again.");
+      console.error("Google Auth pipeline failure:", googleError);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const triggerGoogleLogin = () => {
+    if (window.google) {
+      google.accounts.id.prompt(); // Triggers the elegant native Google One Tap / Sign In overlay prompt
+    } else {
+      setError("Google Sign-In is currently unavailable. Please refresh or use email setup.");
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((current) => ({
@@ -61,10 +98,7 @@ function Register() {
     setError("");
 
     try {
-      // Submit registration data through AuthContext
       await register(formData);
-
-      // Strictly navigate to the login screen upon successful registration
       navigate("/login");
     } catch (registerError) {
       setError("We could not create your account right now. Please check your details and try again.");
@@ -81,7 +115,6 @@ function Register() {
       <section className="login-visual-panel">
         <Link to="/" className="bx-nav-brand-group">
           <img src={Logo} alt="" className="bx-nav-logo2 d-flex" />
-          {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
         </Link>
 
         <div className="login-visual-content">
@@ -220,7 +253,7 @@ function Register() {
 
             {error ? <p className="login-error">{error}</p> : null}
 
-            <button type="submit" className="login-submit" disabled={loading}>
+            <button type="submit" className="login-submit" disabled={loading || googleLoading}>
               {loading ? (
                 <span className="login-spinner-row">
                   <span className="login-spinner" />
@@ -231,6 +264,21 @@ function Register() {
                   Create Account <FiArrowRight />
                 </>
               )}
+            </button>
+
+            {/* 🌐 NEW SECURE GOOGLE STRATEGY LOGICAL INTERFACE NODE */}
+            <button
+              type="button"
+              className="login-google-btn"
+              onClick={triggerGoogleLogin}
+              disabled={loading || googleLoading}
+            >
+              {googleLoading ? (
+                <span className="login-spinner" />
+              ) : (
+                <span className="google-emoji-wrapper">⚡</span>
+              )}
+              {googleLoading ? "Verifying..." : "Continue with Google"}
             </button>
           </form>
 

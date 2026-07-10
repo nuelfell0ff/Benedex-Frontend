@@ -49,6 +49,25 @@ export const AuthProvider = ({ children }) => {
     return finalUser; 
   };
 
+  // Google Authentication Handler Node
+  const loginWithGoogle = async (idToken) => {
+    try {
+      // Swapped out raw axios for your local API config context vector
+      const res = await API.post("/auth/google", { credential: idToken });
+      const { token, user: userProfile } = res.data;
+
+      // Persist the authentication variables cleanly matching your native layout
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userProfile || res.data));
+
+      const finalUser = userProfile || res.data;
+      setUser(finalUser);
+      return finalUser;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  };
+
   // Logout
   const logout = () => {
     localStorage.removeItem("token");
@@ -57,7 +76,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, register, login, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

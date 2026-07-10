@@ -8,7 +8,7 @@ import Logo from "../../assets/20260623_190807.png";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth(); // Extracted loginWithGoogle for social integration
 
   const [formData, setFormData] = useState({
     email: "",
@@ -16,6 +16,7 @@ function Login() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [messageIndex, setMessageIndex] = useState(0);
 
@@ -45,6 +46,58 @@ function Login() {
     return () => window.clearInterval(timer);
   }, [messages.length]);
 
+  // Initializing Google Sign-In API instance safely
+  useEffect(() => {
+    /* global google */
+    if (window.google && !window.google.accounts.id.initialized) {
+      google.accounts.id.initialize({
+        client_id: "1091918268463-724o0piphionbjucki0dfgt06glpj63g.apps.googleusercontent.com",
+        callback: handleGoogleCredentialResponse,
+      });
+      // Flag it as initialized so it doesn't double-fire
+      window.google.accounts.id.initialized = true;
+    }
+  }, []);
+
+  // Shared matrix logic to handle dashboard redirection based on roles
+  const handleRoleRouting = (userPayload) => {
+    const targetRole = userPayload?.role || userPayload?.user?.role;
+
+    if (targetRole === "student") {
+      navigate("/student");
+    } else if (targetRole === "instructor") {
+      navigate("/instructor");
+    } else if (targetRole === "admin") {
+      navigate("/admin");
+    } else {
+      console.warn("Authentication passed, but role property path could not be resolved:", userPayload);
+      navigate("/");
+    }
+  };
+
+  const handleGoogleCredentialResponse = async (response) => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      // Securely authenticating with identity token token backbones
+      const loggedInUser = await loginWithGoogle(response.credential);
+      handleRoleRouting(loggedInUser);
+    } catch (googleError) {
+      setError("Google authentication failed. Please try again.");
+      console.error("Google Auth pipeline login failure:", googleError);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const triggerGoogleLogin = () => {
+    if (window.google) {
+      google.accounts.id.prompt(); // Launches native Google authentication UI overlay
+    } else {
+      setError("Google Sign-In is currently unavailable. Please refresh or use email setup.");
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((current) => ({
@@ -59,25 +112,8 @@ function Login() {
     setError("");
 
     try {
-      // 1. Authenticate with backend and wait for profile payload data
       const loggedInUser = await login(formData);
-
-      // 2. Safely extract role parsing fallback branches
-      const targetRole = loggedInUser?.role || loggedInUser?.user?.role;
-
-      // 3. Absolute Routing Matrix Execution
-      if (targetRole === "student") {
-        navigate("/student");
-      } else if (targetRole === "instructor") {
-        navigate("/instructor");
-      } else if (targetRole === "admin") {
-        navigate("/admin");
-      } else {
-        // Safe generic recovery path to root dashboard routing evaluation if parsing drops through
-        console.warn("Authentication passed, but role property path could not be resolved:", loggedInUser);
-        navigate("/");
-      }
-
+      handleRoleRouting(loggedInUser);
     } catch (loginError) {
       setError("We could not sign you in right now. Check your details and try again.");
       console.error("Login submission failure pipeline summary:", loginError);
@@ -93,7 +129,6 @@ function Login() {
       <section className="login-visual-panel">
         <Link to="/" className="bx-nav-brand-group">
           <img src={Logo} alt="" className="bx-nav-logo2 d-flex" />
-          {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
         </Link>
 
         <div className="login-visual-content">
@@ -222,7 +257,7 @@ function Login() {
 
             {error ? <p className="login-error">{error}</p> : null}
 
-            <button type="submit" className="login-submit" disabled={loading}>
+            <button type="submit" className="login-submit" disabled={loading || googleLoading}>
               {loading ? (
                 <span className="login-spinner-row">
                   <span className="login-spinner" />
@@ -233,6 +268,21 @@ function Login() {
                   Sign In <FiArrowRight />
                 </>
               )}
+            </button>
+
+            {/* 🌐 SHARED GOOGLE AUTHENTICATION SYSTEM ACTION VECTOR */}
+            <button
+              type="button"
+              className="login-google-btn"
+              onClick={triggerGoogleLogin}
+              disabled={loading || googleLoading}
+            >
+              {googleLoading ? (
+                <span className="login-spinner" />
+              ) : (
+                <span className="google-emoji-wrapper">⚡</span>
+              )}
+              {googleLoading ? "Verifying..." : "Continue with Google"}
             </button>
           </form>
 
