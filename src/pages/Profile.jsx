@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import API from "../../services/api";
-import { 
-  FiUser, FiMail, FiShield, FiKey, FiCamera, 
-  FiCheckCircle, FiAlertCircle, FiLogOut 
+import { useAuth } from "../context/AuthContext";
+import API from "../services/api";
+import {
+  FiUser, FiMail, FiShield, FiKey, FiCamera,
+  FiCheckCircle, FiAlertCircle, FiLogOut
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import "../../App.css";
+import "./Profile.css";
 
 function Profile() {
   const { user, logout } = useAuth();
-  
+
   const [activeTab, setActiveTab] = useState("general"); // Options: general, security
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -46,9 +46,9 @@ function Profile() {
       setFeedback({ type: "success", message: "Password updated successfully!" });
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
-      setFeedback({ 
-        type: "error", 
-        message: err.response?.data?.message || "Failed to update password. Verify current credentials." 
+      setFeedback({
+        type: "error",
+        message: err.response?.data?.message || "Failed to update password. Verify current credentials."
       });
     } finally {
       setLoading(false);
@@ -60,9 +60,9 @@ function Profile() {
     setFeedback({ type: "", message: "" });
     try {
       await API.post("/auth/forgot-password", { email: user?.email });
-      setFeedback({ 
-        type: "success", 
-        message: "A password verification link has been initialized and dispatched to your email." 
+      setFeedback({
+        type: "success",
+        message: "A password verification link has been initialized and dispatched to your email."
       });
     } catch (err) {
       setFeedback({ type: "error", message: "Could not trigger verification vector." });
@@ -88,7 +88,7 @@ function Profile() {
             <FiCamera />
           </button>
         </div>
-        
+
         <div className="profile-identity-block">
           <h2>{user?.fullName || "Benedex Member"}</h2>
           <span className="profile-role-badge">{user?.role || "Student"}</span>
@@ -98,13 +98,13 @@ function Profile() {
       {/* Main Control Panel Structure */}
       <main className="profile-content-frame">
         <aside className="profile-navigation-sidebar">
-          <button 
+          <button
             className={`profile-nav-tab ${activeTab === "general" ? "active" : ""}`}
             onClick={() => setActiveTab("general")}
           >
             <FiUser /> General Info
           </button>
-          <button 
+          <button
             className={`profile-nav-tab ${activeTab === "security" ? "active" : ""}`}
             onClick={() => setActiveTab("security")}
           >
@@ -120,7 +120,7 @@ function Profile() {
           {/* Notification Feedback Loops */}
           <AnimatePresence>
             {feedback.message && (
-              <motion.div 
+              <motion.div
                 className={`profile-banner-alert ${feedback.type}`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -136,7 +136,7 @@ function Profile() {
             <div className="profile-tab-view">
               <h3>Account Details</h3>
               <p className="tab-subtitle">Manage your general public profile credentials.</p>
-              
+
               <div className="profile-details-grid">
                 <div className="detail-field-box">
                   <label><FiUser /> Full Name</label>
@@ -166,8 +166,8 @@ function Profile() {
               {user?.googleId && !user?.password ? (
                 <div className="google-user-security-block">
                   <p>You currently log in via Google Auth. If you want to setup a local password profile interface, initialize a recovery sequence below.</p>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="trigger-reset-vector-btn"
                     onClick={handleTriggerResetToken}
                     disabled={loading}
@@ -179,35 +179,35 @@ function Profile() {
                 <form onSubmit={handleUpdatePassword} className="security-credentials-form">
                   <div className="detail-field-box">
                     <label>Current Password</label>
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
                       name="currentPassword"
                       placeholder="••••••••"
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
-                      required 
+                      required
                     />
                   </div>
                   <div className="detail-field-box">
                     <label>New Password</label>
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
                       name="newPassword"
                       placeholder="Enter new secure password"
                       value={passwordData.newPassword}
                       onChange={handlePasswordChange}
-                      required 
+                      required
                     />
                   </div>
                   <div className="detail-field-box">
                     <label>Confirm New Password</label>
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
                       name="confirmPassword"
                       placeholder="Confirm new secure password"
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
-                      required 
+                      required
                     />
                   </div>
 
@@ -215,8 +215,8 @@ function Profile() {
                     <button type="submit" className="save-credentials-btn" disabled={loading}>
                       {loading ? "Processing..." : "Update System Password"}
                     </button>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="forgot-trigger-link"
                       onClick={handleTriggerResetToken}
                     >

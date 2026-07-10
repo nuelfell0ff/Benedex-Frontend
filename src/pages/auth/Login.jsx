@@ -76,19 +76,33 @@ function Login() {
   };
 
   const handleGoogleCredentialResponse = async (response) => {
-    setGoogleLoading(true);
-    setError("");
-    try {
-      // Securely authenticating with identity token token backbones
-      const loggedInUser = await loginWithGoogle(response.credential);
-      handleRoleRouting(loggedInUser);
-    } catch (googleError) {
-      setError("Google authentication failed. Please try again.");
-      console.error("Google Auth pipeline login failure:", googleError);
-    } finally {
-      setGoogleLoading(false);
+  setGoogleLoading(true);
+  setError("");
+  try {
+    // 1. Authenticate and capture the returned user profile payload
+    const loggedInUser = await loginWithGoogle(response.credential);
+
+    // 2. Extract role parsing branches dynamically
+    const targetRole = loggedInUser?.role || loggedInUser?.user?.role;
+
+    // 3. Execute Absolute Routing Matrix (Skipping static /dashboard)
+    if (targetRole === "student") {
+      navigate("/student");
+    } else if (targetRole === "instructor") {
+      navigate("/instructor");
+    } else if (targetRole === "admin") {
+      navigate("/admin");
+    } else {
+      console.warn("Google Auth passed, but role property path could not be resolved:", loggedInUser);
+      navigate("/");
     }
-  };
+  } catch (googleError) {
+    setError("Google authentication failed. Please try again.");
+    console.error("Google Auth pipeline failure:", googleError);
+  } finally {
+    setGoogleLoading(false);
+  }
+};
 
   const triggerGoogleLogin = () => {
     if (window.google) {
