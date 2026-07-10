@@ -1,333 +1,234 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import API from "../../services/api";
+import { 
+  FiUser, FiMail, FiShield, FiKey, FiCamera, 
+  FiCheckCircle, FiAlertCircle, FiLogOut 
+} from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LuUser,
-  LuLock,
-  LuBriefcase,
-  LuMail,
-  LuBookOpen,
-  LuAward,
-  LuUsers,
-  LuGraduationCap,
-  LuTrendingUp,
-  LuDollarSign
-} from "react-icons/lu";
-import "./Profile.css";
+import "../../App.css";
 
 function Profile() {
-  const [activeTab, setActiveTab] = useState("account"); // account, security, dashboard
-  const [user, setUser] = useState(null);
-
-  // Profile Input fields
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-
-  // Password Reset fields
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  // UI Status State Handlers
+  const { user, logout } = useAuth();
+  
+  const [activeTab, setActiveTab] = useState("general"); // Options: general, security
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [isError, setIsError] = useState(false);
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      const parsed = JSON.parse(savedUser);
-      setUser(parsed);
-      setFullName(parsed.fullName || "");
-      setEmail(parsed.email || "");
-    }
-  }, []);
-
-  const triggerAlert = (text, errorFlag = false) => {
-    setMessage(text);
-    setIsError(errorFlag);
-    setTimeout(() => setMessage(null), 4000);
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((current) => ({ ...current, [name]: value }));
   };
 
-  const handleUpdateAccount = async (e) => {
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        "https://benedex-backend.onrender.com/api/users/profile/update",
-        { fullName, email },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    setFeedback({ type: "", message: "" });
 
-      if (response.data.success) {
-        triggerAlert("Account metadata successfully synchronized.", false);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setUser(response.data.user);
-      }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setFeedback({ type: "error", message: "New passwords do not match." });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Points directly to your secure profile update routing engine
+      await API.put("/auth/update-password", {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      setFeedback({ type: "success", message: "Password updated successfully!" });
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
-      triggerAlert(err.response?.data?.message || "Failed to save profile structural variables.", true);
+      setFeedback({ 
+        type: "error", 
+        message: err.response?.data?.message || "Failed to update password. Verify current credentials." 
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔒 WORKING PASSWORD UPDATE HANDLER CONNECTED TO BACKEND
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-
-    if (newPassword !== confirmPassword) {
-      return triggerAlert("Structural confirmation mismatch. New passwords do not match.", true);
-    }
-
-    if (newPassword.length < 6) {
-      return triggerAlert("Security policy: New password must be at least 6 characters long.", true);
-    }
-
+  const handleTriggerResetToken = async () => {
     setLoading(true);
+    setFeedback({ type: "", message: "" });
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        "https://benedex-backend.onrender.com/api/users/profile/password",
-        { currentPassword, newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      triggerAlert(response.data?.message || "Access gateway credentials securely updated!", false);
-
-      // Flush password field vectors completely on success
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      await API.post("/auth/forgot-password", { email: user?.email });
+      setFeedback({ 
+        type: "success", 
+        message: "A password verification link has been initialized and dispatched to your email." 
+      });
     } catch (err) {
-      triggerAlert(err.response?.data?.message || "Failed to cycle gateway credentials. Verify old password.", true);
+      setFeedback({ type: "error", message: "Could not trigger verification vector." });
     } finally {
       setLoading(false);
     }
   };
-
-  if (!user) {
-    return (
-      <div className="profile-page-container">
-        <div className="profile-content-card" style={{ textAlignment: "center" }}>
-          <p>Syncing runtime platform profile nodes...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="profile-page-container">
-      {/* 1. White Background Identity Hero Header Card */}
-      <div className="profile-hero-card">
+    <div className="profile-dashboard-layout">
+      {/* Premium Header Banner Node */}
+      <header className="profile-hero-card">
+        <div className="profile-hero-overlay" />
         <div className="profile-avatar-wrapper">
-          {user.profileImage ? (
-            <img src={user.profileImage} alt="User Avatar" className="profile-avatar-img" />
+          {user?.profileImage ? (
+            <img src={user.profileImage} alt={user.fullName} className="profile-main-avatar" />
           ) : (
-            <LuUser className="profile-avatar-fallback" />
+            <div className="profile-avatar-fallback">
+              {user?.fullName?.charAt(0).toUpperCase() || "B"}
+            </div>
           )}
+          <button className="avatar-edit-badge" title="Change Avatar Image">
+            <FiCamera />
+          </button>
         </div>
-        <div className="profile-meta-info">
-          <h2>{user.fullName}</h2>
-          <span className="profile-role-badge">{user.role}</span>
+        
+        <div className="profile-identity-block">
+          <h2>{user?.fullName || "Benedex Member"}</h2>
+          <span className="profile-role-badge">{user?.role || "Student"}</span>
         </div>
-      </div>
+      </header>
 
-      {/* 2. Horizontal Navigation Tabs Line */}
-      <div className="profile-tabs-nav">
-        <button
-          className={`profile-tab-btn ${activeTab === "account" ? "active" : ""}`}
-          onClick={() => setActiveTab("account")}
-        >
-          <LuUser /> Account Detail
-          {activeTab === "account" && <motion.div layoutId="activeTabUnderline" className="active-tab-indicator" />}
-        </button>
-        <button
-          className={`profile-tab-btn ${activeTab === "security" ? "active" : ""}`}
-          onClick={() => setActiveTab("security")}
-        >
-          <LuLock /> Reset Password
-          {activeTab === "security" && <motion.div layoutId="activeTabUnderline" className="active-tab-indicator" />}
-        </button>
-        <button
-          className={`profile-tab-btn ${activeTab === "dashboard" ? "active" : ""}`}
-          onClick={() => setActiveTab("dashboard")}
-        >
-          <LuBriefcase /> Performance Scope
-          {activeTab === "dashboard" && <motion.div layoutId="activeTabUnderline" className="active-tab-indicator" />}
-        </button>
-      </div>
-
-      {/* 3. Global Notification Pop-in Feedback Drawer */}
-      <AnimatePresence mode="wait">
-        {message && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className={`profile-alert-banner ${isError ? "error" : "success"}`}
+      {/* Main Control Panel Structure */}
+      <main className="profile-content-frame">
+        <aside className="profile-navigation-sidebar">
+          <button 
+            className={`profile-nav-tab ${activeTab === "general" ? "active" : ""}`}
+            onClick={() => setActiveTab("general")}
           >
-            {message}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <FiUser /> General Info
+          </button>
+          <button 
+            className={`profile-nav-tab ${activeTab === "security" ? "active" : ""}`}
+            onClick={() => setActiveTab("security")}
+          >
+            <FiShield /> Security & Password
+          </button>
+          <hr className="profile-sidebar-divider" />
+          <button className="profile-nav-tab logout-vector-btn" onClick={logout}>
+            <FiLogOut /> Sign Out Account
+          </button>
+        </aside>
 
-      {/* 4. Main White Operational Dashboard Work Card */}
-      <div className="profile-content-card">
-        {activeTab === "account" && (
-          <form onSubmit={handleUpdateAccount}>
-            <h3 className="profile-section-title"><LuUser /> Public Profile Configuration</h3>
-            <div className="profile-form-grid">
-              <div className="form-field-group">
-                <label>Full Account Name</label>
-                <div className="input-with-icon-wrapper">
-                  <LuUser />
-                  <input
-                    type="text"
-                    className="profile-input-field"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
+        <section className="profile-display-card">
+          {/* Notification Feedback Loops */}
+          <AnimatePresence>
+            {feedback.message && (
+              <motion.div 
+                className={`profile-banner-alert ${feedback.type}`}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                {feedback.type === "success" ? <FiCheckCircle /> : <FiAlertCircle />}
+                <span>{feedback.message}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {activeTab === "general" ? (
+            <div className="profile-tab-view">
+              <h3>Account Details</h3>
+              <p className="tab-subtitle">Manage your general public profile credentials.</p>
+              
+              <div className="profile-details-grid">
+                <div className="detail-field-box">
+                  <label><FiUser /> Full Name</label>
+                  <input type="text" value={user?.fullName || ""} readOnly disabled />
+                </div>
+                <div className="detail-field-box">
+                  <label><FiMail /> Email Address</label>
+                  <input type="email" value={user?.email || ""} readOnly disabled />
                 </div>
               </div>
-              <div className="form-field-group">
-                <label>Ecosystem Verified Email</label>
-                <div className="input-with-icon-wrapper">
-                  <LuMail />
-                  <input
-                    type="email"
-                    className="profile-input-field"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+
+              {user?.googleId && (
+                <div className="social-sync-notice">
+                  <span className="sync-icon">⚡</span>
+                  <div>
+                    <strong>Connected to Google Account Services</strong>
+                    <p>Your authentication credentials are secured and managed via Google single sign-on.</p>
+                  </div>
                 </div>
-              </div>
-              <button type="submit" className="profile-submit-btn" disabled={loading}>
-                {loading ? "Processing Sync..." : "Commit Profile Changes"}
-              </button>
+              )}
             </div>
-          </form>
-        )}
+          ) : (
+            <div className="profile-tab-view">
+              <h3>Security Gateway</h3>
+              <p className="tab-subtitle">Keep your workspace account authentication variables updated.</p>
 
-        {activeTab === "security" && (
-          <form onSubmit={handleChangePassword}>
-            <h3 className="profile-section-title"><LuLock /> Access Credential Modification</h3>
-            <div className="profile-form-grid">
-              <div className="form-field-group">
-                <label>Current Security Password</label>
-                <div className="input-with-icon-wrapper">
-                  <LuLock />
-                  <input
-                    type="password"
-                    className="profile-input-field"
-                    placeholder="••••••••"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    required
-                  />
+              {user?.googleId && !user?.password ? (
+                <div className="google-user-security-block">
+                  <p>You currently log in via Google Auth. If you want to setup a local password profile interface, initialize a recovery sequence below.</p>
+                  <button 
+                    type="button" 
+                    className="trigger-reset-vector-btn"
+                    onClick={handleTriggerResetToken}
+                    disabled={loading}
+                  >
+                    <FiKey /> Set Up Local Account Password
+                  </button>
                 </div>
-              </div>
-              <div style={{ gridColumn: "1 / -1", height: "1px", background: "rgba(7, 51, 92, 0.06)", margin: "8px 0" }} />
-              <div className="form-field-group">
-                <label>Target New Password</label>
-                <div className="input-with-icon-wrapper">
-                  <LuLock />
-                  <input
-                    type="password"
-                    className="profile-input-field"
-                    placeholder="••••••••"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-field-group">
-                <label>Confirm Target Password</label>
-                <div className="input-with-icon-wrapper">
-                  <LuLock />
-                  <input
-                    type="password"
-                    className="profile-input-field"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <button type="submit" className="profile-submit-btn" disabled={loading}>
-                {loading ? "Recycling Access Nodes..." : "Confirm Password Update"}
-              </button>
+              ) : (
+                <form onSubmit={handleUpdatePassword} className="security-credentials-form">
+                  <div className="detail-field-box">
+                    <label>Current Password</label>
+                    <input 
+                      type="password" 
+                      name="currentPassword"
+                      placeholder="••••••••"
+                      value={passwordData.currentPassword}
+                      onChange={handlePasswordChange}
+                      required 
+                    />
+                  </div>
+                  <div className="detail-field-box">
+                    <label>New Password</label>
+                    <input 
+                      type="password" 
+                      name="newPassword"
+                      placeholder="Enter new secure password"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                      required 
+                    />
+                  </div>
+                  <div className="detail-field-box">
+                    <label>Confirm New Password</label>
+                    <input 
+                      type="password" 
+                      name="confirmPassword"
+                      placeholder="Confirm new secure password"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      required 
+                    />
+                  </div>
+
+                  <div className="security-actions-row">
+                    <button type="submit" className="save-credentials-btn" disabled={loading}>
+                      {loading ? "Processing..." : "Update System Password"}
+                    </button>
+                    <button 
+                      type="button" 
+                      className="forgot-trigger-link"
+                      onClick={handleTriggerResetToken}
+                    >
+                      Forgot current password?
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-          </form>
-        )}
-
-        {activeTab === "dashboard" && (
-          <div>
-            <h3 className="profile-section-title"><LuBriefcase /> Role Performance Metrics</h3>
-
-            {user.role === "student" && (
-              <div className="role-metrics-dashboard-grid">
-                <div className="metric-micro-card">
-                  <div className="metric-icon-box"><LuBookOpen /></div>
-                  <div className="metric-data-node">
-                    <h4>Active</h4>
-                    <p>Enrolled Courses</p>
-                  </div>
-                </div>
-                <div className="metric-micro-card">
-                  <div className="metric-icon-box"><LuAward /></div>
-                  <div className="metric-data-node">
-                    <h4>{user.xp || 0} XP</h4>
-                    <p>Accumulated Level</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {user.role === "instructor" && (
-              <div className="role-metrics-dashboard-grid">
-                <div className="metric-micro-card">
-                  <div className="metric-icon-box"><LuGraduationCap /></div>
-                  <div className="metric-data-node">
-                    <h4>Curriculum</h4>
-                    <p>Published Courses</p>
-                  </div>
-                </div>
-                <div className="metric-micro-card">
-                  <div className="metric-icon-box"><LuUsers /></div>
-                  <div className="metric-data-node">
-                    <h4>Rostered</h4>
-                    <p>Total Class Base</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {user.role === "admin" && (
-              <div className="role-metrics-dashboard-grid">
-                <div className="metric-micro-card">
-                  <div className="metric-icon-box"><LuTrendingUp /></div>
-                  <div className="metric-data-node">
-                    <h4>Core Scope</h4>
-                    <p>Ecosystem Controls Active</p>
-                  </div>
-                </div>
-                <div className="metric-micro-card">
-                  <div className="metric-icon-box"><LuDollarSign /></div>
-                  <div className="metric-data-node">
-                    <h4>Global Override</h4>
-                    <p>System Variables Unlocked</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </section>
+      </main>
     </div>
   );
 }
