@@ -2408,8 +2408,9 @@ input {
   }
 
   .bx-nav-logo {
-    width: 30px;
+    width: 35px;
     display: flex;
+    margin-left: 10px !important;
     align-items: center !important;
     justify-content: center !important;
     /* margin: 0 !important; */

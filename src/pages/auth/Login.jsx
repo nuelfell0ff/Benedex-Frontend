@@ -265,7 +265,7 @@ function Login() {
                 <input type="checkbox" />
                 <span>Remember me for 30 days</span>
               </label>
-              <Link to="/forgot-password" type="button" className="login-link-button">
+              <Link to="/forgot-password" type="button" className="login-link-button" style={{textDecoration: "none"}}>
                 Forgot password?
               </Link>
             </div>
