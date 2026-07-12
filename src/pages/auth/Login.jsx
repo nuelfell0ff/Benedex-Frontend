@@ -265,9 +265,9 @@ function Login() {
                 <input type="checkbox" />
                 <span>Remember me for 30 days</span>
               </label>
-              <button type="button" className="login-link-button">
+              <Link to="/forgot-password" type="button" className="login-link-button">
                 Forgot password?
-              </button>
+              </Link>
             </div>
 
             {error ? <p className="login-error">{error}</p> : null}

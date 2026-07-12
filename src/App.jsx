@@ -15,6 +15,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import LandingPage from "./pages/landingPage/Landing";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import ForgotPassword from "./pages/auth/ForgotPassword"
 import Profile from "./pages/Profile";
 import Maintenance from "./pages/Maintainance";
 
@@ -99,6 +100,11 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        <Route 
+          path="/forgot-password"
+          element={<ForgotPassword />}
         />
 
         <Route 

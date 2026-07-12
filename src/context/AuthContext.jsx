@@ -38,7 +38,6 @@ export const AuthProvider = ({ children }) => {
   // Login
   const login = async (data) => {
     const res = await API.post("/auth/login", data);
-    // Destructure user nested object if it exists, otherwise fall back to raw response data
     const { token, user: userProfile } = res.data;
 
     localStorage.setItem("token", token);
@@ -46,23 +45,41 @@ export const AuthProvider = ({ children }) => {
 
     const finalUser = userProfile || res.data;
     setUser(finalUser);
-    return finalUser; 
+    return finalUser;
   };
 
   // Google Authentication Handler Node
   const loginWithGoogle = async (idToken) => {
     try {
-      // Swapped out raw axios for your local API config context vector
       const res = await API.post("/auth/google", { credential: idToken });
       const { token, user: userProfile } = res.data;
 
-      // Persist the authentication variables cleanly matching your native layout
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userProfile || res.data));
 
       const finalUser = userProfile || res.data;
       setUser(finalUser);
       return finalUser;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  };
+
+  // Trigger Forgot Password Recovery Email
+  const forgotPassword = async (email) => {
+    try {
+      const res = await API.post("/auth/forgot-password", { email });
+      return res.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  };
+
+  // Reset Password using token from URL
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const res = await API.post(`/auth/reset-password/${token}`, { password: newPassword });
+      return res.data;
     } catch (error) {
       throw error.response?.data || error;
     }
@@ -76,7 +93,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout, loginWithGoogle }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        register,
+        login,
+        logout,
+        loginWithGoogle,
+        forgotPassword,
+        resetPassword
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -195,8 +195,7 @@ function Topbar() {
           ) : null}
         </Link>
 
-        <Link to="/profile" className="student-user-chip navbar-profile-icon-btn">
-          <LuUser style={{ color: "#07335c", fontSize: "20px" }} />
+        <Link to="/profile" className="student-user-chip navbar-profile-icon-btn" style={{ textDecoration: "none" }}>
           <span className="student-user-avatar">{initials}</span>
           <div className="student-user-copy">
             <strong>{user?.fullName || "User Account"}</strong>

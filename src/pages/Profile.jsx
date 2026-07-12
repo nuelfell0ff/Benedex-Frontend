@@ -55,24 +55,37 @@ function Profile() {
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setFeedback({ type: "error", message: "New passwords do not match." });
+      setTimeout(() => {
+        setFeedback({ type: "", message: "" });
+      }, 3000);
       setLoading(false);
       return;
     }
 
     try {
       // Points directly to your secure profile update routing engine
-      await API.put("/auth/forget-password", {
+      await API.put("/auth/update-password", {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
 
       setFeedback({ type: "success", message: "Password updated successfully!" });
+      setTimeout(() => {
+        setFeedback({ type: "", message: "" });
+      });
+      setTimeout(() => {
+        setFeedback({ type: "", message: "" });
+      }, 3000);
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
       setFeedback({
         type: "error",
         message: err.response?.data?.message || "Failed to update password. Verify current credentials."
       });
+
+      setTimeout(() => {
+        setFeedback({ type: "", message: "" });
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -87,8 +100,16 @@ function Profile() {
         type: "success",
         message: "A password verification link has been initialized and dispatched to your email."
       });
+
+      // 2. Hide it automatically after exactly 3 seconds
+      setTimeout(() => {
+        setFeedback({ type: "", message: "" });
+      }, 3000);
     } catch (err) {
       setFeedback({ type: "error", message: "Could not trigger verification vector." });
+      setTimeout(() => {
+        setFeedback({ type: "", message: "" });
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -125,7 +146,7 @@ function Profile() {
           <button className="profile-nav-tab" onClick={handleBackToDashboard}>
             <FiGrid /> Go to Dashboard
           </button>
-          
+
           <hr className="profile-sidebar-divider" />
 
           <button
@@ -140,9 +161,9 @@ function Profile() {
           >
             <FiShield /> Security & Password
           </button>
-          
+
           <hr className="profile-sidebar-divider" />
-          
+
           <button className="profile-nav-tab logout-vector-btn" onClick={handleSignOut}>
             <FiLogOut /> Sign Out Account
           </button>
