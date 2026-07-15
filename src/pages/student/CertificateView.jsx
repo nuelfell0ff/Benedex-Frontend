@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiLoader, FiDownload, FiImage } from "react-icons/fi";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import { QRCodeSVG } from "qrcode.react"; // Added QR Code Generator dependency
+import { QRCodeSVG } from "qrcode.react";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./CertificateView.css";
@@ -25,14 +25,13 @@ const CertificateView = () => {
       try {
         const res = await API.get(`/certificates/course/${courseId}`);
         
-        // Handle delayed payment verification grace states
         if (res.data?.isPaid || res.data?.hasCertificate) {
           setCert(res.data);
           setLoading(false);
         } else {
           if (retries < maxRetries) {
             retries++;
-            setTimeout(fetchCertificate, 1500); // Retry after 1.5s
+            setTimeout(fetchCertificate, 1500); // Wait and retry to handle fast redirects
           } else {
             alert("Access Denied: Certificate payment not verified yet.");
             navigate(`/student/courses/${courseId}`);
@@ -42,7 +41,7 @@ const CertificateView = () => {
         console.error("Frontend Certificate Load Exception:", err);
         if (retries < maxRetries) {
           retries++;
-          setTimeout(fetchCertificate, 1500); // Retry on temporary request fails
+          setTimeout(fetchCertificate, 1500);
         } else {
           alert("Failed to load official credential records.");
           navigate(`/student/courses/${courseId}`);
@@ -124,9 +123,11 @@ const CertificateView = () => {
     );
   }
 
+  // FIXED: Strictly formats the backend payment confirmation timestamp.
+  // If the record exists but has no date timestamp, it falls back to a static "PENDING" or "VERIFIED" rather than sliding to "Today".
   const issueDate = cert?.issuedAt
     ? new Date(cert.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' })
-    : new Date().toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
+    : "VERIFIED";
 
   // Shareable unique validation link encoded directly inside the QR code matrix
   const validationUrl = `https://benedex.org/verify/${cert?.certificateId || "BX-PENDING"}`;
@@ -178,7 +179,7 @@ const CertificateView = () => {
               <span className="brand-logo-dark">digital</span>
             </div>
 
-            {/* ISSUE TIMESTAMPS */}
+            {/* ISSUE TIMESTAMPS (Locked permanently to database payment completion date) */}
             <div className="cert-date-stamp">
               {issueDate}
             </div>
