@@ -1,0 +1,270 @@
+/* Container & Base Styles */
+.verify-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Header logo formatting */
+.verify-header {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.verify-brand {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-decoration: none;
+}
+
+.brand-blue {
+  color: #0d5aa0;
+}
+
+.brand-dark {
+  color: #1e293b;
+  font-weight: 400;
+  margin-left: 1px;
+}
+
+/* Main Card Wrapper */
+.verify-card-wrapper {
+  width: 100%;
+  max-width: 540px;
+  margin: auto 0;
+}
+
+.verify-status-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Color highlights for Pass/Fail */
+.valid-card {
+  border-top: 6px solid #10b981;
+}
+
+.invalid-card {
+  border-top: 6px solid #ef4444;
+}
+
+/* Status badging */
+.verify-icon-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.success-badge {
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+.error-badge {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.verification-pill {
+  background: #eff6ff;
+  color: #0d5aa0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.verify-title {
+  font-size: 1.5rem;
+  color: #1e293b;
+  font-weight: 800;
+  margin: 0 0 0.75rem 0;
+}
+
+.verify-intro-text {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 2rem 0;
+}
+
+/* Dynamic Details Grid */
+.verify-details-grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.verify-detail-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  box-sizing: border-box;
+}
+
+.verify-detail-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.verify-detail-value {
+  font-size: 1rem;
+  color: #1e293b;
+  font-weight: 500;
+  text-align: left;
+}
+
+.recipient-highlight {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.course-highlight {
+  font-weight: 700;
+  color: #0d5aa0;
+}
+
+.cert-id-code {
+  font-family: monospace;
+  font-weight: bold;
+  color: #334155;
+  background-color: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Dividers & Footer Notes */
+.verify-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.verify-footer-notes p {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.verify-error-msg {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+
+.verify-instruction {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.verify-home-btn {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.verify-home-btn:hover {
+  background-color: #0d5aa0;
+}
+
+/* Page Footer styling */
+.verify-footer {
+  width: 100%;
+  text-align: center;
+  padding: 1.5rem 0 0 0;
+}
+
+.verify-footer p {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Load State Spinner animations */
+.verify-page-loader {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  color: #0d5aa0;
+}
+
+.verify-page-loader p {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.verify-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0d5aa0;
+  border-radius: 50%;
+  animation: vSpin 1s linear infinite;
+}
+
+@keyframes vSpin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Layout responsiveness tweaks */
+@media (max-width: 480px) {
+  .verify-status-card {
+    padding: 2rem 1.25rem;
+  }
+  .verify-title {
+    font-size: 1.35rem;
+  }
+}

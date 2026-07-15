@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiLoader, FiDownload, FiImage } from "react-icons/fi";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { QRCodeSVG } from "qrcode.react"; // Added QR Code Generator dependency
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./CertificateView.css";
@@ -17,23 +18,38 @@ const CertificateView = () => {
   const certificateRef = useRef(null);
 
   useEffect(() => {
+    let retries = 0;
+    const maxRetries = 3;
+
     const fetchCertificate = async () => {
       try {
         const res = await API.get(`/certificates/course/${courseId}`);
+        
+        // Handle delayed payment verification grace states
         if (res.data?.isPaid || res.data?.hasCertificate) {
           setCert(res.data);
+          setLoading(false);
         } else {
-          alert("Access Denied: Certificate payment not verified yet.");
-          navigate(`/student/courses/${courseId}`);
+          if (retries < maxRetries) {
+            retries++;
+            setTimeout(fetchCertificate, 1500); // Retry after 1.5s
+          } else {
+            alert("Access Denied: Certificate payment not verified yet.");
+            navigate(`/student/courses/${courseId}`);
+          }
         }
       } catch (err) {
         console.error("Frontend Certificate Load Exception:", err);
-        alert("Failed to load official credential records.");
-        navigate(`/student/courses/${courseId}`);
-      } finally {
-        setLoading(false);
+        if (retries < maxRetries) {
+          retries++;
+          setTimeout(fetchCertificate, 1500); // Retry on temporary request fails
+        } else {
+          alert("Failed to load official credential records.");
+          navigate(`/student/courses/${courseId}`);
+        }
       }
     };
+    
     fetchCertificate();
   }, [courseId, navigate]);
 
@@ -112,6 +128,9 @@ const CertificateView = () => {
     ? new Date(cert.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' })
     : new Date().toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
 
+  // Shareable unique validation link encoded directly inside the QR code matrix
+  const validationUrl = `https://benedex.org/verify/${cert?.certificateId || "BX-PENDING"}`;
+
   return (
     <div className="cert-page-wrapper">
 
@@ -183,7 +202,6 @@ const CertificateView = () => {
             {/* SIGNATURE SECTION */}
             <div className="cert-signature-section">
               <div className="signature-wrapper">
-                {/* Decorative Signature Script Line */}
                 <div className="signature-graphic-mock">John Doe</div>
                 <div className="signature-line"></div>
                 <p className="signatory-name">John Doe</p>
@@ -210,9 +228,19 @@ const CertificateView = () => {
               </div>
             </div>
 
-            {/* LOWER VALIDATION AND CREDENTIAL IDENTIFIERS */}
+            {/* LOWER VALIDATION AND CREDENTIAL IDENTIFIERS with integrated QR CODE */}
             <div className="cert-validation-footer">
-              <p>{cert?.certificateId || "BX-PENDING-TOKEN"}</p>
+              <div className="cert-qrcode-wrapper">
+                <QRCodeSVG
+                  value={validationUrl}
+                  size={76}
+                  level="M"
+                  bgColor="#ffffff"
+                  fgColor="#0d5aa0"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="cert-verification-id">{cert?.certificateId || "BX-PENDING-TOKEN"}</p>
               <p>Benedex has confirmed the identity of this individual and their participation in the course.</p>
             </div>
           </div>

@@ -10,7 +10,7 @@
 }
 
 /* Loading Panel Indicators */
-.cert-loading-screen {
+.scd-loader-container {
   min-height: 100vh;
   background: #ffffff;
   display: flex;
@@ -21,14 +21,19 @@
   color: #0d5aa0;
 }
 
-.cert-loading-screen p {
+.scd-loader-container p {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-weight: 600;
   font-size: 0.85rem;
   letter-spacing: 1.5px;
 }
 
-.cert-spinner {
+.scd-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0d5aa0;
+  border-radius: 50%;
   animation: certSpin 1s linear infinite;
 }
 
@@ -101,8 +106,6 @@
 
 /* ============================================================
    RESPONSIVE SCALING & HORIZONTAL SCROLL ENGINE
-   Scales down dynamically and handles small viewports with a 
-   clean scrollbar wrapper so no parts are sliced or cropped.
    ============================================================
 */
 .cert-scale-container {
@@ -110,13 +113,13 @@
   max-width: 1000px;
   margin: 0 auto;
   display: flex;
-  justify-content: flex-start; /* Aligns canvas leftwards to allow proper scroll flow */
+  justify-content: flex-start;
   align-items: flex-start;
   min-height: 720px; 
-  overflow-x: auto; /* Generates horizontal scroll tracker when screen size drops */
+  overflow-x: auto;
   overflow-y: hidden;
-  padding-bottom: 15px; /* Creates clearance space for the mobile scroll track */
-  -webkit-overflow-scrolling: touch; /* Smooth kinetic scroll friction on iOS devices */
+  padding-bottom: 15px;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom Scrollbar styling track for Webkit Browsers */
@@ -138,7 +141,7 @@
 @media (max-width: 1040px) {
   .certificate-print-canvas {
     transform: scale(calc(100vw / 1100));
-    transform-origin: top left; /* Changed to left to coordinate with scrolling boundaries */
+    transform-origin: top left;
     margin-bottom: calc(-700px + (700px * (100vw / 1100)));
     flex-shrink: 0; 
   }
@@ -149,10 +152,9 @@
 
 @media (max-width: 768px) {
   .certificate-print-canvas {
-    /* Stabilizes scaling bounds to prevent text from crushing on tablet splits */
     transform: scale(0.72); 
     transform-origin: top left;
-    margin-bottom: -196px; /* Corrects layout margin gap: -700 + (700 * 0.72) */
+    margin-bottom: -196px;
     flex-shrink: 0;
   }
   .cert-scale-container {
@@ -162,10 +164,9 @@
 
 @media (max-width: 480px) {
   .certificate-print-canvas {
-    /* Locks scale threshold on mobile phones to preserve the exact card details */
     transform: scale(0.55); 
     transform-origin: top left;
-    margin-bottom: -315px; /* Corrects layout margin gap: -700 + (700 * 0.55) */
+    margin-bottom: -315px;
     flex-shrink: 0;
   }
   .cert-scale-container {
@@ -474,14 +475,27 @@
   max-width: 280px;
   text-align: right;
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.cert-validation-footer p:first-of-type {
+/* Elegant layout for modern QR display inside the certificate canvas */
+.cert-qrcode-wrapper {
+  background: #ffffff;
+  padding: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.cert-verification-id {
   font-size: 0.72rem;
-  color: #444444;
-  font-weight: 600;
+  color: #111111;
+  font-weight: 700;
   margin: 0 0 6px 0;
-  word-break: break-all;
+  font-family: monospace;
 }
 
 .cert-validation-footer p:last-of-type {

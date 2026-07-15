@@ -18,6 +18,7 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword"
 import Profile from "./pages/Profile";
 import Maintenance from "./pages/Maintainance";
+import CertificateVerification from "./pages/public/CertificateVerification";
 
 import StudentLayout from "./layouts/StudentLayout";
 import InstructorLayout from "./layouts/InstructorLayout";
@@ -116,6 +117,11 @@ function App() {
         <Route
           path="/maintenance"
           element={<Maintenance />}
+        />
+
+        <Route 
+          path="/verify/:certificateId" 
+          element={<CertificateVerification />} 
         />
 
         <Route
