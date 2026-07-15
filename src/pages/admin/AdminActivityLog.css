@@ -229,3 +229,111 @@
 .error-retry-btn:hover {
   background-color: #a81d1a !important;
 }
+
+/* ============================================================
+   DATE FILTER EXTENSION STYLES
+   ============================================================ */
+.logs-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date-filter-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(7, 51, 92, 0.03);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(7, 51, 92, 0.08);
+}
+
+.date-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-input-wrapper label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #07335c;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.date-picker-input {
+  background: #ffffff;
+  border: 1px solid rgba(7, 51, 92, 0.15);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #333333;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-picker-input:focus {
+  border-color: #07335c;
+  box-shadow: 0 0 0 2px rgba(7, 51, 92, 0.1);
+}
+
+.clear-filter-btn {
+  background: transparent;
+  border: none;
+  color: #c5221f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+  background: rgba(197, 34, 31, 0.1);
+}
+
+@media (max-width: 900px) {
+  .logs-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-actions-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-actions-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .date-filter-panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .date-input-wrapper {
+    justify-content: space-between;
+  }
+}

@@ -8,14 +8,20 @@ import {
   LuUser, 
   LuLayers, 
   LuActivity, 
-  LuFileText 
+  LuFileText,
+  LuFilterX
 } from "react-icons/lu";
 import "./AdminActivityLog.css";
 
 function AdminActivityLog() {
   const [logs, setLogs] = useState([]);
+  const [filteredLogs, setFilteredLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Filter States
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -32,6 +38,7 @@ function AdminActivityLog() {
       );
       if (response.data.success) {
         setLogs(response.data.logs);
+        setFilteredLogs(response.data.logs);
       }
     } catch (err) {
       console.error("System operations audit pipeline sync crash:", err);
@@ -44,6 +51,32 @@ function AdminActivityLog() {
   useEffect(() => {
     fetchLogs();
   }, []);
+
+  // Filter logic runs whenever startDate, endDate, or the master logs array changes
+  useEffect(() => {
+    let result = [...logs];
+
+    if (startDate) {
+      // Set start of day for comparison (00:00:00)
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      result = result.filter((log) => new Date(log.createdAt) >= start);
+    }
+
+    if (endDate) {
+      // Set end of day for comparison (23:59:59)
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      result = result.filter((log) => new Date(log.createdAt) <= end);
+    }
+
+    setFilteredLogs(result);
+  }, [startDate, endDate, logs]);
+
+  const clearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+  };
 
   const formatTimestamp = (dateString) => {
     return new Date(dateString).toLocaleString("en-GB", {
@@ -71,16 +104,52 @@ function AdminActivityLog() {
             Unalterable chronological snapshot ledger of administrative ecosystem interactions.
           </p>
         </div>
-        <motion.button 
-          className="refresh-logs-btn" 
-          onClick={fetchLogs} 
-          disabled={loading}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <LuRefreshCw className={`refresh-icon ${loading ? "spinning" : ""}`} />
-          {loading ? "Syncing Grid..." : "Refresh Log Stream"}
-        </motion.button>
+        
+        {/* Date Filter Controls & Refresh Block */}
+        <div className="header-actions-group">
+          <div className="date-filter-panel">
+            <div className="date-input-wrapper">
+              <label htmlFor="startDate">From:</label>
+              <input 
+                type="date" 
+                id="startDate"
+                value={startDate} 
+                onChange={(e) => setStartDate(e.target.value)} 
+                className="date-picker-input"
+              />
+            </div>
+            <div className="date-input-wrapper">
+              <label htmlFor="endDate">To:</label>
+              <input 
+                type="date" 
+                id="endDate"
+                value={endDate} 
+                onChange={(e) => setEndDate(e.target.value)} 
+                className="date-picker-input"
+              />
+            </div>
+            {(startDate || endDate) && (
+              <button 
+                onClick={clearFilters} 
+                className="clear-filter-btn" 
+                title="Clear Filters"
+              >
+                <LuFilterX />
+              </button>
+            )}
+          </div>
+
+          <motion.button 
+            className="refresh-logs-btn" 
+            onClick={fetchLogs} 
+            disabled={loading}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <LuRefreshCw className={`refresh-icon ${loading ? "spinning" : ""}`} />
+            {loading ? "Syncing Grid..." : "Refresh Log Stream"}
+          </motion.button>
+        </div>
       </div>
 
       <div className="logs-table-card">
@@ -101,9 +170,19 @@ function AdminActivityLog() {
               Retry Stream
             </motion.button>
           </div>
-        ) : logs.length === 0 ? (
+        ) : filteredLogs.length === 0 ? (
           <div className="logs-empty-container">
-            <p>No logged system manipulations or views registered across environment nodes yet.</p>
+            <p>
+              {logs.length > 0 
+                ? "No administrative actions found matching the selected date range."
+                : "No logged system manipulations or views registered across environment nodes yet."
+              }
+            </p>
+            {(startDate || endDate) && (
+              <button onClick={clearFilters} className="refresh-logs-btn" style={{ margin: "15px auto 0" }}>
+                Reset Date Filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="logs-table-wrapper">
@@ -118,7 +197,7 @@ function AdminActivityLog() {
                 </tr>
               </thead>
               <tbody>
-                {logs.map((log) => (
+                {filteredLogs.map((log) => (
                   <tr key={log._id}>
                     <td className="log-timestamp">
                       {formatTimestamp(log.createdAt)}

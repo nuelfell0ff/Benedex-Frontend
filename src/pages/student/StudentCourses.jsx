@@ -11,11 +11,9 @@ import {
   FiPlayCircle,
   FiStar,
   FiUsers,
-  FiCheckCircle,
 } from "react-icons/fi";
 
 import API from "../../services/api";
-// Importing styles as a scoped module
 import styles from "./StudentCourses.module.css";
 
 function StudentCourses() {
@@ -51,7 +49,6 @@ function StudentCourses() {
     fetchCourses();
   }, []);
 
-  // Filter courses into Enrolled vs Marketplace Lists
   const enrolledCourses = useMemo(() => {
     return courses.filter((course) => enrolledCourseIds.has(course._id));
   }, [courses, enrolledCourseIds]);
@@ -227,12 +224,16 @@ function StudentCourses() {
 
           <div className={styles.coursesGrid}>
             {enrolledCourses.map((course, index) => {
+              const level = getLevel(course, index);
               const instructorName = course.instructor?.fullName || "Benedex Mentor";
+              const tools = course.tools || [];
+              const studentCount = course.students?.length || 0;
+
               return (
                 <motion.article
                   key={`enrolled-${course._id}`}
-                  className={`${styles.courseCard} ${styles.enrolledCard}`}
-                  whileHover={{ y: -4 }}
+                  className={styles.courseCard}
+                  whileHover={{ y: -6 }}
                 >
                   <div className={styles.cardPreview}>
                     {course.image ? (
@@ -241,26 +242,44 @@ function StudentCourses() {
                       <div className={styles.cardFallback}><FiPlayCircle /></div>
                     )}
                     <div className={styles.cardBadges}>
-                      <span className={styles.enrolledBadge}><FiCheckCircle /> Active</span>
+                      <span>{tools[0] || "Premium Track"}</span>
+                      <span className={styles.hotBadge}>Active</span>
                     </div>
                   </div>
 
                   <div className={styles.cardBody}>
-                    <div className={styles.enrolledTopMeta}>
-                      <span><FiClock /> {course.duration || "3 Months"}</span>
+                    <div className={styles.cardTopMeta}>
+                      <span><FiLayers /> {level}</span>
+                      <span><FiStar /> Enrolled</span>
                     </div>
+
                     <h3>{course.title}</h3>
                     <p>{course.description}</p>
 
+                    {/* <div className={styles.tagsContainer}>
+                      {(tools.length > 0 ? tools : ["Strategy"]).slice(0, 3).map((tool) => (
+                        <span key={tool}>{tool}</span>
+                      ))}
+                    </div> */}
+
+                    {/* <div className={styles.statsContainer}>
+                      <span><FiUsers /> {formatStudents(studentCount)}</span>
+                      <span><FiClock /> {course.duration || "3 Months"}</span>
+                    </div> */}
+
                     <div className={styles.cardFooter}>
+                      <div className={styles.priceContainer}>
+                        <span>Status</span>
+                        <strong>Active</strong>
+                      </div>
                       <div className={styles.instructorMini}>
                         <span>{instructorName.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}</span>
                         <strong>{instructorName}</strong>
                       </div>
                     </div>
 
-                    <div className={styles.cardActions}>
-                      <Link className={styles.primaryActionButton} to={`/student/courses/${course._id}`}>
+                    <div className={`${styles.cardActions} ${styles.singleAction}`}>
+                      <Link className={styles.enrollButton} to={`/student/courses/${course._id}`}>
                         Enter Classroom <FiArrowRight />
                       </Link>
                     </div>
