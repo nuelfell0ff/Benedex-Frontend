@@ -1,14 +1,16 @@
 import axios from "axios";
 
+// Dynamically set Gateway target while keeping the /api path base intact
 const API = axios.create({
-  baseURL:  "https://benedex.onrender.com/api",
-  // baseURL:  "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, "")}/api`
+    : "https://benedex.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request Interceptor (Injects your JWT Token)
+// Request Interceptor (Injects JWT Token cleanly)
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -20,23 +22,22 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
-// CRITICAL: GLOBAL INTERCEPTOR FOR MAINTENANCE MODE (503)
+// Response Interceptor (Strictly handles planned maintenance without breaking on cold boots)
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If the server returns a 503 (Service Unavailable)
-    if (error.response && error.response.status === 503) {
-      
-      // Double check localStorage to make sure we don't accidentally boot out the Admin
+    const status = error.response?.status;
+    const isExplicitMaintenance = error.response?.data?.maintenance === true;
+
+    // Only redirect to maintenance if the API explicitly flags a maintenance state
+    if (status === 503 && isExplicitMaintenance) {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      
-      if (user.role !== "admin") {
-        // Force-redirect non-admins to your maintenance screen route layout
+
+      if (user?.role !== "admin") {
         window.location.href = "/maintenance";
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
