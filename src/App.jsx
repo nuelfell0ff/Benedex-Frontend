@@ -58,6 +58,7 @@ import AdminAiTickets from "./pages/admin/AdminAiTickets";
 import AdminNotifications from "./pages/admin/AdminNotificationForm";
 import AdminActivityLog from "./pages/admin/AdminActivityLog";
 import AdminSyllabusGenerator from "./pages/admin/AdminSyllabusGenerator";
+import AdminCourseReview from "./pages/admin/AdminCourseReview";
 
 
 function HomeRedirect() {
@@ -361,6 +362,10 @@ function App() {
           <Route 
             path="syllabus-generator"
             element={<AdminSyllabusGenerator />}
+          />
+          <Route
+            path="/admin/courses/:courseId/review"
+            element={<AdminCourseReview />}
           />
         </Route>
 

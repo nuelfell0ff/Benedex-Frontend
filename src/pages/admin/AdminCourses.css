@@ -249,3 +249,74 @@
 }
 
 @keyframes crSpin { to { transform: rotate(360deg); } }
+
+/* COURSE STATUS */
+
+.bx-cr-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bx-cr-status-draft {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.bx-cr-status-published {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* DRAFT CARD */
+
+.bx-cr-card-draft {
+  border-color: #fed7aa;
+}
+
+.bx-cr-card-draft:hover {
+  border-color: #f59e0b;
+}
+
+/* REVIEW BUTTON */
+
+.bx-cr-review-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bx-cr-review-primary {
+  background: #07335c;
+  color: white;
+}
+
+.bx-cr-review-primary:hover {
+  background: #0b477c;
+  transform: translateY(-1px);
+}
+
+.bx-cr-review-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.bx-cr-review-secondary:hover {
+  background: #e2e8f0;
+  color: #07335c;
+}
