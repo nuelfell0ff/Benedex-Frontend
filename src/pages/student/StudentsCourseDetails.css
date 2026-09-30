@@ -11,9 +11,11 @@
   --accent-red: #ef4444;
   --accent-green: #22c55e;
   --font-stack: "Inter", system-ui, -apple-system, sans-serif;
-
-  /* Windows Terminal Monospace Font Stack requested for Reader */
   --font-monospace: "Cascadia Code", "Fira Code", "Consolas", "Courier New", monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -57,10 +59,12 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ==========================================================================
-   1. TOPBAR PLATFORM BRANDING OVERLAY
+   1. TOPBAR PLATFORM BRANDING OVERLAY (STICKY AS REQUESTED)
    ========================================================================== */
 .student-topbar {
   display: flex;
@@ -73,11 +77,11 @@ body {
   top: 0;
   z-index: 100;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  width: 100%;
 }
 
 .student-topbar-brand-container {
   display: flex;
-  /* background-color: #ffffff !important; */
   align-items: center;
   margin-right: 24px;
 }
@@ -245,10 +249,10 @@ body {
 }
 
 /* ==========================================================================
-   LAYOUT STRUCTURES
+   LAYOUT STRUCTURES (100% DEVICE WIDTH FLUID SUPPORT)
    ========================================================================== */
 .benedex-container {
-  max-width: 1320px;
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
   padding: 32px 24px;
@@ -260,12 +264,15 @@ body {
   grid-template-columns: 1fr 380px;
   gap: 32px;
   align-items: start;
+  width: 100%;
 }
 
 .main-content-flow {
   display: flex;
   flex-direction: column;
   gap: 28px;
+  width: 100%;
+  min-width: 0;
 }
 
 .media-player-card {
@@ -274,6 +281,7 @@ body {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  width: 100%;
 }
 
 .iframe-aspect-ratio {
@@ -292,15 +300,15 @@ body {
 }
 
 /* ==========================================================================
-   3. MODERN TEXT READER WORKSPACE (NO CODE INTERFACE LOGIC)
+   3. MODERN TEXT READER WORKSPACE & PERFORMANCE SCROLL FIXES
    ========================================================================== */
 .modern-text-workspace {
   background-color: #f8fafc;
-  /* Crisp reader tint background */
   min-height: 460px;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #e2e8f0;
+  width: 100%;
 }
 
 .reader-header {
@@ -324,9 +332,16 @@ body {
 
 .reader-scroll-canvas {
   padding: 40px 48px;
-  max-height: 550px;
+  max-height: 600px;
   overflow-y: auto;
   box-sizing: border-box;
+  width: 100%;
+  
+  /* CRITICAL PERFORMANCE & LAG FIXES */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  contain: layout paint;
+  will-change: scroll-position;
 }
 
 .reader-article-title {
@@ -339,17 +354,90 @@ body {
 
 .reader-typography-body {
   font-family: var(--font-monospace) !important;
-  /* Forces your terminal font stack constraint */
   font-size: 15px;
   line-height: 1.8;
   color: #334155;
   margin: 0;
-
-  /* CRITICAL CHANGES: Prevents text from leaking or forcing wide scrollbars */
+  width: 100%;
   white-space: pre-wrap;
   word-wrap: break-word;
   word-break: break-word;
   overflow-wrap: break-word;
+}
+
+/* STYLING FORMATTED MARKDOWN HEADINGS & UNSPLASH HERO */
+.reader-typography-body h1,
+.reader-typography-body h2,
+.reader-typography-body h3,
+.reader-typography-body h4 {
+  color: #0f172a;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.reader-typography-body h1 { font-size: 1.8rem; }
+.reader-typography-body h2 { 
+  font-size: 1.45rem; 
+  border-bottom: 2px solid #e2e8f0; 
+  padding-bottom: 0.4rem; 
+}
+.reader-typography-body h3 { font-size: 1.2rem; }
+
+/* Unsplash Inline & Hero Image Styles */
+.lesson-unsplash-banner {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background-color: #f1f5f9;
+  width: 100%;
+}
+
+.lesson-unsplash-img {
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  display: block;
+}
+
+.lesson-unsplash-credit {
+  display: block;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background-color: #ffffff;
+  text-align: right;
+  border-top: 1px solid #e2e8f0;
+}
+
+.lesson-unsplash-credit a {
+  color: var(--brand-primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.reader-typography-body img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 1.5rem 0 0.5rem 0;
+  border: 1px solid #e2e8f0;
+  display: block;
+}
+
+.reader-typography-body sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.reader-typography-body sub a {
+  color: var(--brand-primary);
+  text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -362,6 +450,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 40px;
+  width: 100%;
 }
 
 .document-glass-card {
@@ -370,6 +459,7 @@ body {
   border-radius: 12px;
   padding: 32px;
   max-width: 440px;
+  width: 100%;
   text-align: center;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
   display: flex;
@@ -427,36 +517,11 @@ body {
   color: #94a3b8;
   padding: 40px;
   text-align: center;
-}
-
-.media-overlay-details {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, rgba(2, 6, 23, 0.95) 0%, rgba(2, 6, 23, 0.4) 75%, transparent 100%);
-  padding: 40px 24px 20px 24px;
-  pointer-events: none;
-}
-
-.now-playing-badge {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #38bdf8;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.playing-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
+  width: 100%;
 }
 
 /* ==========================================================================
-   2. NEXT, COMPLETE, AND PREVIOUS NAVIGATION BOTTOM ROW SYSTEM
+   2. NAVIGATION BOTTOM ROW SYSTEM
    ========================================================================== */
 .workspace-navigation-row-bar {
   display: flex;
@@ -466,7 +531,7 @@ body {
   border: 1px solid #e2e8f0;
   padding: 14px 20px;
   border-radius: 12px;
-  margin-top: -8px;
+  width: 100%;
 }
 
 .nav-control-button {
@@ -501,10 +566,6 @@ body {
   color: var(--text-main);
   font-weight: 700;
   padding: 10px 24px;
-}
-
-.nav-control-button.center-complete:hover:not(:disabled) {
-  background-color: #e2e8f0;
 }
 
 .nav-control-button.center-complete.is-finished {
@@ -557,44 +618,6 @@ body {
   margin: 0;
 }
 
-/* OBJECTIVES CARD OVERVIEWS */
-.learning-objectives-card {
-  background-color: var(--bg-surface);
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.learning-objectives-card h2 {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 16px 0;
-}
-
-.objectives-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 28px;
-}
-
-.objective-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.check-icon-blue {
-  color: #3b82f6;
-  margin-top: 3px;
-  flex-shrink: 0;
-}
-
-.objective-item span {
-  font-size: 13px;
-  line-height: 1.5;
-  color: #334155;
-}
-
 /* ACCORDION PATTERN AND COMPONENT SYSTEMS */
 .accordion-section-header {
   display: flex;
@@ -619,6 +642,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 .custom-accordion-item {
@@ -626,6 +650,7 @@ body {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
+  width: 100%;
   transition: border-color 0.2s;
 }
 
@@ -716,17 +741,9 @@ body {
   flex-shrink: 0;
 }
 
-.status-icon.completed-color {
-  color: var(--accent-green);
-}
-
-.status-icon.active-color {
-  color: #6366f1;
-}
-
-.status-icon.locked-color {
-  color: var(--text-muted);
-}
+.status-icon.completed-color { color: var(--accent-green); }
+.status-icon.active-color { color: #6366f1; }
+.status-icon.locked-color { color: var(--text-muted); }
 
 .status-dot-default {
   width: 6px;
@@ -804,14 +821,15 @@ body {
 }
 
 /* ==========================================================================
-   4. CHECKOUT CONTROLLERS AND DYNAMIC PRICING HOOKS
+   4. CHECKOUT CONTROLLERS AND SIDEBARS
    ========================================================================== */
 .sidebar-sticky-flow {
   display: flex;
   flex-direction: column;
   gap: 24px;
   position: sticky;
-  top: 110px;
+  top: 96px;
+  width: 100%;
 }
 
 .checkout-widget-card {
@@ -819,6 +837,7 @@ body {
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 24px;
+  width: 100%;
 }
 
 .enrolled-status-banner {
@@ -842,14 +861,6 @@ body {
 .enrolled-status-banner strong {
   font-size: 14px;
   color: #166534;
-}
-
-.workspace-status-notification {
-  font-size: 13px;
-  line-height: 1.5;
-  color: #475569;
-  text-align: center;
-  padding: 4px 0;
 }
 
 .pricing-header-row {
@@ -937,7 +948,7 @@ body {
   color: #475569;
 }
 
-/* 4. REAL INSTRUCTOR PROFILE DESIGN HOOKS */
+/* INSTRUCTOR PROFILE WIDGET */
 .instructor-profile-widget {
   background-color: var(--bg-surface);
   border: 1px solid #e2e8f0;
@@ -946,6 +957,7 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  width: 100%;
 }
 
 .instructor-avatar-circle {
@@ -996,43 +1008,17 @@ body {
   color: var(--brand-primary);
 }
 
-.requirements-widget-card {
-  background-color: var(--bg-surface);
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
-}
-
-.requirements-widget-card h3 {
-  margin: 0 0 12px 0;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.requirements-widget-card ul {
-  padding-left: 16px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.requirements-widget-card li {
-  font-size: 13px;
-  line-height: 1.4;
-  color: #475569;
-}
-
-/* MASTER PLATFORM FOOTER */
+/* FOOTER STYLING */
 .benedex-footer-wrapper {
   margin-top: auto;
   background-color: var(--bg-surface);
   border-top: 1px solid #edf2f7;
   padding: 32px 40px;
+  width: 100%;
 }
 
 .footer-top-row {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -1065,7 +1051,7 @@ body {
   cursor: pointer;
 }
 
-/* Premium Certificate Sidebar Claim Styles */
+/* Certificate Claim Box */
 .certificate-sidebar-claim-zone {
   margin-top: 1.5rem;
   padding: 1.25rem;
@@ -1073,7 +1059,6 @@ body {
   border: 1px solid rgba(245, 158, 11, 0.3);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  animation: pulseGoldBorder 2s infinite alternate;
 }
 
 .certificate-sidebar-claim-zone h5 {
@@ -1107,35 +1092,9 @@ body {
   color: white;
 }
 
-.btn-certificate-action.checkout-btn:hover {
-  background: #0d5aa0;
-  transform: translateY(-2px);
-}
-
 .btn-certificate-action.view-btn {
   background: #0a4fa6;
   color: #ffffff;
-}
-
-.btn-certificate-action.view-btn:hover {
-  background: #0a4fa6;
-  transform: translateY(-2px);
-}
-
-.btn-certificate-action:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-@keyframes pulseGoldBorder {
-  0% {
-    background-color: white;
-  }
-
-  100% {
-    background-color: white;
-  }
 }
 
 /* RESPONSIVE DISPLAY VIEWPORTS */
@@ -1152,30 +1111,18 @@ body {
 
 @media (max-width: 768px) {
   .student-topbar {
-    padding: 16px 20px;
-  }
-
-  .student-search2 {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 65% !important;
-    max-width: 360px;
+    padding: 12px 16px;
   }
 
   .benedex-container {
-    padding: 20px 16px;
-  }
-
-  .objectives-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .course-main-title {
-    font-size: 26px;
+    padding: 16px 12px;
   }
 
   .reader-scroll-canvas {
-    padding: 24px;
+    padding: 20px 16px;
+  }
+
+  .course-main-title {
+    font-size: 24px;
   }
 }

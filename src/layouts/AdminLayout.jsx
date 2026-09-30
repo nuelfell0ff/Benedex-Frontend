@@ -1,7 +1,5 @@
 import { Outlet } from "react-router-dom";
-
 import { useMemo } from "react";
-
 import {
   FiBell,
   FiBookOpen,
@@ -12,6 +10,7 @@ import {
   FiUsers,
   FiAlertCircle,
   FiActivity,
+  FiCpu, // Added for the AI Syllabus Generator navigation link
 } from "react-icons/fi";
 
 import Sidebar from "../components/layout/Sidebar";
@@ -21,10 +20,8 @@ import { GrAnalytics } from "react-icons/gr";
 import { CiSettings } from "react-icons/ci";
 
 function AdminLayout() {
-
   const links = useMemo(
     () => [
-
       {
         label: "Dashboard",
         path: "/admin",
@@ -44,6 +41,12 @@ function AdminLayout() {
       },
 
       {
+        label: "AI Course Generator",
+        path: "/admin/syllabus-generator",
+        icon: <FiCpu />
+      },
+
+      {
         label: "Payments",
         path: "/admin/payments",
         icon: <MdPayments />
@@ -58,13 +61,13 @@ function AdminLayout() {
       {
         label: "Support Tickets",
         path: "/admin/tickets",
-        icon: <FiAlertCircle />, // or any icon of your choosing
+        icon: <FiAlertCircle />
       },
 
       {
         label: "Notifications",
         path: "/admin/notifications",
-        icon: <FiBell />,
+        icon: <FiBell />
       },
 
       {
@@ -78,12 +81,11 @@ function AdminLayout() {
         path: "/admin/settings",
         icon: <CiSettings />
       }
-
-    ]
-  )
+    ],
+    []
+  );
 
   return (
-
     <div className="student-shell">
       <Sidebar links={links} />
 
@@ -95,9 +97,7 @@ function AdminLayout() {
         </main>
       </div>
     </div>
-
   );
-
 }
 
 export default AdminLayout;

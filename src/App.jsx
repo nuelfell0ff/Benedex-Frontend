@@ -57,6 +57,7 @@ import PaymentCallback from "./pages/payments/PaymentCallback";
 import AdminAiTickets from "./pages/admin/AdminAiTickets";
 import AdminNotifications from "./pages/admin/AdminNotificationForm";
 import AdminActivityLog from "./pages/admin/AdminActivityLog";
+import AdminSyllabusGenerator from "./pages/admin/AdminSyllabusGenerator";
 
 
 function HomeRedirect() {
@@ -356,6 +357,10 @@ function App() {
           <Route
             path="activity-logs"
             element={<AdminActivityLog />}
+          />
+          <Route 
+            path="syllabus-generator"
+            element={<AdminSyllabusGenerator />}
           />
         </Route>
 

@@ -722,8 +722,8 @@ input {
 .search-result-item {
   padding: 10px 16px;
   cursor: pointer;
-  border-b: 1px solid #f1f5f9;
-  transition: bg 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
 }
 
 .search-result-item:hover {
@@ -856,9 +856,6 @@ input {
 .student-icon-button:hover {
   background: rgba(8, 52, 90, 0.06);
   transform: translateY(-1px);
-  display: flex !important;
-  align-items: center !important;
-  justify-items: center !important;
 }
 
 .student-user-chip {
@@ -907,6 +904,21 @@ input {
   min-width: 0;
   padding: 24px 20px 28px;
   background: #ffffff;
+}
+
+/* Global Top Spacer Classes for non-details dashboard layout wrappers */
+.dashboard-content-wrapper,
+.admin-dashboard-wrapper,
+.student-dashboard-wrapper {
+  padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-content-wrapper,
+  .admin-dashboard-wrapper,
+  .student-dashboard-wrapper {
+    padding-top: 70px;
+  }
 }
 
 .student-dashboard {
