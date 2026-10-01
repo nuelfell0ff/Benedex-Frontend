@@ -18,8 +18,8 @@ function Navbar() {
 
         {/* LOGO NODE WITH RECTANGLE ICON HOLDER */}
         <Link to="/" className="bx-nav-brand-group">
-          <img src={Logo} alt="" className="bx-nav-logo2 d-lg-flex d-none" />
-          <img src={Logo} alt="" className="bx-nav-logo2 d-lg-none d-sm-flex" />
+          <img src={Logo} alt="" className="bx-nav-logo d-lg-flex d-none" />
+          <img src={Logo} alt="" className="bx-nav-logo d-lg-none d-sm-flex" />
           {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
         </Link>
 

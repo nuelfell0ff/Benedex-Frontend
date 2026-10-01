@@ -2445,6 +2445,10 @@ input {
 }
 
 @media (max-width: 640px) {
+  .bx-nav-logo {
+  width: 110px !important;
+  margin: 0 !important;
+}
   .student-sidebar {
     width: 72px;
   }

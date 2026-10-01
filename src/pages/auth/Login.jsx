@@ -143,7 +143,7 @@ function Login() {
     <main className="login-shell">
       <section className="login-visual-panel">
         <Link to="/" className="bx-nav-brand-group">
-          <img src={Logo} alt="" className="bx-nav-logo2 d-flex" />
+          <img src={Logo} alt="" className="bx-nav-logo d-flex" />
         </Link>
 
         <div className="login-visual-content">
@@ -307,14 +307,14 @@ function Login() {
             Don&apos;t have an account? <Link to="/register">Get Started</Link>
           </p>
 
-          <div className="login-trust">
+          {/* <div className="login-trust">
             <span>Trusted by teams at</span>
             <div>
               <strong>PayStack</strong>
               <strong>Flutterwave</strong>
               <strong>Andela</strong>
             </div>
-          </div>
+          </div> */}
         </motion.div>
       </section>
     </main>
