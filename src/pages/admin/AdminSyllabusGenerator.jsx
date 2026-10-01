@@ -21,8 +21,12 @@ import {
   FiTerminal,
   FiCheck,
   FiLoader,
+  FiEdit3,
 } from "react-icons/fi";
 import "./AdminSyllabusGenerator.css";
+
+const GENERATION_JOB_STORAGE_KEY =
+  "benedex_active_course_generation_job";
 
 function AdminSyllabusGenerator() {
   const [syllabusText, setSyllabusText] =
@@ -49,19 +53,24 @@ function AdminSyllabusGenerator() {
   const [progressLogs, setProgressLogs] =
     useState([]);
 
+  const [progress, setProgress] =
+    useState(0);
+
+  const [currentStep, setCurrentStep] =
+    useState(
+      "Preparing course generation..."
+    );
+
+  const [jobId, setJobId] =
+    useState(null);
+
   const logsEndRef = useRef(null);
 
-  // ==========================================
-  // AUTO SCROLL PROGRESS TERMINAL
-  // ==========================================
+  const lastLoggedStepRef =
+    useRef("");
 
-  useEffect(() => {
-    if (loading) {
-      logsEndRef.current?.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }, [progressLogs, loading]);
+  const pollingRef =
+    useRef(null);
 
   // ==========================================
   // ADD LOG
@@ -71,25 +80,489 @@ function AdminSyllabusGenerator() {
     message,
     type = "info"
   ) => {
-    setProgressLogs((previous) => [
-      ...previous,
-      {
-        id:
-          Date.now() +
-          Math.random(),
-        message,
-        type,
-        time: new Date().toLocaleTimeString(
-          [],
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          }
-        ),
-      },
-    ]);
+    if (!message) {
+      return;
+    }
+
+    setProgressLogs((previous) => {
+      const lastLog =
+        previous[previous.length - 1];
+
+      if (
+        lastLog?.message === message
+      ) {
+        return previous;
+      }
+
+      return [
+        ...previous,
+        {
+          id:
+            Date.now() +
+            Math.random(),
+          message,
+          type,
+          time:
+            new Date().toLocaleTimeString(
+              [],
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }
+            ),
+        },
+      ];
+    });
   };
+
+  // ==========================================
+  // HANDLE GENERATION STATUS
+  // ==========================================
+
+  const handleGenerationStatus = (
+    job
+  ) => {
+    if (!job) {
+      return;
+    }
+
+    setProgress(
+      Number(job.progress) || 0
+    );
+
+    setCurrentStep(
+      job.currentStep ||
+        "Generating course..."
+    );
+
+    if (
+      job.currentStep &&
+      job.currentStep !==
+        lastLoggedStepRef.current
+    ) {
+      let type = "info";
+
+      if (
+        job.currentStep.includes(
+          "completed:"
+        ) ||
+        job.currentStep.includes(
+          "completed"
+        )
+      ) {
+        type = "success";
+      } else if (
+        job.currentStep.includes(
+          "failed"
+        )
+      ) {
+        type = "error";
+      } else if (
+        job.currentStep.includes(
+          "could not"
+        ) ||
+        job.currentStep.includes(
+          "warning"
+        )
+      ) {
+        type = "warning";
+      } else if (
+        job.currentStep.includes(
+          "Generating"
+        ) ||
+        job.currentStep.includes(
+          "Preparing"
+        ) ||
+        job.currentStep.includes(
+          "Creating"
+        )
+      ) {
+        type = "step";
+      }
+
+      addProgressLog(
+        job.currentStep,
+        type
+      );
+
+      lastLoggedStepRef.current =
+        job.currentStep;
+    }
+
+    if (job.course) {
+      setGeneratedCourse(
+        job.course
+      );
+    }
+
+    if (
+      job.status === "completed"
+    ) {
+      setProgress(100);
+      setLoading(false);
+
+      if (job.course) {
+        setGeneratedCourse(
+          job.course
+        );
+      }
+
+      addProgressLog(
+        "Course generation completed. Draft is ready for admin review.",
+        "success"
+      );
+
+      localStorage.removeItem(
+        GENERATION_JOB_STORAGE_KEY
+      );
+
+      setJobId(null);
+
+      return "completed";
+    }
+
+    if (
+      job.status === "failed"
+    ) {
+      setLoading(false);
+
+      const message =
+        job.error ||
+        "Course generation failed.";
+
+      setErrorState(message);
+
+      addProgressLog(
+        message,
+        "error"
+      );
+
+      localStorage.removeItem(
+        GENERATION_JOB_STORAGE_KEY
+      );
+
+      setJobId(null);
+
+      return "failed";
+    }
+
+    setLoading(true);
+
+    return "active";
+  };
+
+  // ==========================================
+  // FETCH GENERATION STATUS
+  // ==========================================
+
+  const fetchGenerationStatus =
+    async (activeJobId) => {
+      if (!activeJobId) {
+        return null;
+      }
+
+      try {
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        if (!token) {
+          throw new Error(
+            "Authentication token not found. Please log in again."
+          );
+        }
+
+        const baseURL =
+          API.defaults.baseURL ||
+          "http://localhost:5000/api";
+
+        const response =
+          await fetch(
+            `${baseURL}/courses/admin/generation/${activeJobId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept:
+                  "application/json",
+              },
+            }
+          );
+
+        if (!response.ok) {
+          let errorMessage =
+            "Unable to retrieve course generation status.";
+
+          try {
+            const errorData =
+              await response.json();
+
+            errorMessage =
+              errorData.message ||
+              errorMessage;
+          } catch {
+            // Ignore invalid error response.
+          }
+
+          throw new Error(
+            errorMessage
+          );
+        }
+
+        const data =
+          await response.json();
+
+        return data.job || null;
+      } catch (error) {
+        console.error(
+          "Generation status error:",
+          error
+        );
+
+        throw error;
+      }
+    };
+
+  // ==========================================
+  // STOP POLLING
+  // ==========================================
+
+  const stopPolling = () => {
+    if (pollingRef.current) {
+      clearInterval(
+        pollingRef.current
+      );
+
+      pollingRef.current = null;
+    }
+  };
+
+  // ==========================================
+  // START POLLING
+  // ==========================================
+
+  const startPolling = (
+    activeJobId
+  ) => {
+    if (!activeJobId) {
+      return;
+    }
+
+    stopPolling();
+
+    const poll = async () => {
+      try {
+        const job =
+          await fetchGenerationStatus(
+            activeJobId
+          );
+
+        if (!job) {
+          stopPolling();
+          setLoading(false);
+
+          localStorage.removeItem(
+            GENERATION_JOB_STORAGE_KEY
+          );
+
+          setJobId(null);
+
+          return;
+        }
+
+        const status =
+          handleGenerationStatus(
+            job
+          );
+
+        if (
+          status === "completed" ||
+          status === "failed"
+        ) {
+          stopPolling();
+        }
+      } catch (error) {
+        console.error(
+          "Polling error:",
+          error
+        );
+
+        setErrorState(
+          error.message ||
+            "Unable to monitor course generation."
+        );
+      }
+    };
+
+    poll();
+
+    pollingRef.current =
+      setInterval(
+        poll,
+        2500
+      );
+  };
+
+  // ==========================================
+  // CHECK FOR ACTIVE GENERATION
+  // ==========================================
+
+  const checkForActiveGeneration =
+    async () => {
+      try {
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        if (!token) {
+          return;
+        }
+
+        const baseURL =
+          API.defaults.baseURL ||
+          "http://localhost:5000/api";
+
+        const response =
+          await fetch(
+            `${baseURL}/courses/admin/generation/active`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept:
+                  "application/json",
+              },
+            }
+          );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data =
+          await response.json();
+
+        const activeJob =
+          data.job;
+
+        if (!activeJob) {
+          return;
+        }
+
+        setJobId(
+          activeJob._id
+        );
+
+        localStorage.setItem(
+          GENERATION_JOB_STORAGE_KEY,
+          activeJob._id
+        );
+
+        setProgressLogs([]);
+
+        lastLoggedStepRef.current =
+          "";
+
+        handleGenerationStatus(
+          activeJob
+        );
+
+        startPolling(
+          activeJob._id
+        );
+      } catch (error) {
+        console.error(
+          "Active generation check error:",
+          error
+        );
+      }
+    };
+
+  // ==========================================
+  // CHECK ACTIVE JOB ON PAGE LOAD
+  // ==========================================
+
+  useEffect(() => {
+    const storedJobId =
+      localStorage.getItem(
+        GENERATION_JOB_STORAGE_KEY
+      );
+
+    if (storedJobId) {
+      setJobId(storedJobId);
+
+      fetchGenerationStatus(
+        storedJobId
+      )
+        .then((job) => {
+          if (!job) {
+            localStorage.removeItem(
+              GENERATION_JOB_STORAGE_KEY
+            );
+
+            setJobId(null);
+
+            checkForActiveGeneration();
+
+            return;
+          }
+
+          const status =
+            handleGenerationStatus(
+              job
+            );
+
+          if (
+            status === "active"
+          ) {
+            startPolling(
+              storedJobId
+            );
+          }
+        })
+        .catch(() => {
+          checkForActiveGeneration();
+        });
+
+      return;
+    }
+
+    checkForActiveGeneration();
+
+    return () => {
+      stopPolling();
+    };
+  }, []);
+
+  // ==========================================
+  // CLEANUP POLLING
+  // ==========================================
+
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, []);
+
+  // ==========================================
+  // AUTO SCROLL PROGRESS TERMINAL
+  // ==========================================
+
+  useEffect(() => {
+    if (loading) {
+      logsEndRef.current?.scrollIntoView(
+        {
+          behavior: "smooth",
+        }
+      );
+    }
+  }, [
+    progressLogs,
+    loading,
+  ]);
 
   // ==========================================
   // GENERATE COURSE
@@ -104,21 +577,34 @@ function AdminSyllabusGenerator() {
       return;
     }
 
+    stopPolling();
+
     setLoading(true);
     setErrorState(null);
     setGeneratedCourse(null);
     setProgressLogs([]);
+    setProgress(0);
+    setCurrentStep(
+      "Preparing course generation..."
+    );
+
+    lastLoggedStepRef.current =
+      "";
 
     const toolsArray = toolsInput
       ? toolsInput
           .split(",")
-          .map((t) => t.trim())
+          .map((tool) =>
+            tool.trim()
+          )
           .filter(Boolean)
       : [];
 
     try {
       const token =
-        localStorage.getItem("token");
+        localStorage.getItem(
+          "token"
+        );
 
       if (!token) {
         throw new Error(
@@ -130,33 +616,34 @@ function AdminSyllabusGenerator() {
         API.defaults.baseURL ||
         "http://localhost:5000/api";
 
-      const response = await fetch(
-        `${baseURL}/courses/admin/generate-from-syllabus`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-            Authorization: `Bearer ${token}`,
-            Accept:
-              "text/event-stream",
-          },
-
-          body: JSON.stringify({
-            syllabusText,
-            price:
-              Number(price) || 0,
-            duration:
-              duration || "3 Months",
-            tools: toolsArray,
-          }),
-        }
-      );
+      const response =
+        await fetch(
+          `${baseURL}/courses/admin/generate-from-syllabus`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+              Authorization: `Bearer ${token}`,
+              Accept:
+                "application/json",
+            },
+            body: JSON.stringify({
+              syllabusText:
+                syllabusText.trim(),
+              price:
+                Number(price) || 0,
+              duration:
+                duration ||
+                "3 Months",
+              tools: toolsArray,
+            }),
+          }
+        );
 
       if (!response.ok) {
         let errorMessage =
-          "Course generation failed.";
+          "Unable to start course generation.";
 
         try {
           const errorData =
@@ -166,199 +653,79 @@ function AdminSyllabusGenerator() {
             errorData.message ||
             errorMessage;
         } catch {
-          // Response wasn't JSON.
+          // Ignore invalid error response.
         }
 
-        throw new Error(errorMessage);
-      }
-
-      if (!response.body) {
         throw new Error(
-          "Your browser does not support streaming responses."
+          errorMessage
         );
       }
 
-      const reader =
-        response.body.getReader();
+      const data =
+        await response.json();
 
-      const decoder =
-        new TextDecoder("utf-8");
-
-      let buffer = "";
-
-      while (true) {
-        const {
-          value,
-          done,
-        } = await reader.read();
-
-        if (done) {
-          break;
-        }
-
-        buffer += decoder.decode(
-          value,
-          {
-            stream: true,
-          }
+      if (!data.jobId) {
+        throw new Error(
+          "The server did not return a generation job ID."
         );
-
-        const events =
-          buffer.split("\n\n");
-
-        buffer =
-          events.pop() || "";
-
-        for (const event of events) {
-          const lines =
-            event
-              .split("\n")
-              .filter((line) =>
-                line.startsWith("data:")
-              );
-
-          if (!lines.length) {
-            continue;
-          }
-
-          const dataText =
-            lines
-              .map((line) =>
-                line.replace(
-                  /^data:\s?/,
-                  ""
-                )
-              )
-              .join("\n");
-
-          try {
-            const data =
-              JSON.parse(dataText);
-
-            // ------------------------------
-            // Normal progress event
-            // ------------------------------
-
-            if (data.message) {
-              addProgressLog(
-                data.message,
-                data.type || "info"
-              );
-            }
-
-            // ------------------------------
-            // Final course
-            // ------------------------------
-
-            if (
-              data.type === "complete" &&
-              data.course
-            ) {
-              setGeneratedCourse(
-                data.course
-              );
-            }
-
-            // ------------------------------
-            // Backend error
-            // ------------------------------
-
-            if (
-              data.type === "error"
-            ) {
-              setErrorState(
-                data.message ||
-                  "Course generation failed."
-              );
-            }
-          } catch (parseError) {
-            console.error(
-              "Failed to parse generation event:",
-              parseError,
-              dataText
-            );
-          }
-        }
       }
 
-      // Flush any remaining decoder data.
-      buffer += decoder.decode();
+      setJobId(
+        data.jobId
+      );
 
-      if (buffer.trim()) {
-        const lines =
-          buffer
-            .split("\n")
-            .filter((line) =>
-              line.startsWith("data:")
-            );
+      localStorage.setItem(
+        GENERATION_JOB_STORAGE_KEY,
+        data.jobId
+      );
 
-        for (const line of lines) {
-          try {
-            const data =
-              JSON.parse(
-                line.replace(
-                  /^data:\s?/,
-                  ""
-                )
-              );
+      addProgressLog(
+        "Course generation started in the background.",
+        "success"
+      );
 
-            if (data.message) {
-              addProgressLog(
-                data.message,
-                data.type || "info"
-              );
-            }
+      addProgressLog(
+        "You can safely navigate to other pages while generation continues.",
+        "info"
+      );
 
-            if (
-              data.type === "complete" &&
-              data.course
-            ) {
-              setGeneratedCourse(
-                data.course
-              );
-            }
-
-            if (
-              data.type === "error"
-            ) {
-              setErrorState(
-                data.message ||
-                  "Course generation failed."
-              );
-            }
-          } catch {
-            // Ignore incomplete final chunk.
-          }
-        }
-      }
+      startPolling(
+        data.jobId
+      );
     } catch (error) {
       console.error(
         "Course Generation Error:",
         error
       );
 
+      setLoading(false);
+
       setErrorState(
         error.message ||
-          "Automated course synthesis encountered an error."
+          "Unable to start course generation."
       );
 
       addProgressLog(
-        `Generation stopped: ${
+        `Generation could not start: ${
           error.message ||
           "Unknown error"
         }`,
         "error"
       );
-    } finally {
-      setLoading(false);
     }
   };
 
   // ==========================================
-  // RESET
+  // RESET FORM
   // ==========================================
 
   const handleResetForm = () => {
+    stopPolling();
+
+    localStorage.removeItem(
+      GENERATION_JOB_STORAGE_KEY
+    );
+
     setSyllabusText("");
     setPrice("");
     setDuration("3 Months");
@@ -366,6 +733,14 @@ function AdminSyllabusGenerator() {
     setGeneratedCourse(null);
     setErrorState(null);
     setProgressLogs([]);
+    setProgress(0);
+    setCurrentStep(
+      "Preparing course generation..."
+    );
+    setJobId(null);
+
+    lastLoggedStepRef.current =
+      "";
   };
 
   // ==========================================
@@ -374,8 +749,6 @@ function AdminSyllabusGenerator() {
 
   return (
     <div className="bx-ad-workspace container-fluid py-4">
-
-      {/* HERO */}
 
       <header className="bx-ad-hero-banner mb-4">
         <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
@@ -388,7 +761,7 @@ function AdminSyllabusGenerator() {
             </div>
 
             <div>
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex align-items-center gap-2 flex-wrap">
                 <h1 className="bx-ad-title mb-0">
                   Automated Course Synthesizer
                 </h1>
@@ -411,10 +784,13 @@ function AdminSyllabusGenerator() {
 
           {generatedCourse && (
             <button
-              onClick={handleResetForm}
+              onClick={
+                handleResetForm
+              }
               className="bx-ad-refresh-action-btn"
             >
               <FiRefreshCw />
+
               <span>
                 Create Another Course
               </span>
@@ -423,8 +799,6 @@ function AdminSyllabusGenerator() {
 
         </div>
       </header>
-
-      {/* ERROR */}
 
       {errorState && (
         <motion.div
@@ -457,10 +831,6 @@ function AdminSyllabusGenerator() {
         </motion.div>
       )}
 
-      {/* ===================================== */}
-      {/* LIVE GENERATION TERMINAL             */}
-      {/* ===================================== */}
-
       {loading ? (
         <motion.div
           className="bx-ad-generation-panel"
@@ -488,7 +858,7 @@ function AdminSyllabusGenerator() {
                 </h3>
 
                 <p className="bx-ad-generation-subtitle mb-0">
-                  Live backend generation stream
+                  Background generation is running
                 </p>
               </div>
 
@@ -496,7 +866,44 @@ function AdminSyllabusGenerator() {
 
             <div className="bx-ad-live-indicator">
               <span />
-              LIVE
+              GENERATING
+            </div>
+
+          </div>
+
+          <div className="bx-ad-progress-wrapper">
+
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <span className="bx-ad-progress-label">
+                Generation Progress
+              </span>
+
+              <strong className="bx-ad-progress-value">
+                {progress}%
+              </strong>
+            </div>
+
+            <div className="bx-ad-progress-track">
+              <div
+                className="bx-ad-progress-bar"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.max(
+                      0,
+                      progress
+                    )
+                  )}%`,
+                }}
+              />
+            </div>
+
+            <div className="bx-ad-current-step">
+              <FiLoader />
+
+              <span>
+                {currentStep}
+              </span>
             </div>
 
           </div>
@@ -521,57 +928,60 @@ function AdminSyllabusGenerator() {
                 <span className="bx-ad-terminal-green">
                   $
                 </span>{" "}
-                Starting automated curriculum
-                pipeline...
+                Background curriculum
+                pipeline active...
               </div>
 
-              {progressLogs.map((log) => (
-                <div
-                  key={log.id}
-                  className={`bx-ad-log-line is-${log.type}`}
-                >
+              {progressLogs.map(
+                (log) => (
+                  <div
+                    key={log.id}
+                    className={`bx-ad-log-line is-${log.type}`}
+                  >
+                    <span className="bx-ad-log-time">
+                      [
+                      {log.time}
+                      ]
+                    </span>
 
-                  <span className="bx-ad-log-time">
-                    [{log.time}]
-                  </span>
+                    <span className="bx-ad-log-icon">
+                      {log.type ===
+                        "success" && (
+                        <FiCheck />
+                      )}
 
-                  <span className="bx-ad-log-icon">
+                      {log.type ===
+                        "error" && (
+                        <FiAlertTriangle />
+                      )}
 
-                    {log.type ===
-                      "success" && (
-                      <FiCheck />
-                    )}
+                      {log.type ===
+                        "warning" && (
+                        <FiAlertTriangle />
+                      )}
 
-                    {log.type ===
-                      "error" && (
-                      <FiAlertTriangle />
-                    )}
+                      {log.type ===
+                        "step" && (
+                        <FiLoader />
+                      )}
 
-                    {log.type ===
-                      "warning" && (
-                      <FiAlertTriangle />
-                    )}
+                      {log.type ===
+                        "info" && (
+                        <FiTerminal />
+                      )}
+                    </span>
 
-                    {log.type ===
-                      "step" && (
-                      <FiLoader />
-                    )}
-
-                    {log.type ===
-                      "info" && (
-                      <FiTerminal />
-                    )}
-                  </span>
-
-                  <span className="bx-ad-log-message">
-                    {log.message}
-                  </span>
-
-                </div>
-              ))}
+                    <span className="bx-ad-log-message">
+                      {log.message}
+                    </span>
+                  </div>
+                )
+              )}
 
               <div
-                ref={logsEndRef}
+                ref={
+                  logsEndRef
+                }
                 className="bx-ad-terminal-cursor"
               >
                 <span>$</span>
@@ -587,18 +997,16 @@ function AdminSyllabusGenerator() {
             <FiCpu />
 
             <span>
-              Please keep this page open while
-              the AI pipeline generates the course.
+              Generation continues on the
+              server. You can safely navigate
+              away and return later to check
+              its progress.
             </span>
 
           </div>
 
         </motion.div>
       ) : generatedCourse ? (
-
-        /* =================================== */
-        /* GENERATED COURSE                    */
-        /* =================================== */
 
         <motion.div
           className="bx-ad-card-panel mb-4"
@@ -618,7 +1026,7 @@ function AdminSyllabusGenerator() {
 
               <span className="bx-ad-status-pill is-success mb-2">
                 <FiCheckCircle className="me-1" />
-                Course Created & Ready
+                Draft Created & Ready for Review
               </span>
 
               <h2 className="bx-ad-title h4 mb-1">
@@ -631,11 +1039,41 @@ function AdminSyllabusGenerator() {
 
             </div>
 
-            <div className="d-flex align-items-center gap-2">
+            <div className="d-flex align-items-center gap-2 flex-wrap">
               <span className="bx-ad-badge-info">
-                Course Link Identifier:{" "}
-                {generatedCourse.slug}
+                Status:{" "}
+                {generatedCourse.status ||
+                  "draft"}
               </span>
+
+              {generatedCourse.slug && (
+                <span className="bx-ad-badge-info">
+                  Course Link Identifier:{" "}
+                  {generatedCourse.slug}
+                </span>
+              )}
+            </div>
+
+          </div>
+
+          <div className="bx-ad-review-notice mb-4">
+
+            <div className="bx-ad-review-notice-icon">
+              <FiEdit3 />
+            </div>
+
+            <div>
+              <h4>
+                Admin Review Required
+              </h4>
+
+              <p>
+                The course has been generated
+                as a draft. Review and edit the
+                course, modules, lessons, and
+                quizzes before publishing it to
+                students.
+              </p>
             </div>
 
           </div>
@@ -644,6 +1082,7 @@ function AdminSyllabusGenerator() {
 
             <div className="col-6 col-md-3">
               <div className="bx-ad-stat-card">
+
                 <span className="bx-ad-stat-label">
                   Enrollment Price
                 </span>
@@ -660,6 +1099,7 @@ function AdminSyllabusGenerator() {
                   </div>
 
                 </div>
+
               </div>
             </div>
 
@@ -681,6 +1121,7 @@ function AdminSyllabusGenerator() {
                   </div>
 
                 </div>
+
               </div>
             </div>
 
@@ -704,6 +1145,7 @@ function AdminSyllabusGenerator() {
                   </div>
 
                 </div>
+
               </div>
             </div>
 
@@ -725,6 +1167,7 @@ function AdminSyllabusGenerator() {
                   </div>
 
                 </div>
+
               </div>
             </div>
 
@@ -742,7 +1185,8 @@ function AdminSyllabusGenerator() {
                 }
                 className="w-100 object-fit-cover"
                 style={{
-                  maxHeight: "240px",
+                  maxHeight:
+                    "240px",
                 }}
               />
 
@@ -757,6 +1201,8 @@ function AdminSyllabusGenerator() {
               }
               className="bx-ad-refresh-action-btn"
             >
+              <FiRefreshCw />
+
               <span>
                 Generate Another Syllabus
               </span>
@@ -767,10 +1213,6 @@ function AdminSyllabusGenerator() {
         </motion.div>
 
       ) : (
-
-        /* =================================== */
-        /* INPUT FORM                           */
-        /* =================================== */
 
         <section className="row g-4">
 
@@ -790,6 +1232,7 @@ function AdminSyllabusGenerator() {
 
               <h3 className="bx-ad-panel-title mb-3">
                 <FiFileText />
+
                 <span>
                   Input Syllabus / Course Outline
                   Text
@@ -964,6 +1407,7 @@ Module 2: Advanced React & State Management
 
                 <h3 className="bx-ad-panel-title mb-3">
                   <FiCpu />
+
                   <span>
                     Automation Capabilities
                   </span>
@@ -1052,15 +1496,15 @@ Module 2: Advanced React & State Management
               <div className="mt-4 pt-3 border-t">
 
                 <span className="bx-ad-badge-info d-inline-block mb-2">
-                  Automated Workflow
+                  Admin Review Workflow
                 </span>
 
                 <p className="text-muted small mb-0">
                   Courses generated through this
-                  terminal are immediately
-                  published to your platform
-                  catalog and ready for student
-                  enrollment.
+                  terminal are saved as drafts.
+                  Review and edit the generated
+                  content before manually publishing
+                  it for student enrollment.
                 </p>
 
               </div>
