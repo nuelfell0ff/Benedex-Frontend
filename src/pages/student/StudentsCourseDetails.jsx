@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
+
 import ReactMarkdown from "react-markdown";
+
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
+
 import { motion, AnimatePresence } from "framer-motion";
+
 import {
   FiCheckCircle,
   FiPlayCircle,
@@ -16,14 +20,18 @@ import {
   FiArrowLeft,
   FiArrowRight,
   FiCheck,
-  FiActivity,
   FiBookOpen,
   FiCreditCard
 } from "react-icons/fi";
+
 import API from "../../services/api";
+
 import { useAuth } from "../../context/AuthContext";
+
 import "./StudentsCourseDetails.css";
-import { FaGraduationCap, FaSchool } from "react-icons/fa";
+
+import { FaGraduationCap } from "react-icons/fa";
+
 import Logo from "../../assets/20260623_190852.png";
 import Logo2 from "../../assets/20260623_191023.png";
 
@@ -42,10 +50,9 @@ const StudentsCourseDetails = () => {
   const [lessons, setLessons] = useState([]);
   const [quiz, setQuiz] = useState(null);
   const [totalLessons, setTotalLessons] = useState(0);
-
+  const [courseLessonIds, setCourseLessonIds] = useState([]);
   const [selectedModuleIndex, setSelectedModuleIndex] = useState(0);
   const [selectedLessonIndex, setSelectedLessonIndex] = useState(0);
-
   const [progress, setProgress] = useState([]);
   const [quizProgress, setQuizProgress] = useState([]);
   const [allModulesQuizzes, setAllModulesQuizzes] = useState({});
@@ -66,9 +73,11 @@ const StudentsCourseDetails = () => {
     isPaid: false,
     certificateId: null
   });
+
   const [loadingCert, setLoadingCert] = useState(false);
 
   /* ---------------- AUTO-SCROLL TO TOP ON LESSON/MODULE CHANGE ---------------- */
+
   useEffect(() => {
     const scrollCanvas = document.querySelector(".reader-scroll-canvas");
 
@@ -86,6 +95,7 @@ const StudentsCourseDetails = () => {
   }, [selectedLessonIndex, selectedModuleIndex]);
 
   /* ---------------- BASELINE DATA INITIALIZATION + BOOKMARKING ---------------- */
+
   useEffect(() => {
     let isMounted = true;
 
@@ -113,11 +123,11 @@ const StudentsCourseDetails = () => {
             return { data: {} };
           }),
 
-          API.get(`/quizzes/progress`).catch(() => ({
+          API.get("/quizzes/progress").catch(() => ({
             data: []
           })),
 
-          API.get(`/lessons/progress`).catch(() => ({
+          API.get("/lessons/progress").catch(() => ({
             data: []
           }))
         ]);
@@ -171,8 +181,7 @@ const StudentsCourseDetails = () => {
               }))
           );
 
-          const resolvedQuizzes =
-            await Promise.all(quizPromises);
+          const resolvedQuizzes = await Promise.all(quizPromises);
 
           const quizMapping = {};
 
@@ -201,8 +210,18 @@ const StudentsCourseDetails = () => {
                   }))
               );
 
-              const allModulesLessons =
-                await Promise.all(lessonPromises);
+              const allModulesLessons = await Promise.all(lessonPromises);
+
+              const allCourseLessonIds = allModulesLessons.flatMap(
+                (item) =>
+                  (item.lessons || [])
+                    .map((lesson) => lesson?._id)
+                    .filter(Boolean)
+                    .map((id) => String(id))
+              );
+
+              setCourseLessonIds(allCourseLessonIds);
+              setTotalLessons(allCourseLessonIds.length);
 
               let foundBookmark = false;
 
@@ -211,30 +230,26 @@ const StudentsCourseDetails = () => {
                 m < rawModules.length;
                 m++
               ) {
-                const targetData =
-                  allModulesLessons.find(
-                    (item) =>
-                      item.moduleId === rawModules[m]._id
-                  );
+                const targetData = allModulesLessons.find(
+                  (item) =>
+                    item.moduleId === rawModules[m]._id
+                );
 
-                const modLessons =
-                  targetData
-                    ? targetData.lessons
-                    : [];
+                const modLessons = targetData
+                  ? targetData.lessons
+                  : [];
 
                 for (
                   let l = 0;
                   l < modLessons.length;
                   l++
                 ) {
-                  const isLessonDone =
-                    completedLessons.some(
-                      (p) =>
-                        String(
-                          p.lesson?._id || p.lesson
-                        ) ===
-                        String(modLessons[l]._id)
-                    );
+                  const isLessonDone = completedLessons.some(
+                    (p) =>
+                      String(
+                        p.lesson?._id || p.lesson
+                      ) === String(modLessons[l]._id)
+                  );
 
                   if (!isLessonDone) {
                     bookmarkedModuleIdx = m;
@@ -255,13 +270,8 @@ const StudentsCourseDetails = () => {
           }
 
           if (isMounted) {
-            setSelectedModuleIndex(
-              bookmarkedModuleIdx
-            );
-
-            setSelectedLessonIndex(
-              bookmarkedLessonIdx
-            );
+            setSelectedModuleIndex(bookmarkedModuleIdx);
+            setSelectedLessonIndex(bookmarkedLessonIdx);
           }
         }
       } catch (err) {
@@ -284,12 +294,14 @@ const StudentsCourseDetails = () => {
   }, [courseId]);
 
   /* ---------------- TOPBAR NOTIFICATIONS LOGIC ---------------- */
+
   useEffect(() => {
     let isMounted = true;
 
     const fetchNotifications = async () => {
       try {
         const res = await API.get("/notifications");
+
         const broadcasts = res.data || [];
 
         const count = broadcasts.filter(
@@ -325,6 +337,7 @@ const StudentsCourseDetails = () => {
   }, [location.pathname]);
 
   /* ---------------- CERTIFICATE REALTIME EXTRACTION ---------------- */
+
   useEffect(() => {
     const checkCertificateStatus = async () => {
       try {
@@ -350,6 +363,8 @@ const StudentsCourseDetails = () => {
     }
   }, [courseId, isEnrolled, progress.length]);
 
+  /* ---------------- STUDENT INITIALS ---------------- */
+
   const initials = (user?.fullName || "Student")
     .split(" ")
     .map((part) => part[0])
@@ -358,6 +373,7 @@ const StudentsCourseDetails = () => {
     .toUpperCase();
 
   /* ---------------- LESSONS + QUIZ FETCHING ---------------- */
+
   useEffect(() => {
     let isMounted = true;
 
@@ -411,12 +427,12 @@ const StudentsCourseDetails = () => {
           lessonRes.data || [];
 
         setLessons(fetchedLessons);
+
         setQuiz(quizRes?.data || null);
 
         if (
           selectedLessonIndex === null ||
-          selectedLessonIndex >=
-            fetchedLessons.length
+          selectedLessonIndex >= fetchedLessons.length
         ) {
           setSelectedLessonIndex(0);
         }
@@ -430,9 +446,7 @@ const StudentsCourseDetails = () => {
             );
 
           const lessonResponses =
-            await Promise.all(
-              lessonRequests
-            );
+            await Promise.all(lessonRequests);
 
           if (isMounted) {
             const total =
@@ -476,18 +490,15 @@ const StudentsCourseDetails = () => {
   /* -----------------------------------------------------------
      CHECK IF LESSON IS COMPLETED
   ----------------------------------------------------------- */
+
   const isCompleted = (lessonId) => {
     if (!lessonId) return false;
 
     const cleanLessonId = String(lessonId);
 
-    /*
-     * Check the local optimistic state first.
-     * This makes the lesson unlock immediately after
-     * the student clicks "Mark as Complete", without
-     * waiting for the backend or another progress request.
-     */
-    if (optimisticCompletedLessons.has(cleanLessonId)) {
+    if (
+      optimisticCompletedLessons.has(cleanLessonId)
+    ) {
       return true;
     }
 
@@ -502,25 +513,31 @@ const StudentsCourseDetails = () => {
     });
   };
 
-  const cleanUniqueCourseCompletedCount =
-    useMemo(() => {
-      if (!progress || !lessons.length) {
-        return 0;
-      }
+  const cleanUniqueCourseCompletedCount = useMemo(() => {
+    if (!progress?.length || !courseLessonIds.length) {
+      return 0;
+    }
 
-      const progressIds = progress.map(
-        (p) =>
-          String(
-            p.lesson?._id || p.lesson
-          )
-      );
+    const courseLessonIdSet =
+      new Set(courseLessonIds);
 
-      const uniqueProgressIds = [
-        ...new Set(progressIds)
-      ];
+    const completedCourseLessonIds =
+      progress
+        .map(
+          (item) =>
+            item?.lesson?._id ||
+            item?.lesson
+        )
+        .filter(Boolean)
+        .map((id) => String(id))
+        .filter((id) =>
+          courseLessonIdSet.has(id)
+        );
 
-      return uniqueProgressIds.length;
-    }, [progress, lessons]);
+    return new Set(
+      completedCourseLessonIds
+    ).size;
+  }, [progress, courseLessonIds]);
 
   const getQuizRecord = (quizId) => {
     if (
@@ -575,6 +592,7 @@ const StudentsCourseDetails = () => {
 
   const isModuleLocked = (moduleIndex) => {
     if (!isEnrolled) return true;
+
     if (moduleIndex === 0) return false;
 
     const previousModule =
@@ -620,6 +638,7 @@ const StudentsCourseDetails = () => {
   /* -----------------------------------------------------------
      MARK LESSON COMPLETE
   ----------------------------------------------------------- */
+
   const markComplete = async () => {
     if (
       !isEnrolled ||
@@ -637,39 +656,36 @@ const StudentsCourseDetails = () => {
       return;
     }
 
-    const lessonId = String(currentLesson._id);
+    const lessonId =
+      String(currentLesson._id);
 
-    /*
-     * Unlock this lesson immediately.
-     * The backend save happens after this local update.
-     */
-    setOptimisticCompletedLessons((previous) => {
-      const next = new Set(previous);
-      next.add(lessonId);
-      return next;
-    });
+    setCourseLessonIds((previousIds) =>
+      previousIds.includes(lessonId)
+        ? previousIds
+        : [...previousIds, lessonId]
+    );
+
+    setOptimisticCompletedLessons(
+      (previous) => {
+        const next = new Set(previous);
+
+        next.add(lessonId);
+
+        return next;
+      }
+    );
 
     setIsCompletingLesson(true);
 
     try {
-      /*
-       * IMPORTANT:
-       * Do NOT immediately call GET /lessons/progress here.
-       *
-       * The backend already returns the saved progress
-       * record from POST /lessons/complete/:lessonId.
-       */
-      const response = await API.post(
-        `/lessons/complete/${currentLesson._id}`
-      );
+      const response =
+        await API.post(
+          `/lessons/complete/${currentLesson._id}`
+        );
 
       const savedProgress =
         response?.data?.progress;
 
-      /*
-       * Add the exact progress record returned
-       * by the backend to the current React state.
-       */
       if (savedProgress) {
         setProgress(
           (previousProgress) => {
@@ -723,11 +739,6 @@ const StudentsCourseDetails = () => {
         err
       );
 
-      /*
-       * If the backend says the lesson was already completed,
-       * keep the local completion state and recover the server record.
-       * For a real failure, roll back the optimistic unlock.
-       */
       if (
         err.response?.status === 400 &&
         err.response?.data?.message ===
@@ -749,17 +760,17 @@ const StudentsCourseDetails = () => {
           );
         }
       } else {
-        setOptimisticCompletedLessons((previous) => {
-          const next = new Set(previous);
-          next.delete(lessonId);
-          return next;
-        });
+        setOptimisticCompletedLessons(
+          (previous) => {
+            const next = new Set(previous);
+
+            next.delete(lessonId);
+
+            return next;
+          }
+        );
       }
     } finally {
-      /*
-       * Saving... disappears ONLY after the
-       * backend request has finished.
-       */
       setIsCompletingLesson(false);
     }
   };
@@ -767,6 +778,7 @@ const StudentsCourseDetails = () => {
   /* -----------------------------------------------------------
      PREVIOUS LESSON
   ----------------------------------------------------------- */
+
   const handlePrevLesson = () => {
     if (!isEnrolled) return;
 
@@ -797,26 +809,45 @@ const StudentsCourseDetails = () => {
   /* -----------------------------------------------------------
      NEXT LESSON
   ----------------------------------------------------------- */
+
   const handleNextLesson = () => {
     if (!isEnrolled) return;
 
-    // Once the student clicks Mark as Complete, allow them
-    // to move forward immediately. Do not wait for backend progress.
-    if (selectedLessonIndex < lessons.length - 1) {
-      setSelectedLessonIndex((prev) => prev + 1);
+    if (
+      selectedLessonIndex <
+      lessons.length - 1
+    ) {
+      setSelectedLessonIndex(
+        (prev) => prev + 1
+      );
+
       return;
     }
 
-    // Moving into another module can still respect the module quiz lock.
-    if (selectedModuleIndex < modules.length - 1) {
-      const nextModIndex = selectedModuleIndex + 1;
+    if (
+      selectedModuleIndex <
+      modules.length - 1
+    ) {
+      const nextModIndex =
+        selectedModuleIndex + 1;
 
-      if (!isModuleLocked(nextModIndex)) {
-        setSelectedModuleIndex(nextModIndex);
+      if (
+        !isModuleLocked(
+          nextModIndex
+        )
+      ) {
+        setSelectedModuleIndex(
+          nextModIndex
+        );
+
         setSelectedLessonIndex(0);
       }
     }
   };
+
+  /* -----------------------------------------------------------
+     YOUTUBE EMBED
+  ----------------------------------------------------------- */
 
   const getYoutubeEmbed = (url) => {
     if (!url) return "";
@@ -831,28 +862,72 @@ const StudentsCourseDetails = () => {
       : url;
   };
 
+  /* -----------------------------------------------------------
+     PRICE
+  ----------------------------------------------------------- */
+
   const formatPrice = (value) =>
     `₦${Number(
       value || 0
     ).toLocaleString()}`;
 
+  /* -----------------------------------------------------------
+     INSTRUCTOR INFORMATION
+
+     The backend should populate course.instructor:
+
+     instructor: {
+       _id: "...",
+       fullName: "Instructor Name"
+     }
+
+     We support both `fullName` and `name`.
+  ----------------------------------------------------------- */
+
+  const instructor = course?.instructor;
+
   const instructorName =
-    course?.instructor?.fullName ||
-    "Adeola Johnson";
+    typeof instructor === "object"
+      ? instructor?.fullName ||
+        instructor?.name ||
+        "Course Instructor"
+      : "Course Instructor";
 
   const instructorTitle =
-    course?.instructor?.bio ||
-    "Senior Design Lead at FinStream";
+    typeof instructor === "object"
+      ? instructor?.bio ||
+        instructor?.role ||
+        "Course Instructor"
+      : "Course Instructor";
+
+  const instructorRating =
+    typeof instructor === "object"
+      ? instructor?.rating ??
+        course?.rating ??
+        null
+      : course?.rating ?? null;
+
+  const instructorRatingCount =
+    typeof instructor === "object"
+      ? instructor?.ratingCount ??
+        course?.ratingCount ??
+        null
+      : course?.ratingCount ?? null;
 
   const instructorInitials =
     instructorName
       .split(" ")
+      .filter(Boolean)
       .map(
         (part) => part[0]
       )
       .slice(0, 2)
       .join("")
       .toUpperCase();
+
+  /* -----------------------------------------------------------
+     ENROLL
+  ----------------------------------------------------------- */
 
   const handleEnroll = async () => {
     if (
@@ -865,13 +940,14 @@ const StudentsCourseDetails = () => {
     setIsProcessingPayment(true);
 
     try {
-      const res = await API.post(
-        "/payments/initialize",
-        {
-          courseId,
-          callbackUrl: `${window.location.origin}/payments/callback`
-        }
-      );
+      const res =
+        await API.post(
+          "/payments/initialize",
+          {
+            courseId,
+            callbackUrl: `${window.location.origin}/payments/callback`
+          }
+        );
 
       const authorizationUrl =
         res?.data?.authorization_url;
@@ -884,9 +960,14 @@ const StudentsCourseDetails = () => {
       }
     } catch (err) {
       console.error(err);
+
       setIsProcessingPayment(false);
     }
   };
+
+  /* -----------------------------------------------------------
+     PURCHASE CERTIFICATE
+  ----------------------------------------------------------- */
 
   const handlePurchaseCertificate =
     async () => {
@@ -912,10 +993,15 @@ const StudentsCourseDetails = () => {
       }
     };
 
+  /* -----------------------------------------------------------
+     LOADING
+  ----------------------------------------------------------- */
+
   if (!course) {
     return (
       <div className="scd-loader-container">
         <div className="scd-spinner" />
+
         <p>
           Loading Course Experience...
         </p>
@@ -925,9 +1011,13 @@ const StudentsCourseDetails = () => {
 
   return (
     <div className="benedex-lms-theme">
+
       {/* TOPBAR */}
+
       <header className="student-topbar">
+
         <div className="student-topbar-brand-container">
+
           <Link
             to="/"
             className="bx-nav-brand-group"
@@ -944,6 +1034,7 @@ const StudentsCourseDetails = () => {
               className="bx-nav-logo d-lg-none d-sm-flex"
             />
           </Link>
+
         </div>
 
         <label
@@ -960,6 +1051,7 @@ const StudentsCourseDetails = () => {
         </label>
 
         <div className="student-top-actions">
+
           <Link
             className="student-icon-button student-notification-button"
             to="/student/notifications"
@@ -976,11 +1068,13 @@ const StudentsCourseDetails = () => {
           </Link>
 
           <div className="student-top-actions">
+
             <span className="student-user-avatar">
               {initials}
             </span>
 
             <div className="student-user-copy">
+
               <strong>
                 {user?.fullName ||
                   "User Account"}
@@ -990,26 +1084,39 @@ const StudentsCourseDetails = () => {
                 {user?.role ||
                   "Student"}
               </span>
+
             </div>
 
             <FiChevronDown className="student-user-chevron" />
+
           </div>
+
         </div>
+
       </header>
 
       {/* MAIN LAYOUT */}
+
       <div className="benedex-container">
+
         <div className="benedex-grid">
+
           <main className="main-content-flow">
+
             <div className="media-player-card">
+
               {!isEnrolled ? (
+
                 <div className="modern-document-workspace locked-module-workspace">
+
                   <div className="document-glass-card paywall-layout-box">
+
                     <div className="document-icon-wrapper lock-alert-color">
                       <FiLock size={40} />
                     </div>
 
                     <div className="document-meta-details">
+
                       <h4>
                         Premium Course Content Locked
                       </h4>
@@ -1051,19 +1158,27 @@ const StudentsCourseDetails = () => {
                           ? "Opening Gateway..."
                           : "Pay & Unlock Track"}
                       </button>
+
                     </div>
+
                   </div>
+
                 </div>
+
               ) : isModuleLocked(
                   selectedModuleIndex
                 ) ? (
+
                 <div className="modern-document-workspace locked-module-workspace">
+
                   <div className="document-glass-card">
+
                     <div className="document-icon-wrapper lock-alert-color">
                       <FiLock size={40} />
                     </div>
 
                     <div className="document-meta-details">
+
                       <h4>
                         Module Segment Content Locked
                       </h4>
@@ -1076,14 +1191,20 @@ const StudentsCourseDetails = () => {
                         the previous module
                         segment to gain access.
                       </p>
+
                     </div>
+
                   </div>
+
                 </div>
+
               ) : currentLesson &&
                 currentLesson.type ===
                   "video" &&
                 currentLesson.videoUrl ? (
+
                 <div className="iframe-aspect-ratio">
+
                   <iframe
                     src={getYoutubeEmbed(
                       currentLesson.videoUrl
@@ -1091,23 +1212,34 @@ const StudentsCourseDetails = () => {
                     title="Course Lesson Video Player"
                     allowFullScreen
                   />
+
                 </div>
+
               ) : currentLesson &&
                 currentLesson.type ===
                   "text" ? (
+
                 <div className="modern-text-workspace">
+
                   <div className="reader-header">
+
                     <div className="reader-meta">
+
                       <FiBookOpen />
+
                       <span>
                         Reading Mode
                       </span>
+
                     </div>
+
                   </div>
 
                   <div className="reader-scroll-canvas">
+
                     {currentLesson.illustrationUrl && (
                       <div className="lesson-unsplash-banner">
+
                         <img
                           src={
                             currentLesson.illustrationUrl
@@ -1120,7 +1252,9 @@ const StudentsCourseDetails = () => {
 
                         {currentLesson.photographerName && (
                           <span className="lesson-unsplash-credit">
+
                             Photo by{" "}
+
                             <a
                               href={`${currentLesson.photographerUrl}?utm_source=Benedex&utm_medium=referral`}
                               target="_blank"
@@ -1130,9 +1264,12 @@ const StudentsCourseDetails = () => {
                                 currentLesson.photographerName
                               }
                             </a>{" "}
+
                             on Unsplash
+
                           </span>
                         )}
+
                       </div>
                     )}
 
@@ -1143,24 +1280,33 @@ const StudentsCourseDetails = () => {
                     </h2>
 
                     <div className="reader-typography-body">
+
                       <ReactMarkdown>
                         {
                           currentLesson.content
                         }
                       </ReactMarkdown>
+
                     </div>
+
                   </div>
+
                 </div>
+
               ) : currentLesson &&
                 currentLesson.type ===
                   "document" ? (
+
                 <div className="modern-document-workspace">
+
                   <div className="document-glass-card">
+
                     <div className="document-icon-wrapper">
                       <FiFileText size={40} />
                     </div>
 
                     <div className="document-meta-details">
+
                       <h4>
                         Resource Sheet Asset
                       </h4>
@@ -1171,6 +1317,7 @@ const StudentsCourseDetails = () => {
                         handbook file assigned
                         to this milestone.
                       </p>
+
                     </div>
 
                     <a
@@ -1183,20 +1330,29 @@ const StudentsCourseDetails = () => {
                     >
                       Open Document Resource
                     </a>
+
                   </div>
+
                 </div>
+
               ) : (
+
                 <div className="no-lesson-fallback">
+
                   <p>
                     Select a lesson from the
                     module overview below to
                     begin streaming content.
                   </p>
+
                 </div>
+
               )}
+
             </div>
 
             <div className="workspace-navigation-row-bar">
+
               <button
                 className="nav-control-button prev"
                 onClick={
@@ -1233,6 +1389,7 @@ const StudentsCourseDetails = () => {
                   isCompletingLesson
                 }
               >
+
                 {currentLesson &&
                 isCompleted(
                   currentLesson._id
@@ -1246,6 +1403,7 @@ const StudentsCourseDetails = () => {
                 ) : (
                   "Mark as Complete"
                 )}
+
               </button>
 
               <button
@@ -1255,27 +1413,36 @@ const StudentsCourseDetails = () => {
                 }
                 disabled={
                   !isEnrolled ||
-                  (selectedModuleIndex === modules.length - 1 &&
-                    selectedLessonIndex === lessons.length - 1) ||
-                  isModuleLocked(selectedModuleIndex)
+                  (selectedModuleIndex ===
+                    modules.length - 1 &&
+                    selectedLessonIndex ===
+                      lessons.length - 1) ||
+                  isModuleLocked(
+                    selectedModuleIndex
+                  )
                 }
               >
                 Next <FiArrowRight />
               </button>
+
             </div>
 
             <div className="course-headline-section">
+
               <div className="badge-row">
+
                 <span className="bestseller-tag">
                   BESTSELLER
                 </span>
 
                 <span className="rating-text">
                   ★ 4.9{" "}
+
                   <span className="rating-count">
                     (2.4k Ratings)
                   </span>
                 </span>
+
               </div>
 
               <h1 className="course-main-title">
@@ -1285,10 +1452,13 @@ const StudentsCourseDetails = () => {
               <p className="course-main-desc">
                 {course.description}
               </p>
+
             </div>
 
             <div className="course-content-accordion-area">
+
               <div className="accordion-section-header">
+
                 <h2>
                   Course Content
                 </h2>
@@ -1298,14 +1468,17 @@ const StudentsCourseDetails = () => {
                   {totalLessons} Lessons • 12h
                   Total
                 </span>
+
               </div>
 
               <div className="custom-accordion-stack">
+
                 {modules.map(
                   (
                     module,
                     moduleIndex
                   ) => {
+
                     const isOpen =
                       moduleIndex ===
                       selectedModuleIndex;
@@ -1316,6 +1489,7 @@ const StudentsCourseDetails = () => {
                       );
 
                     return (
+
                       <div
                         key={module._id}
                         className={`custom-accordion-item ${
@@ -1328,9 +1502,11 @@ const StudentsCourseDetails = () => {
                             : ""
                         }`}
                       >
+
                         <button
                           className="custom-accordion-trigger"
                           onClick={() => {
+
                             if (
                               lockedModule
                             ) {
@@ -1344,18 +1520,25 @@ const StudentsCourseDetails = () => {
                             setSelectedLessonIndex(
                               0
                             );
+
                           }}
                         >
+
                           <div className="trigger-left-block">
+
                             <span className="module-index-number">
+
                               {lockedModule ? (
+
                                 <FiLock
                                   style={{
                                     fontSize:
                                       "1rem"
                                   }}
                                 />
+
                               ) : (
+
                                 String(
                                   moduleIndex +
                                     1
@@ -1363,10 +1546,13 @@ const StudentsCourseDetails = () => {
                                   2,
                                   "0"
                                 )
+
                               )}
+
                             </span>
 
                             <div className="module-title-text-group">
+
                               <h3
                                 style={{
                                   color:
@@ -1381,6 +1567,7 @@ const StudentsCourseDetails = () => {
                               </h3>
 
                               <span className="sub-lessons-count">
+
                                 {!isEnrolled
                                   ? "Locked - Premium Subscription Asset"
                                   : lockedModule
@@ -1388,11 +1575,15 @@ const StudentsCourseDetails = () => {
                                   : isOpen
                                   ? `${lessons.length} Lessons`
                                   : "Available Lessons"}
+
                               </span>
+
                             </div>
+
                           </div>
 
                           <div className="trigger-right-block">
+
                             {lockedModule
                               ? null
                               : isOpen
@@ -1402,14 +1593,18 @@ const StudentsCourseDetails = () => {
                               : (
                                 <FiChevronDown />
                               )}
+
                           </div>
+
                         </button>
 
                         <AnimatePresence
                           initial={false}
                         >
+
                           {isOpen &&
                             !lockedModule && (
+
                               <motion.div
                                 initial={{
                                   height: 0,
@@ -1432,12 +1627,15 @@ const StudentsCourseDetails = () => {
                                 }}
                                 className="custom-accordion-panel"
                               >
+
                                 <div className="panel-inner-content">
+
                                   {lessons.map(
                                     (
                                       lesson,
                                       lessonIndex
                                     ) => {
+
                                       const completed =
                                         isCompleted(
                                           lesson._id
@@ -1453,6 +1651,7 @@ const StudentsCourseDetails = () => {
                                         lessonIndex;
 
                                       return (
+
                                         <div
                                           key={
                                             lesson._id
@@ -1467,6 +1666,7 @@ const StudentsCourseDetails = () => {
                                               : ""
                                           }`}
                                           onClick={() => {
+
                                             if (
                                               locked
                                             ) {
@@ -1476,29 +1676,45 @@ const StudentsCourseDetails = () => {
                                             setSelectedLessonIndex(
                                               lessonIndex
                                             );
+
                                           }}
                                         >
+
                                           <div className="lesson-row-left">
+
                                             {completed ? (
+
                                               <FiCheckCircle className="status-icon completed-color" />
+
                                             ) : active ? (
+
                                               <FiPlayCircle className="status-icon active-color" />
+
                                             ) : locked ? (
+
                                               <FiLock className="status-icon locked-color" />
+
                                             ) : (
+
                                               <div className="status-dot-default" />
+
                                             )}
 
                                             <span className="lesson-row-title-text">
+
                                               {
                                                 lesson.title
                                               }
+
                                             </span>
+
                                           </div>
 
                                           <div className="lesson-row-right">
+
                                             {active &&
                                               !completed && (
+
                                                 <button
                                                   className="btn-inline-complete"
                                                   disabled={
@@ -1507,27 +1723,40 @@ const StudentsCourseDetails = () => {
                                                   onClick={(
                                                     e
                                                   ) => {
+
                                                     e.stopPropagation();
+
                                                     markComplete();
+
                                                   }}
                                                 >
+
                                                   {isCompletingLesson
                                                     ? "Saving..."
                                                     : "Complete ✓"}
+
                                                 </button>
+
                                               )}
+
                                           </div>
+
                                         </div>
+
                                       );
                                     }
                                   )}
 
                                   {quiz && (
+
                                     <div className="panel-quiz-card-row">
+
                                       <div className="quiz-row-left">
+
                                         <FiAward className="quiz-award-icon" />
 
                                         <div>
+
                                           <h4>
                                             {
                                               quiz.title
@@ -1535,9 +1764,11 @@ const StudentsCourseDetails = () => {
                                           </h4>
 
                                           <p>
+
                                             {hasTakenQuiz(
                                               quiz._id
                                             ) ? (
+
                                               <span
                                                 style={{
                                                   fontWeight:
@@ -1550,6 +1781,7 @@ const StudentsCourseDetails = () => {
                                                       : "#ef4444"
                                                 }}
                                               >
+
                                                 {hasPassedQuiz(
                                                   quiz._id
                                                 )
@@ -1564,15 +1796,21 @@ const StudentsCourseDetails = () => {
                                                   ` • Your Score: ${
                                                     getQuizRecord(
                                                       quiz._id
-                                                    )
-                                                      .score
+                                                    ).score
                                                   }%`}
+
                                               </span>
+
                                             ) : (
+
                                               "Evaluation Module Test"
+
                                             )}
+
                                           </p>
+
                                         </div>
+
                                       </div>
 
                                       <Link
@@ -1585,61 +1823,93 @@ const StudentsCourseDetails = () => {
                                             : ""
                                         }`}
                                       >
+
                                         {hasTakenQuiz(
                                           quiz._id
                                         )
                                           ? "Retake Quiz"
                                           : "Take Quiz"}
+
                                       </Link>
+
                                     </div>
+
                                   )}
+
                                 </div>
+
                               </motion.div>
+
                             )}
+
                         </AnimatePresence>
+
                       </div>
+
                     );
                   }
                 )}
+
               </div>
+
             </div>
+
           </main>
 
           <aside className="sidebar-sticky-flow">
+
             <div className="checkout-widget-card">
+
               {isEnrolled ? (
+
                 <div className="enrolled-status-banner">
+
                   <span className="enrolled-badge-dot"></span>
+
                   <strong>
                     Paid & Enrolled
                   </strong>
+
                 </div>
+
               ) : (
+
                 <>
+
                   <div className="pricing-header-row">
+
                     <span className="current-price-tag">
+
                       {formatPrice(
                         course?.price
                       )}
+
                     </span>
 
                     <span className="old-strike-price">
+
                       {formatPrice(
                         (course?.price ||
                           0) * 1.8
                       )}
+
                     </span>
+
                   </div>
 
                   <p className="scarcity-urgency-text">
                     ⏱ Limited time left at
                     this price tier
                   </p>
+
                 </>
+
               )}
 
               <div className="action-buttons-stack">
+
                 {!isEnrolled && (
+
                   <button
                     className="btn-primary-action-buy"
                     onClick={handleEnroll}
@@ -1647,11 +1917,15 @@ const StudentsCourseDetails = () => {
                       isProcessingPayment
                     }
                   >
+
                     {isProcessingPayment
                       ? "Connecting..."
                       : "Enroll Now"}
+
                   </button>
+
                 )}
+
               </div>
 
               <span className="guarantee-footer-text">
@@ -1661,21 +1935,23 @@ const StudentsCourseDetails = () => {
               <hr className="divider-line" />
 
               <div className="course-includes-perks-list">
+
                 <h4>
                   Course Includes:
                 </h4>
 
                 <ul>
+
                   <li>
-                    <FiVideo /> 12 hours
-                    on-demand video
-                    streaming
+                    <FiVideo />{" "}
+                    {course?.duration
+                      ? `${course.duration} course duration`
+                      : "Course duration available"}
                   </li>
 
                   <li>
                     <FiFileText />{" "}
-                    {totalLessons} dynamic
-                    class assets
+                    {totalLessons} course lessons
                   </li>
 
                   <li>
@@ -1693,16 +1969,20 @@ const StudentsCourseDetails = () => {
                     certificate of
                     completion
                   </li>
+
                 </ul>
 
                 {certStatus.isEligible && (
+
                   <div className="certificate-sidebar-claim-zone">
+
                     <h5>
                       <FaGraduationCap />{" "}
                       Course Completed!
                     </h5>
 
                     {certStatus.isPaid ? (
+
                       <Link
                         to={`/student/certificate/view/${courseId}`}
                         className="btn-certificate-action view-btn"
@@ -1710,7 +1990,9 @@ const StudentsCourseDetails = () => {
                         <FiAward /> View
                         Your Certificate
                       </Link>
+
                     ) : (
+
                       <button
                         className="btn-certificate-action checkout-btn"
                         onClick={
@@ -1720,35 +2002,54 @@ const StudentsCourseDetails = () => {
                           loadingCert
                         }
                       >
+
                         <FiCreditCard />
 
                         {loadingCert
                           ? "Processing..."
                           : "Pay for Certificate (₦5,000)"}
+
                       </button>
+
                     )}
+
                   </div>
+
                 )}
+
               </div>
+
             </div>
 
+            {/* INSTRUCTOR PROFILE */}
+
             <div className="instructor-profile-widget">
+
               <div className="instructor-avatar-circle">
-                {course.instructor?.image ? (
+
+                {course?.instructor?.image ? (
+
                   <img
                     src={
                       course.instructor.image
                     }
                     alt={instructorName}
                   />
+
                 ) : (
+
                   <div className="instructor-avatar-fallback">
+
                     {instructorInitials}
+
                   </div>
+
                 )}
+
               </div>
 
               <div className="instructor-meta-details">
+
                 <h3>
                   {instructorName}
                 </h3>
@@ -1758,25 +2059,53 @@ const StudentsCourseDetails = () => {
                 </p>
 
                 <div className="instructor-stats-inline">
-                  <span>
-                    Mentoring Partner
-                  </span>
-
-                  <span>•</span>
 
                   <span>
-                    4.9 Star Rating
+                    Instructor
                   </span>
+
+                  {instructorRating !== null && (
+
+                    <>
+
+                      <span>•</span>
+
+                      <span>
+
+                        {Number(
+                          instructorRating
+                        ).toFixed(1)} Star Rating
+
+                        {instructorRatingCount !== null
+                          ? ` (${Number(
+                              instructorRatingCount
+                            ).toLocaleString()} ratings)`
+                          : ""}
+
+                      </span>
+
+                    </>
+
+                  )}
+
                 </div>
+
               </div>
+
             </div>
+
           </aside>
+
         </div>
+
       </div>
 
       <footer className="benedex-footer-wrapper">
+
         <div className="footer-top-row">
+
           <div className="footer-brand-column">
+
             <h3>
               Benedex Digital
             </h3>
@@ -1785,9 +2114,11 @@ const StudentsCourseDetails = () => {
               © 2026 Benedex Digital Hub.
               Built for African Excellence.
             </p>
+
           </div>
 
           <div className="footer-links-column">
+
             <span>
               Privacy Policy
             </span>
@@ -1803,9 +2134,13 @@ const StudentsCourseDetails = () => {
             <span>
               Contact Support
             </span>
+
           </div>
+
         </div>
+
       </footer>
+
     </div>
   );
 };
