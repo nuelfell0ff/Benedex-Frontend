@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../services/api";
+
 import {
   FiArrowLeft,
   FiBookOpen,
@@ -24,74 +25,63 @@ import {
   FiCalendar,
   FiImage,
   FiLoader,
+  FiPlus,
+  FiTrash2,
+  FiCheck,
 } from "react-icons/fi";
+
 import "./AdminCourseReview.css";
 
 function AdminCourseReview() {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
-  const [courseData, setCourseData] =
-    useState(null);
+  const [courseData, setCourseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
-
-  const [expandedModules, setExpandedModules] =
-    useState({});
-
-  const [expandedLessons, setExpandedLessons] =
-    useState({});
+  const [expandedModules, setExpandedModules] = useState({});
+  const [expandedLessons, setExpandedLessons] = useState({});
+  const [expandedQuizzes, setExpandedQuizzes] = useState({});
 
   const [editing, setEditing] = useState({
     type: null,
     data: null,
   });
 
-  const [saving, setSaving] =
-    useState(false);
+  const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishModal, setPublishModal] = useState(false);
 
-  const [publishing, setPublishing] =
-    useState(false);
+  const [message, setMessage] = useState({
+    type: "",
+    text: "",
+  });
 
-  const [publishModal, setPublishModal] =
-    useState(false);
+  const fetchCourseStructure = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-  const [message, setMessage] =
-    useState({
-      type: "",
-      text: "",
-    });
+      const res = await API.get(
+        `/courses/admin/${courseId}/structure`
+      );
 
-  const fetchCourseStructure =
-    async () => {
-      try {
-        setLoading(true);
-        setError("");
+      setCourseData(res.data);
+    } catch (error) {
+      console.error(
+        "Course review load failure:",
+        error
+      );
 
-        const res =
-          await API.get(
-            `/courses/admin/${courseId}/structure`
-          );
-
-        setCourseData(res.data);
-      } catch (error) {
-        console.error(
-          "Course review load failure:",
-          error
-        );
-
-        setError(
-          error.response?.data?.message ||
-            "Unable to load course architecture."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+      setError(
+        error.response?.data?.message ||
+          "Unable to load course architecture."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchCourseStructure();
@@ -111,15 +101,47 @@ function AdminCourseReview() {
     }));
   };
 
+  const toggleQuiz = (quizId) => {
+    setExpandedQuizzes((prev) => ({
+      ...prev,
+      [quizId]: !prev[quizId],
+    }));
+  };
+
   const openEditor = (type, data) => {
     setMessage({
       type: "",
       text: "",
     });
 
+    let editorData = {
+      ...data,
+    };
+
+    if (type === "quiz") {
+      editorData = {
+        ...data,
+        passMark: data.passMark ?? 70,
+        description: data.description || "",
+        questions: Array.isArray(data.questions)
+          ? data.questions.map((question) => ({
+              ...question,
+              question: question.question || "",
+              correctAnswer:
+                question.correctAnswer || "",
+              options:
+                Array.isArray(question.options) &&
+                question.options.length === 4
+                  ? [...question.options]
+                  : ["", "", "", ""],
+            }))
+          : [],
+      };
+    }
+
     setEditing({
       type,
-      data: { ...data },
+      data: editorData,
     });
   };
 
@@ -132,10 +154,7 @@ function AdminCourseReview() {
     });
   };
 
-  const handleEditorChange = (
-    field,
-    value
-  ) => {
+  const handleEditorChange = (field, value) => {
     setEditing((prev) => ({
       ...prev,
       data: {
@@ -145,36 +164,143 @@ function AdminCourseReview() {
     }));
   };
 
+  const handleQuizQuestionChange = (
+    questionIndex,
+    field,
+    value
+  ) => {
+    setEditing((prev) => {
+      const questions = [
+        ...(prev.data.questions || []),
+      ];
+
+      questions[questionIndex] = {
+        ...questions[questionIndex],
+        [field]: value,
+      };
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          questions,
+        },
+      };
+    });
+  };
+
+  const handleQuizOptionChange = (
+    questionIndex,
+    optionIndex,
+    value
+  ) => {
+    setEditing((prev) => {
+      const questions = [
+        ...(prev.data.questions || []),
+      ];
+
+      const currentQuestion = {
+        ...questions[questionIndex],
+      };
+
+      const previousOption =
+        currentQuestion.options?.[optionIndex];
+
+      const options = [
+        ...(currentQuestion.options || [
+          "",
+          "",
+          "",
+          "",
+        ]),
+      ];
+
+      options[optionIndex] = value;
+
+      currentQuestion.options = options;
+
+      if (
+        currentQuestion.correctAnswer ===
+        previousOption
+      ) {
+        currentQuestion.correctAnswer = value;
+      }
+
+      questions[questionIndex] =
+        currentQuestion;
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          questions,
+        },
+      };
+    });
+  };
+
+  const addQuizQuestion = () => {
+    setEditing((prev) => ({
+      ...prev,
+      data: {
+        ...prev.data,
+        questions: [
+          ...(prev.data.questions || []),
+          {
+            question: "",
+            options: ["", "", "", ""],
+            correctAnswer: "",
+          },
+        ],
+      },
+    }));
+  };
+
+  const removeQuizQuestion = (questionIndex) => {
+    setEditing((prev) => {
+      const questions = [
+        ...(prev.data.questions || []),
+      ];
+
+      if (questions.length <= 1) {
+        return prev;
+      }
+
+      questions.splice(questionIndex, 1);
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          questions,
+        },
+      };
+    });
+  };
+
   const saveCourse = async () => {
     try {
       setSaving(true);
 
-      const course =
-        editing.data;
+      const course = editing.data;
 
-      const res =
-        await API.put(
-          `/courses/admin/${courseId}`,
-          {
-            title: course.title,
-            description:
-              course.description,
-            price: Number(course.price),
-            duration:
-              course.duration,
-            tools:
-              typeof course.tools ===
-              "string"
-                ? course.tools
-                    .split(",")
-                    .map((tool) =>
-                      tool.trim()
-                    )
-                    .filter(Boolean)
-                : course.tools,
-            image: course.image,
-          }
-        );
+      const res = await API.put(
+        `/courses/admin/${courseId}`,
+        {
+          title: course.title,
+          description: course.description,
+          price: Number(course.price),
+          duration: course.duration,
+          tools:
+            typeof course.tools === "string"
+              ? course.tools
+                  .split(",")
+                  .map((tool) => tool.trim())
+                  .filter(Boolean)
+              : course.tools,
+          image: course.image,
+        }
+      );
 
       setCourseData((prev) => ({
         ...prev,
@@ -208,33 +334,28 @@ function AdminCourseReview() {
     try {
       setSaving(true);
 
-      const module =
-        editing.data;
+      const module = editing.data;
 
-      const res =
-        await API.put(
-          `/modules/admin/${module._id}`,
-          {
-            title: module.title,
-            description:
-              module.description,
-            month: Number(module.month),
-            order: Number(module.order),
-          }
-        );
+      const res = await API.put(
+        `/modules/admin/${module._id}`,
+        {
+          title: module.title,
+          description: module.description,
+          month: Number(module.month),
+          order: Number(module.order),
+        }
+      );
 
       setCourseData((prev) => ({
         ...prev,
-        modules:
-          prev.modules.map(
-            (item) =>
-              item._id === module._id
-                ? {
-                    ...item,
-                    ...res.data.module,
-                  }
-                : item
-          ),
+        modules: prev.modules.map((item) =>
+          item._id === module._id
+            ? {
+                ...item,
+                ...res.data.module,
+              }
+            : item
+        ),
       }));
 
       setMessage({
@@ -264,55 +385,46 @@ function AdminCourseReview() {
     try {
       setSaving(true);
 
-      const lesson =
-        editing.data;
+      const lesson = editing.data;
 
-      const res =
-        await API.put(
-          `/lessons/admin/${lesson._id}`,
-          {
-            title: lesson.title,
-            type: lesson.type,
-            content: lesson.content,
-            videoUrl:
-              lesson.videoUrl,
-            documentUrl:
-              lesson.documentUrl,
-            illustrationUrl:
-              lesson.illustrationUrl,
-            photographerName:
-              lesson.photographerName,
-            photographerUrl:
-              lesson.photographerUrl,
-            order: Number(
-              lesson.order
-            ),
-            isPreview:
-              Boolean(
-                lesson.isPreview
-              ),
-          }
-        );
+      const res = await API.put(
+        `/lessons/admin/${lesson._id}`,
+        {
+          title: lesson.title,
+          type: lesson.type,
+          content: lesson.content,
+          videoUrl: lesson.videoUrl,
+          documentUrl: lesson.documentUrl,
+          illustrationUrl:
+            lesson.illustrationUrl,
+          photographerName:
+            lesson.photographerName,
+          photographerUrl:
+            lesson.photographerUrl,
+          order: Number(lesson.order),
+          isPreview: Boolean(
+            lesson.isPreview
+          ),
+        }
+      );
 
       setCourseData((prev) => ({
         ...prev,
-        modules:
-          prev.modules.map(
-            (module) => ({
-              ...module,
-              lessons:
-                module.lessons?.map(
-                  (item) =>
-                    item._id ===
-                    lesson._id
-                      ? {
-                          ...item,
-                          ...res.data.lesson,
-                        }
-                      : item
-                ),
-            })
-          ),
+        modules: prev.modules.map(
+          (module) => ({
+            ...module,
+            lessons:
+              module.lessons?.map(
+                (item) =>
+                  item._id === lesson._id
+                    ? {
+                        ...item,
+                        ...res.data.lesson,
+                      }
+                    : item
+              ),
+          })
+        ),
       }));
 
       setMessage({
@@ -338,6 +450,216 @@ function AdminCourseReview() {
     }
   };
 
+  const saveQuiz = async () => {
+    try {
+      setSaving(true);
+
+      const quiz = editing.data;
+
+      if (
+        !quiz.title ||
+        !quiz.title.trim()
+      ) {
+        setMessage({
+          type: "error",
+          text: "Quiz title is required.",
+        });
+
+        setSaving(false);
+        return;
+      }
+
+      if (
+        !Array.isArray(quiz.questions) ||
+        quiz.questions.length === 0
+      ) {
+        setMessage({
+          type: "error",
+          text:
+            "The quiz must contain at least one question.",
+        });
+
+        setSaving(false);
+        return;
+      }
+
+      const cleanedQuestions = [];
+
+      for (
+        let index = 0;
+        index < quiz.questions.length;
+        index++
+      ) {
+        const question =
+          quiz.questions[index];
+
+        if (
+          !question.question ||
+          !question.question.trim()
+        ) {
+          setMessage({
+            type: "error",
+            text: `Question ${
+              index + 1
+            } cannot be empty.`,
+          });
+
+          setSaving(false);
+          return;
+        }
+
+        if (
+          !Array.isArray(
+            question.options
+          ) ||
+          question.options.length !== 4
+        ) {
+          setMessage({
+            type: "error",
+            text: `Question ${
+              index + 1
+            } must have exactly 4 options.`,
+          });
+
+          setSaving(false);
+          return;
+        }
+
+        const cleanedOptions =
+          question.options.map(
+            (option) =>
+              String(option).trim()
+          );
+
+        if (
+          cleanedOptions.some(
+            (option) => !option
+          )
+        ) {
+          setMessage({
+            type: "error",
+            text: `All options for question ${
+              index + 1
+            } must be filled.`,
+          });
+
+          setSaving(false);
+          return;
+        }
+
+        if (
+          new Set(cleanedOptions).size !==
+          4
+        ) {
+          setMessage({
+            type: "error",
+            text: `Question ${
+              index + 1
+            } must have four different options.`,
+          });
+
+          setSaving(false);
+          return;
+        }
+
+        const correctAnswer =
+          String(
+            question.correctAnswer || ""
+          ).trim();
+
+        if (
+          !correctAnswer ||
+          !cleanedOptions.includes(
+            correctAnswer
+          )
+        ) {
+          setMessage({
+            type: "error",
+            text: `Select a correct answer for question ${
+              index + 1
+            }.`,
+          });
+
+          setSaving(false);
+          return;
+        }
+
+        cleanedQuestions.push({
+          question:
+            question.question.trim(),
+          options: cleanedOptions,
+          correctAnswer,
+        });
+      }
+
+      const passMark = Number(
+        quiz.passMark
+      );
+
+      if (
+        Number.isNaN(passMark) ||
+        passMark < 0 ||
+        passMark > 100
+      ) {
+        setMessage({
+          type: "error",
+          text:
+            "Pass mark must be between 0 and 100.",
+        });
+
+        setSaving(false);
+        return;
+      }
+
+      const payload = {
+        title: quiz.title.trim(),
+        description:
+          quiz.description || "",
+        passMark,
+        questions: cleanedQuestions,
+      };
+
+      const res = await API.put(
+        `/quizzes/admin/${quiz._id}`,
+        payload
+      );
+
+      setCourseData((prev) => ({
+        ...prev,
+        modules: prev.modules.map(
+          (module) =>
+            module.quiz?._id === quiz._id
+              ? {
+                  ...module,
+                  quiz: res.data.quiz,
+                }
+              : module
+        ),
+      }));
+
+      setMessage({
+        type: "success",
+        text: "Quiz updated successfully.",
+      });
+
+      closeEditor();
+    } catch (error) {
+      console.error(
+        "Quiz update failure:",
+        error
+      );
+
+      setMessage({
+        type: "error",
+        text:
+          error.response?.data?.message ||
+          "Failed to save quiz.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!editing.data) return;
 
@@ -353,6 +675,11 @@ function AdminCourseReview() {
 
     if (editing.type === "lesson") {
       await saveLesson();
+      return;
+    }
+
+    if (editing.type === "quiz") {
+      await saveQuiz();
     }
   };
 
@@ -360,10 +687,9 @@ function AdminCourseReview() {
     try {
       setPublishing(true);
 
-      const res =
-        await API.patch(
-          `/courses/admin/${courseId}/publish`
-        );
+      const res = await API.patch(
+        `/courses/admin/${courseId}/publish`
+      );
 
       setCourseData((prev) => ({
         ...prev,
@@ -428,7 +754,9 @@ function AdminCourseReview() {
           <button
             className="acr-back-btn"
             onClick={() =>
-              navigate("/admin/courses")
+              navigate(
+                "/admin/courses"
+              )
             }
           >
             <FiArrowLeft />
@@ -455,6 +783,21 @@ function AdminCourseReview() {
       0
     );
 
+  const quizCount =
+    modules.filter(
+      (module) =>
+        Boolean(module.quiz)
+    ).length;
+
+  const questionCount =
+    modules.reduce(
+      (total, module) =>
+        total +
+        (module.quiz?.questions
+          ?.length || 0),
+      0
+    );
+
   return (
     <div className="acr-workspace">
       <div className="acr-container">
@@ -462,7 +805,9 @@ function AdminCourseReview() {
           <button
             className="acr-back-link"
             onClick={() =>
-              navigate("/admin/courses")
+              navigate(
+                "/admin/courses"
+              )
             }
           >
             <FiArrowLeft />
@@ -493,8 +838,7 @@ function AdminCourseReview() {
         {message.text && (
           <motion.div
             className={`acr-alert ${
-              message.type ===
-              "error"
+              message.type === "error"
                 ? "acr-alert-error"
                 : "acr-alert-success"
             }`}
@@ -591,8 +935,7 @@ function AdminCourseReview() {
                       ? course.tools.join(
                           ", "
                         )
-                      : course.tools ||
-                        "",
+                      : course.tools || "",
                 }
               )
             }
@@ -631,6 +974,22 @@ function AdminCourseReview() {
 
               <strong>
                 {lessonCount}
+              </strong>
+            </div>
+          </div>
+
+          <div className="acr-stat-card">
+            <div className="acr-stat-icon">
+              <FiHelpCircle />
+            </div>
+
+            <div>
+              <span>
+                Quizzes
+              </span>
+
+              <strong>
+                {quizCount}
               </strong>
             </div>
           </div>
@@ -687,16 +1046,14 @@ function AdminCourseReview() {
 
               <span className="acr-module-count">
                 {modules.length}{" "}
-                {modules.length ===
-                1
+                {modules.length === 1
                   ? "Module"
                   : "Modules"}
               </span>
             </div>
 
             <div className="acr-module-list">
-              {modules.length ===
-              0 ? (
+              {modules.length === 0 ? (
                 <div className="acr-empty-state">
                   <FiLayers
                     size={32}
@@ -726,6 +1083,17 @@ function AdminCourseReview() {
                     const lessons =
                       module.lessons ||
                       [];
+
+                    const quiz =
+                      module.quiz ||
+                      null;
+
+                    const quizOpen =
+                      quiz
+                        ? expandedQuizzes[
+                            quiz._id
+                          ]
+                        : false;
 
                     return (
                       <motion.div
@@ -766,12 +1134,25 @@ function AdminCourseReview() {
                               </span>
 
                               <span>
-                                {lessons.length}{" "}
+                                {
+                                  lessons.length
+                                }{" "}
                                 {lessons.length ===
                                 1
                                   ? "Lesson"
                                   : "Lessons"}
                               </span>
+
+                              {quiz && (
+                                <span>
+                                  <FiHelpCircle
+                                    size={
+                                      13
+                                    }
+                                  />
+                                  Quiz
+                                </span>
+                              )}
                             </div>
 
                             <h3>
@@ -1088,39 +1469,267 @@ function AdminCourseReview() {
                                 )}
                               </div>
 
-                              <div className="acr-quiz-section">
-                                <div className="acr-quiz-icon">
-                                  <FiHelpCircle />
+                              <div
+                                className={`acr-quiz-section ${
+                                  quizOpen
+                                    ? "acr-quiz-section-open"
+                                    : ""
+                                }`}
+                              >
+                                <div
+                                  className="acr-quiz-header"
+                                  onClick={() =>
+                                    quiz &&
+                                    toggleQuiz(
+                                      quiz._id
+                                    )
+                                  }
+                                >
+                                  <div className="acr-quiz-icon">
+                                    <FiHelpCircle />
+                                  </div>
+
+                                  <div className="acr-quiz-info">
+                                    <span>
+                                      Module Assessment
+                                    </span>
+
+                                    <strong>
+                                      {quiz
+                                        ? quiz.title
+                                        : "No quiz generated"}
+                                    </strong>
+
+                                    {quiz && (
+                                      <div className="acr-quiz-meta">
+                                        <span>
+                                          {
+                                            quiz
+                                              .questions
+                                              ?.length ||
+                                            0
+                                          }{" "}
+                                          Questions
+                                        </span>
+
+                                        <span>
+                                          Pass Mark:{" "}
+                                          {quiz.passMark ??
+                                            70}
+                                          %
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {quiz && (
+                                    <div className="acr-quiz-actions">
+                                      <button
+                                        className="acr-icon-btn"
+                                        title="Edit quiz"
+                                        onClick={(
+                                          e
+                                        ) => {
+                                          e.stopPropagation();
+
+                                          openEditor(
+                                            "quiz",
+                                            quiz
+                                          );
+                                        }}
+                                      >
+                                        <FiEdit3 />
+                                      </button>
+
+                                      <button
+                                        className="acr-chevron-btn"
+                                        onClick={(
+                                          e
+                                        ) => {
+                                          e.stopPropagation();
+
+                                          toggleQuiz(
+                                            quiz._id
+                                          );
+                                        }}
+                                      >
+                                        {quizOpen ? (
+                                          <FiChevronDown />
+                                        ) : (
+                                          <FiChevronRight />
+                                        )}
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
 
-                                <div>
-                                  <span>
-                                    Module
-                                    Assessment
-                                  </span>
+                                <AnimatePresence>
+                                  {quiz &&
+                                    quizOpen && (
+                                      <motion.div
+                                        className="acr-quiz-content"
+                                        initial={{
+                                          height: 0,
+                                          opacity: 0,
+                                        }}
+                                        animate={{
+                                          height:
+                                            "auto",
+                                          opacity: 1,
+                                        }}
+                                        exit={{
+                                          height: 0,
+                                          opacity: 0,
+                                        }}
+                                      >
+                                        {quiz.description && (
+                                          <div className="acr-quiz-description">
+                                            <span>
+                                              Assessment
+                                              Overview
+                                            </span>
 
-                                  <strong>
-                                    {module.quiz
-                                      ? module
-                                          .quiz
-                                          .title
-                                      : "Quiz review will appear here"}
-                                  </strong>
-                                </div>
+                                            <p>
+                                              {
+                                                quiz.description
+                                              }
+                                            </p>
+                                          </div>
+                                        )}
 
-                                {module.quiz && (
-                                  <button
-                                    className="acr-icon-btn"
-                                    onClick={() =>
-                                      openEditor(
-                                        "quiz",
-                                        module.quiz
-                                      )
-                                    }
-                                  >
-                                    <FiEdit3 />
-                                  </button>
-                                )}
+                                        <div className="acr-quiz-overview">
+                                          <div>
+                                            <span>
+                                              Questions
+                                            </span>
+
+                                            <strong>
+                                              {quiz
+                                                .questions
+                                                ?.length ||
+                                                0}
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <span>
+                                              Pass Mark
+                                            </span>
+
+                                            <strong>
+                                              {quiz.passMark ??
+                                                70}
+                                              %
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <span>
+                                              Type
+                                            </span>
+
+                                            <strong>
+                                              Multiple Choice
+                                            </strong>
+                                          </div>
+                                        </div>
+
+                                        <div className="acr-quiz-question-list">
+                                          {quiz.questions?.map(
+                                            (
+                                              question,
+                                              questionIndex
+                                            ) => (
+                                              <div
+                                                className="acr-quiz-question"
+                                                key={
+                                                  question._id ||
+                                                  questionIndex
+                                                }
+                                              >
+                                                <div className="acr-quiz-question-header">
+                                                  <span>
+                                                    Question{" "}
+                                                    {questionIndex +
+                                                      1}
+                                                  </span>
+
+                                                  <span>
+                                                    <FiCheckCircle />
+                                                    Correct
+                                                    answer
+                                                    highlighted
+                                                  </span>
+                                                </div>
+
+                                                <h4>
+                                                  {
+                                                    question.question
+                                                  }
+                                                </h4>
+
+                                                <div className="acr-quiz-options">
+                                                  {question.options?.map(
+                                                    (
+                                                      option,
+                                                      optionIndex
+                                                    ) => {
+                                                      const isCorrect =
+                                                        option ===
+                                                        question.correctAnswer;
+
+                                                      return (
+                                                        <div
+                                                          className={`acr-quiz-option ${
+                                                            isCorrect
+                                                              ? "acr-quiz-option-correct"
+                                                              : ""
+                                                          }`}
+                                                          key={
+                                                            optionIndex
+                                                          }
+                                                        >
+                                                          <span className="acr-quiz-option-letter">
+                                                            {String.fromCharCode(
+                                                              65 +
+                                                                optionIndex
+                                                            )}
+                                                          </span>
+
+                                                          <span className="acr-quiz-option-text">
+                                                            {
+                                                              option
+                                                            }
+                                                          </span>
+
+                                                          {isCorrect && (
+                                                            <FiCheck />
+                                                          )}
+                                                        </div>
+                                                      );
+                                                    }
+                                                  )}
+                                                </div>
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+
+                                        <button
+                                          className="acr-quiz-edit-full-btn"
+                                          onClick={() =>
+                                            openEditor(
+                                              "quiz",
+                                              quiz
+                                            )
+                                          }
+                                        >
+                                          <FiEdit3 />
+                                          Edit Assessment
+                                        </button>
+                                      </motion.div>
+                                    )}
+                                </AnimatePresence>
                               </div>
                             </motion.div>
                           )}
@@ -1181,8 +1790,7 @@ function AdminCourseReview() {
                   <strong>
                     ₦
                     {Number(
-                      course.price ||
-                        0
+                      course.price || 0
                     ).toLocaleString()}
                   </strong>
                 </div>
@@ -1206,6 +1814,26 @@ function AdminCourseReview() {
                     {lessonCount}
                   </strong>
                 </div>
+
+                <div className="acr-detail-item">
+                  <span>
+                    Quizzes
+                  </span>
+
+                  <strong>
+                    {quizCount}
+                  </strong>
+                </div>
+
+                <div className="acr-detail-item">
+                  <span>
+                    Questions
+                  </span>
+
+                  <strong>
+                    {questionCount}
+                  </strong>
+                </div>
               </div>
 
               {course.tools?.length >
@@ -1217,7 +1845,10 @@ function AdminCourseReview() {
 
                   <div className="acr-tools">
                     {course.tools.map(
-                      (tool, index) => (
+                      (
+                        tool,
+                        index
+                      ) => (
                         <span
                           key={index}
                         >
@@ -1284,7 +1915,11 @@ function AdminCourseReview() {
         {editing.type && (
           <div className="acr-modal-overlay">
             <motion.div
-              className="acr-editor-modal"
+              className={`acr-editor-modal ${
+                editing.type === "quiz"
+                  ? "acr-quiz-editor-modal"
+                  : ""
+              }`}
               initial={{
                 opacity: 0,
                 y: 20,
@@ -1304,7 +1939,10 @@ function AdminCourseReview() {
               <div className="acr-modal-header">
                 <div>
                   <span>
-                    Content Editor
+                    {editing.type ===
+                    "quiz"
+                      ? "Assessment Editor"
+                      : "Content Editor"}
                   </span>
 
                   <h3>
@@ -1322,7 +1960,7 @@ function AdminCourseReview() {
 
                     {editing.type ===
                       "quiz" &&
-                      "Edit Quiz"}
+                      "Edit Module Assessment"}
                   </h3>
                 </div>
 
@@ -1398,8 +2036,7 @@ function AdminCourseReview() {
                         min="0"
                         value={
                           editing.data
-                            ?.price ??
-                          ""
+                            ?.price ?? ""
                         }
                         onChange={(
                           e
@@ -1439,7 +2076,8 @@ function AdminCourseReview() {
 
                     <div className="acr-form-group acr-full-width">
                       <label>
-                        Tools & Technologies
+                        Tools &
+                        Technologies
                       </label>
 
                       <input
@@ -1812,22 +2450,340 @@ function AdminCourseReview() {
 
                 {editing.type ===
                   "quiz" && (
-                  <div className="acr-quiz-editor-placeholder">
-                    <FiHelpCircle
-                      size={35}
-                    />
+                  <div className="acr-quiz-editor">
+                    <div className="acr-quiz-editor-intro">
+                      <div className="acr-quiz-editor-intro-icon">
+                        <FiHelpCircle />
+                      </div>
 
-                    <h4>
-                      Quiz Editor
-                    </h4>
+                      <div>
+                        <span>
+                          Module Assessment
+                        </span>
 
-                    <p>
-                      The quiz editor is
-                      ready to be connected
-                      once the admin course
-                      structure includes
-                      the module quiz data.
-                    </p>
+                        <h4>
+                          Build and review
+                          your assessment
+                        </h4>
+
+                        <p>
+                          Edit the questions,
+                          answer choices and
+                          passing requirement
+                          before publishing the
+                          course.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="acr-quiz-settings">
+                      <div className="acr-quiz-setting-main">
+                        <div className="acr-form-group">
+                          <label>
+                            Assessment Title
+                          </label>
+
+                          <input
+                            type="text"
+                            value={
+                              editing.data
+                                ?.title ||
+                              ""
+                            }
+                            onChange={(
+                              e
+                            ) =>
+                              handleEditorChange(
+                                "title",
+                                e.target
+                                  .value
+                              )
+                            }
+                          />
+                        </div>
+
+                        <div className="acr-form-group">
+                          <label>
+                            Description
+                          </label>
+
+                          <textarea
+                            rows="4"
+                            value={
+                              editing.data
+                                ?.description ||
+                              ""
+                            }
+                            onChange={(
+                              e
+                            ) =>
+                              handleEditorChange(
+                                "description",
+                                e.target
+                                  .value
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="acr-quiz-passmark-card">
+                        <span>
+                          Passing Score
+                        </span>
+
+                        <div>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={
+                              editing.data
+                                ?.passMark ??
+                              70
+                            }
+                            onChange={(
+                              e
+                            ) =>
+                              handleEditorChange(
+                                "passMark",
+                                e.target
+                                  .value
+                              )
+                            }
+                          />
+
+                          <strong>
+                            %
+                          </strong>
+                        </div>
+
+                        <small>
+                          Students must reach
+                          this percentage to
+                          pass.
+                        </small>
+                      </div>
+                    </div>
+
+                    <div className="acr-quiz-questions-header">
+                      <div>
+                        <span>
+                          Assessment Questions
+                        </span>
+
+                        <strong>
+                          {editing.data
+                            ?.questions
+                            ?.length || 0}{" "}
+                          Questions
+                        </strong>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={
+                          addQuizQuestion
+                        }
+                      >
+                        <FiPlus />
+                        Add Question
+                      </button>
+                    </div>
+
+                    <div className="acr-editor-question-list">
+                      {editing.data?.questions?.map(
+                        (
+                          question,
+                          questionIndex
+                        ) => (
+                          <div
+                            className="acr-editor-question"
+                            key={
+                              question._id ||
+                              questionIndex
+                            }
+                          >
+                            <div className="acr-editor-question-top">
+                              <div className="acr-editor-question-number">
+                                {String(
+                                  questionIndex +
+                                    1
+                                ).padStart(
+                                  2,
+                                  "0"
+                                )}
+                              </div>
+
+                              <div className="acr-editor-question-heading">
+                                <span>
+                                  Question{" "}
+                                  {questionIndex +
+                                    1}
+                                </span>
+
+                                <strong>
+                                  Multiple Choice
+                                </strong>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="acr-delete-question-btn"
+                                onClick={() =>
+                                  removeQuizQuestion(
+                                    questionIndex
+                                  )
+                                }
+                                disabled={
+                                  editing.data
+                                    ?.questions
+                                    ?.length <=
+                                  1
+                                }
+                                title="Remove question"
+                              >
+                                <FiTrash2 />
+                              </button>
+                            </div>
+
+                            <div className="acr-form-group acr-full-width">
+                              <label>
+                                Question
+                              </label>
+
+                              <textarea
+                                rows="3"
+                                placeholder="Enter the question..."
+                                value={
+                                  question.question ||
+                                  ""
+                                }
+                                onChange={(
+                                  e
+                                ) =>
+                                  handleQuizQuestionChange(
+                                    questionIndex,
+                                    "question",
+                                    e.target
+                                      .value
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div className="acr-options-editor">
+                              <div className="acr-options-editor-heading">
+                                <div>
+                                  <span>
+                                    Answer Options
+                                  </span>
+
+                                  <small>
+                                    Select the
+                                    correct answer
+                                  </small>
+                                </div>
+                              </div>
+
+                              <div className="acr-option-editor-list">
+                                {question.options?.map(
+                                  (
+                                    option,
+                                    optionIndex
+                                  ) => {
+                                    const isCorrect =
+                                      question.correctAnswer ===
+                                      option;
+
+                                    return (
+                                      <div
+                                        className={`acr-option-editor ${
+                                          isCorrect
+                                            ? "acr-option-editor-correct"
+                                            : ""
+                                        }`}
+                                        key={
+                                          optionIndex
+                                        }
+                                      >
+                                        <div className="acr-option-editor-letter">
+                                          {String.fromCharCode(
+                                            65 +
+                                              optionIndex
+                                          )}
+                                        </div>
+
+                                        <input
+                                          type="text"
+                                          placeholder={`Option ${String.fromCharCode(
+                                            65 +
+                                              optionIndex
+                                          )}`}
+                                          value={
+                                            option
+                                          }
+                                          onChange={(
+                                            e
+                                          ) =>
+                                            handleQuizOptionChange(
+                                              questionIndex,
+                                              optionIndex,
+                                              e
+                                                .target
+                                                .value
+                                            )
+                                          }
+                                        />
+
+                                        <button
+                                          type="button"
+                                          className={`acr-mark-correct-btn ${
+                                            isCorrect
+                                              ? "acr-mark-correct-active"
+                                              : ""
+                                          }`}
+                                          onClick={() =>
+                                            handleQuizQuestionChange(
+                                              questionIndex,
+                                              "correctAnswer",
+                                              option
+                                            )
+                                          }
+                                          disabled={
+                                            !option.trim()
+                                          }
+                                        >
+                                          {isCorrect ? (
+                                            <>
+                                              <FiCheck />
+                                              Correct
+                                            </>
+                                          ) : (
+                                            "Mark correct"
+                                          )}
+                                        </button>
+                                      </div>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="acr-add-question-btn"
+                      onClick={
+                        addQuizQuestion
+                      }
+                    >
+                      <FiPlus />
+                      Add Another Question
+                    </button>
                   </div>
                 )}
               </div>
@@ -1933,6 +2889,16 @@ function AdminCourseReview() {
                     {lessonCount}
                   </strong>
                 </div>
+
+                <div>
+                  <span>
+                    Quizzes
+                  </span>
+
+                  <strong>
+                    {quizCount}
+                  </strong>
+                </div>
               </div>
 
               <div className="acr-publish-modal-actions">
@@ -1943,7 +2909,9 @@ function AdminCourseReview() {
                       false
                     )
                   }
-                  disabled={publishing}
+                  disabled={
+                    publishing
+                  }
                 >
                   Cancel
                 </button>
@@ -1953,7 +2921,9 @@ function AdminCourseReview() {
                   onClick={
                     handlePublish
                   }
-                  disabled={publishing}
+                  disabled={
+                    publishing
+                  }
                 >
                   {publishing ? (
                     <>

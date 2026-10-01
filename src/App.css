@@ -2298,10 +2298,14 @@ input {
   animation: loginSpin 0.8s linear infinite;
 }
 
-.bx-nav-logo,
-.bx-nav-logo2 {
+.bx-nav-logo {
   width: 110px;
   margin: 0 !important;
+}
+
+.bx-nav-logo2 {
+  width: 40px !important;
+  margin: 10px !important;
 }
 
 .bx-nav-logo-box {

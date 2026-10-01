@@ -12,7 +12,7 @@ function Sidebar({ links }) {
     <aside className="student-sidebar">
       <Link to="/" className="bx-nav-brand-group">
         <img src={Logo} alt="" className="bx-nav-logo d-lg-flex d-none" />
-        <img src={Logo2} alt="" className="bx-nav-logo d-lg-none d-sm-flex" />
+        <img src={Logo2} alt="" className="bx-nav-logo2 d-lg-none d-sm-flex" />
         {/* <span className="bx-nav-brand-text student-sidebar-brand-copy">Benedex</span> */}
       </Link>
 
