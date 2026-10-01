@@ -1,0 +1,766 @@
+.ait-workspace {
+  min-height: 100%;
+  padding: 30px;
+  background: #f6f8fb;
+  font-family: "Poppins", sans-serif;
+  color: #172033;
+}
+
+.ait-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.ait-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.ait-header-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ait-header-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #e8f2fb;
+  color: #07335c;
+  border: 1px solid #d7e7f5;
+}
+
+.ait-header-content {
+  min-width: 0;
+}
+
+.ait-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #2e7fc1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ait-header-content h1 {
+  margin: 0;
+  color: #052744;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ait-header-content p {
+  margin: 5px 0 0;
+  color: #5f6b7a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ait-refresh-btn {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px;
+  flex-shrink: 0;
+  border: 1px solid #07335c;
+  border-radius: 9px;
+  background: #07335c;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ait-refresh-btn:hover:not(:disabled) {
+  background: #052744;
+  border-color: #052744;
+  box-shadow: 0 5px 14px rgba(5, 39, 68, 0.16);
+  transform: translateY(-1px);
+}
+
+.ait-refresh-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.ait-spin-icon {
+  animation: ait-spin 0.9s linear infinite;
+}
+
+@keyframes ait-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   SUMMARY CARDS
+   ========================================================= */
+
+.ait-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.ait-summary-card {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 17px;
+  background: #ffffff;
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(20, 40, 60, 0.035);
+}
+
+.ait-summary-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.ait-summary-icon-blue {
+  background: #eaf3fb;
+  color: #2e7fc1;
+}
+
+.ait-summary-icon-warning {
+  background: #fff7e6;
+  color: #b45309;
+}
+
+.ait-summary-icon-success {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.ait-summary-icon-danger {
+  background: #fef0f0;
+  color: #dc2626;
+}
+
+.ait-summary-card span {
+  display: block;
+  margin-bottom: 3px;
+  color: #8993a1;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ait-summary-card strong {
+  display: block;
+  color: #172033;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.ait-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e5e9ef;
+  border-radius: 15px;
+  box-shadow: 0 5px 18px rgba(20, 40, 60, 0.045);
+}
+
+.ait-card-header {
+  min-height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #e8ecf1;
+}
+
+.ait-section-eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: #2e7fc1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ait-card-header h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ait-card-header p {
+  margin: 4px 0 0;
+  color: #8993a1;
+  font-size: 12px;
+}
+
+.ait-ticket-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  flex-shrink: 0;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #5f6b7a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.ait-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ait-table {
+  width: 100%;
+  min-width: 1150px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+.ait-table thead {
+  background: #f8fafc;
+}
+
+.ait-table th {
+  padding: 12px 16px;
+  color: #5f6b7a;
+  border-bottom: 1px solid #e5e9ef;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ait-table td {
+  padding: 15px 16px;
+  color: #334155;
+  border-bottom: 1px solid #edf0f4;
+  vertical-align: middle;
+}
+
+.ait-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.ait-table tbody tr:hover {
+  background: #fbfcfe;
+}
+
+.ait-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ait-actions-heading {
+  text-align: right;
+}
+
+/* =========================================================
+   STUDENT
+   ========================================================= */
+
+.ait-student {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.ait-student-avatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #eaf3fb;
+  color: #2e7fc1;
+}
+
+.ait-student-info {
+  min-width: 0;
+}
+
+.ait-student-info strong {
+  display: block;
+  max-width: 170px;
+  overflow: hidden;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ait-student-info span {
+  display: block;
+  max-width: 180px;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #8993a1;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   COURSE
+   ========================================================= */
+
+.ait-course-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 190px;
+}
+
+.ait-cell-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #f1f6fa;
+  color: #2e7fc1;
+}
+
+.ait-course-cell span {
+  overflow: hidden;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   PAYMENT REFERENCE
+   ========================================================= */
+
+.ait-reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 170px;
+  color: #8993a1;
+}
+
+.ait-reference code {
+  max-width: 145px;
+  overflow: hidden;
+  padding: 5px 7px;
+  border: 1px solid #e3e8ee;
+  border-radius: 6px;
+  background: #f6f8fb;
+  color: #3e536b;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+.ait-date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 125px;
+  color: #5f6b7a;
+  font-size: 11px;
+}
+
+.ait-date-cell svg {
+  flex-shrink: 0;
+  color: #8993a1;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.ait-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ait-status-pending {
+  background: #fff7e6;
+  color: #b45309;
+}
+
+.ait-status-resolved {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.ait-status-rejected {
+  background: #fef0f0;
+  color: #dc2626;
+}
+
+.ait-status-default {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* =========================================================
+   RESOLUTION
+   ========================================================= */
+
+.ait-resolution-box {
+  width: 250px;
+  margin-left: auto;
+}
+
+.ait-note-input {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid #d7dde5;
+  border-radius: 8px;
+  background: #ffffff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ait-note-input:focus-within {
+  border-color: #2e7fc1;
+  box-shadow: 0 0 0 3px rgba(46, 127, 193, 0.1);
+}
+
+.ait-note-input svg {
+  flex-shrink: 0;
+  color: #8993a1;
+}
+
+.ait-note-input input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #172033;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.ait-note-input input::placeholder {
+  color: #a1a9b4;
+}
+
+.ait-action-buttons {
+  display: flex;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.ait-action-btn {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ait-action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ait-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ait-approve-btn {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.ait-approve-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 10px rgba(21, 128, 61, 0.16);
+}
+
+.ait-reject-btn {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.ait-reject-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.16);
+}
+
+/* =========================================================
+   ADMIN NOTE
+   ========================================================= */
+
+.ait-admin-note {
+  width: 230px;
+  margin-left: auto;
+  padding: 9px 11px;
+  border: 1px solid #e5e9ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.ait-admin-note span {
+  display: block;
+  margin-bottom: 3px;
+  color: #8993a1;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ait-admin-note p {
+  margin: 0;
+  color: #5f6b7a;
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   LOADING / EMPTY STATES
+   ========================================================= */
+
+.ait-state-container {
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.ait-loading-spinner {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 13px;
+  border-radius: 12px;
+  background: #eaf3fb;
+  color: #2e7fc1;
+  animation: ait-pulse 1.4s ease-in-out infinite;
+}
+
+.ait-loading-spinner svg {
+  animation: ait-spin 0.9s linear infinite;
+}
+
+.ait-state-container h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ait-state-container p {
+  max-width: 390px;
+  margin: 5px 0 0;
+  color: #8993a1;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ait-empty-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 13px;
+  border-radius: 13px;
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+@keyframes ait-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.65;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .ait-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ait-table {
+    min-width: 1100px;
+  }
+}
+
+@media (max-width: 800px) {
+  .ait-workspace {
+    padding: 20px;
+  }
+
+  .ait-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ait-refresh-btn {
+    width: 100%;
+  }
+
+  .ait-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ait-ticket-count {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .ait-workspace {
+    padding: 14px;
+  }
+
+  .ait-header-main {
+    align-items: flex-start;
+  }
+
+  .ait-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+  }
+
+  .ait-header-content h1 {
+    font-size: 20px;
+  }
+
+  .ait-header-content p {
+    font-size: 12px;
+  }
+
+  .ait-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .ait-summary-card {
+    min-height: 72px;
+  }
+
+  .ait-card-header {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 430px) {
+  .ait-workspace {
+    padding: 10px;
+  }
+
+  .ait-header-main {
+    gap: 10px;
+  }
+
+  .ait-header-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ait-header-content h1 {
+    font-size: 18px;
+  }
+
+  .ait-card-header h2 {
+    font-size: 16px;
+  }
+}

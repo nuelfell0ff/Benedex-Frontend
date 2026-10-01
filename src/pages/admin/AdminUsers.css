@@ -313,3 +313,163 @@
 }
 
 @keyframes urSpin { to { transform: rotate(360deg); } }
+
+.bx-ur-refresh-btn {
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d7dde5;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #07335c;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bx-ur-refresh-btn:hover:not(:disabled) {
+  background: #07335c;
+  border-color: #07335c;
+  color: #ffffff;
+}
+
+.bx-ur-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bx-ur-refresh-btn svg {
+  font-size: 14px;
+}
+
+.bx-ur-refresh-spinning {
+  animation: bx-ur-spin 0.8s linear infinite;
+}
+
+
+/* =========================
+   LOAD MORE
+========================= */
+
+.bx-ur-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 20px 28px;
+  border-top: 1px solid #e5e9ef;
+  background: #ffffff;
+}
+
+.bx-ur-load-more-btn {
+  min-width: 170px;
+  height: 42px;
+  padding: 0 20px;
+  border: 1px solid #d7dde5;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #07335c;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bx-ur-load-more-btn:hover:not(:disabled) {
+  background: #07335c;
+  border-color: #07335c;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(7, 51, 92, 0.14);
+}
+
+.bx-ur-load-more-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.bx-ur-load-more-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.bx-ur-load-more-btn svg {
+  font-size: 16px;
+}
+
+.bx-ur-load-more-spinner {
+  animation: bx-ur-spin 0.8s linear infinite;
+}
+
+
+/* =========================
+   END OF REGISTRY
+========================= */
+
+.bx-ur-end-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 20px 28px;
+  border-top: 1px solid #e5e9ef;
+  background: #ffffff;
+  color: #8993a1;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.bx-ur-end-message svg {
+  font-size: 15px;
+  color: #15803d;
+}
+
+
+/* =========================
+   SPIN ANIMATION
+========================= */
+
+@keyframes bx-ur-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+  .bx-ur-load-more-wrap {
+    padding: 20px 15px 24px;
+  }
+
+  .bx-ur-load-more-btn {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  .bx-ur-end-message {
+    padding: 20px 15px 24px;
+    line-height: 1.6;
+  }
+
+  .bx-ur-refresh-btn {
+    width: 100%;
+  }
+}
