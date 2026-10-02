@@ -53,7 +53,7 @@ function AdminNotificationForm() {
     const token = localStorage.getItem("token");
 
     const response = await axios.post(
-      "http://localhost:5000/api/notifications/admin-broadcast",
+      "https://benedex-backend.onrender.com/api/notifications/admin-broadcast",
       formData,
       {
         headers: {
