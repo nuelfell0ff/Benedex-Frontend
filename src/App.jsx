@@ -89,17 +89,11 @@ function App() {
     <AuthProvider>
       <Routes>
 
-        {/* =====================================================
-            PUBLIC ROUTES
-        ====================================================== */}
-
-        {/* Redirect old Google-indexed URL to homepage */}
         <Route
           path="/how-it-works"
           element={<Navigate to="/" replace />}
         />
 
-        {/* Homepage */}
         <Route
           path="/"
           element={<LandingPage />}
@@ -140,20 +134,10 @@ function App() {
           element={<CertificateVerification />}
         />
 
-
-        {/* =====================================================
-            OPTIONAL AUTH-BASED HOME REDIRECT
-        ====================================================== */}
-
         <Route
           path="/home"
           element={<HomeRedirect />}
         />
-
-
-        {/* =====================================================
-            STUDENT ROUTES
-        ====================================================== */}
 
         <Route
           path="/student"
@@ -217,11 +201,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-
-        {/* =====================================================
-            INSTRUCTOR ROUTES
-        ====================================================== */}
 
         <Route
           path="/instructor"
@@ -302,11 +281,6 @@ function App() {
           />
         </Route>
 
-
-        {/* =====================================================
-            ADMIN ROUTES
-        ====================================================== */}
-
         <Route
           path="/admin"
           element={
@@ -359,20 +333,17 @@ function App() {
             path="activity-logs"
             element={<AdminActivityLog />}
           />
-          <Route 
+
+          <Route
             path="syllabus-generator"
             element={<AdminSyllabusGenerator />}
           />
+
           <Route
-            path="/admin/courses/:courseId/review"
+            path="courses/:courseId/review"
             element={<AdminCourseReview />}
           />
         </Route>
-
-
-        {/* =====================================================
-            FALLBACK
-        ====================================================== */}
 
         <Route
           path="*"
