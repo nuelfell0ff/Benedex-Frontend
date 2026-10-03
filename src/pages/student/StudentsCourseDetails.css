@@ -142,7 +142,7 @@ body {
 }
 
 .student-search2 input {
-  width: 100%;
+  width: 80%;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   padding: 11px 16px 11px 46px;
@@ -162,7 +162,7 @@ body {
 .student-top-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 0px;
 }
 
 .student-icon-button {

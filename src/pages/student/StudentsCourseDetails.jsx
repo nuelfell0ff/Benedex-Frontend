@@ -1031,7 +1031,7 @@ const StudentsCourseDetails = () => {
             <img
               src={Logo2}
               alt=""
-              className="bx-nav-logo d-lg-none d-sm-flex"
+              className="bx-nav-logo2 d-lg-none d-sm-flex"
             />
           </Link>
 
@@ -1052,7 +1052,7 @@ const StudentsCourseDetails = () => {
 
         <div className="student-top-actions">
 
-          <Link
+          {/* <Link
             className="student-icon-button student-notification-button"
             to="/student/notifications"
           >
@@ -1065,7 +1065,7 @@ const StudentsCourseDetails = () => {
                   : notificationCount}
               </span>
             ) : null}
-          </Link>
+          </Link> */}
 
           <div className="student-top-actions">
 
