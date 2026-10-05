@@ -381,7 +381,7 @@ function StudentCourses() {
                   </div>
 
                   <div className={styles.statsContainer}>
-                    <span><FiUsers /> {formatStudents(studentCount)}</span>
+                    {/* <span><FiUsers /> {formatStudents(studentCount)}</span> */}
                     <span><FiClock /> {course.duration || "3 Months"}</span>
                   </div>
 
